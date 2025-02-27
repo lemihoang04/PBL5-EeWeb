@@ -1,14 +1,16 @@
 import React from 'react';
-import { Container, Navbar } from 'react-bootstrap';
 
-const Footer = () => {
+function Footer() {
     return (
-        <Navbar bg="dark" variant="dark" fixed="bottom">
-            <Container className="justify-content-center">
-                <Navbar.Text>&copy; 2023 E-Commerce. All rights reserved.</Navbar.Text>
-            </Container>
-        </Navbar>
+        <footer className="bg-dark text-white text-center py-4">
+            <div className="container">
+                <h3>TechShop</h3>
+                <p>Address: 123 Electronics Road, HCMC</p>
+                <p>Email: support@techshop.com</p>
+                <p>Hotline: +1 123 456 7890</p>
+            </div>
+        </footer>
     );
-};
+}
 
 export default Footer;

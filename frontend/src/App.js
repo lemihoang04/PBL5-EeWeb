@@ -1,14 +1,33 @@
 import React from 'react';
-import Home from './pages/Home';
-import './styles/Home.css';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Header from './components/Header';
+import Banner from './components/Banner';
+import ProductList from './components/ProductList';
+import Footer from './components/Footer';
+import Login from './components/Login';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App() {
-    return (
-        <div className="App">
-            <Home />
-        </div>
-    );
+  return (
+    <Router>
+      <div className="App">
+        <Header />
+        <Routes>
+          <Route 
+            path="/" 
+            element={
+              <>
+                <Banner />
+                <ProductList />
+              </>
+            } 
+          />
+          <Route path="/login" element={<Login />} />
+        </Routes>
+        <Footer />
+      </div>
+    </Router>
+  );
 }
 
 export default App;
