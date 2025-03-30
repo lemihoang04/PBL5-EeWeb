@@ -5,7 +5,7 @@ export const AppContext = createContext();
 
 const AppContextProvider = (props) => {
   const value = {
-    products: iphones, // Đổi từ `iphones` thành `products`
+    products: iphones,
   };
 
   return (
