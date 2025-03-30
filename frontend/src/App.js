@@ -13,25 +13,24 @@ function App() {
   return (
     <AppContextProvider>
       <Router>
-      <div className="App">
-        <Header />
-        <Routes>
-          <Route 
-            path="/" 
-            element={
-              <>
-                <Banner />
-                <ProductList />
-              </>
-            } 
-          />
-          <Route path="/login" element={<Login />} />
-          <Route path="/product-info" element={<ProductInfo />} />
-          <Route path="/product-info/:productId" element={<ProductInfo />} />
-        </Routes>
-        <Footer />
-      </div>
-    </Router>
+        <div className="App">
+          <Header />
+          <Routes>
+            <Route 
+              path="/" 
+              element={
+                <>
+                  <Banner />
+                  <ProductList />
+                </>
+              } 
+            />
+            <Route path="/login" element={<Login />} />
+            <Route path="/product-info/:productId" element={<ProductInfo />} />
+          </Routes>
+          <Footer />
+        </div>
+      </Router>
     </AppContextProvider>
   );
 }
