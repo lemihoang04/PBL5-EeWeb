@@ -5,11 +5,14 @@ import Banner from './components/Banner';
 import ProductList from './components/ProductList';
 import Footer from './components/Footer';
 import Login from './components/Login';
+import ProductInfo from './pages/ProductInfo';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import AppContextProvider from './context/AppContext';
 
 function App() {
   return (
-    <Router>
+    <AppContextProvider>
+      <Router>
       <div className="App">
         <Header />
         <Routes>
@@ -23,10 +26,13 @@ function App() {
             } 
           />
           <Route path="/login" element={<Login />} />
+          <Route path="/product-info" element={<ProductInfo />} />
+          <Route path="/product-info/:productId" element={<ProductInfo />} />
         </Routes>
         <Footer />
       </div>
     </Router>
+    </AppContextProvider>
   );
 }
 
