@@ -3,6 +3,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "./Admin.css"; // Import your CSS file for custom styles
 import Sidebar from "./Sidebar/Sidebar.jsx"; // Adjust the import path as necessary
+import Dashboard from "./Dashboard/Dashboard.jsx";
 
 const Admin = () => {
     const [activeTab, setActiveTab] = useState("Dashboard");
@@ -15,7 +16,7 @@ const Admin = () => {
     const renderContent = () => {
         switch (activeTab) {
             case "Dashboard":
-                return <h2>Dashboard Content</h2>;
+                return <Dashboard />;
             case "Category":
                 return <h2>Category Management</h2>;
             case "Order":
@@ -28,10 +29,14 @@ const Admin = () => {
     };
 
     return (
-        <div style={{ display: "flex" }}>
+        <div className="admin-container">
             <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} collapsed={collapsed} toggleSidebar={toggleSidebar} />
-            <div className="content-area">{renderContent()}</div>
+            <div className={`content-area p-2 ${collapsed ? "expanded" : ""}`}>
+                {renderContent()}
+            </div>
         </div>
+
+
     );
 };
 

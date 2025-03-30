@@ -12,24 +12,7 @@ import AppContextProvider from './context/AppContext';
 
 function App() {
   return (
-    <Router>
-      <div className="App">
-        <Header />
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <>
-                <Banner />
-                <ProductList />
-              </>
-            }
-          />
-          <Route path="/login" element={<Login />} />
-        </Routes>
-        <Footer />
-      </div>
-    </Router>
+    <ClientRoute />
   );
 }
 

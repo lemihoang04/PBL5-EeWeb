@@ -9,10 +9,10 @@ import Admin from "../pages/Admin/Admin";
 const ClientRoute = () => {
     return (
         <Router>
-
             <Routes>
                 <Route path="/home" element={<Home />} />
                 <Route path="/admin" element={<Admin />} />
+                <Route path="/" element={<Home />} /> {/* Add a route for the home page */}
             </Routes>
         </Router>
     );

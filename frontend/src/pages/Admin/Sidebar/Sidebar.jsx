@@ -1,7 +1,7 @@
 import React from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
-
+import adminLogo from "../assets/images/admin-icon.svg";
 
 const Sidebar = ({ activeTab, setActiveTab, collapsed, toggleSidebar }) => {
     const sidebarItems = [
@@ -14,7 +14,7 @@ const Sidebar = ({ activeTab, setActiveTab, collapsed, toggleSidebar }) => {
     ];
 
     return (
-        <div className={`sidebar bg-gradient p-3 ${collapsed ? 'collapsed' : ''}`}>
+        <div className={`sidebar bg-gradient p-2 ${collapsed ? 'collapsed' : ''}`}>
             <div className="d-flex justify-content-between align-items-center mb-4">
                 {!collapsed && <h4 className="mb-0 sidebar-title">EcommerceAdmin</h4>}
                 <button className="btn btn-toggle p-1" onClick={toggleSidebar}>
@@ -22,13 +22,12 @@ const Sidebar = ({ activeTab, setActiveTab, collapsed, toggleSidebar }) => {
                 </button>
             </div>
 
-            <div className="user-profile mb-4">
+            <div className="user-profile mb-3">
                 {!collapsed && (
                     <>
-                        <div className="profile-img-container mb-2">
-                            <img src="https://via.placeholder.com/50" alt="Admin" className="profile-img" />
-                        </div>
+
                         <div className="text-center">
+                            <img src={adminLogo} alt="Admin" className="profile-img" />
                             <h6 className="mb-1">Admin User</h6>
                             <p className="small text-muted mb-0">Administrator</p>
                         </div>
@@ -36,7 +35,7 @@ const Sidebar = ({ activeTab, setActiveTab, collapsed, toggleSidebar }) => {
                 )}
                 {collapsed && (
                     <div className="profile-img-container-sm mx-auto mb-3">
-                        <img src="https://via.placeholder.com/30" alt="Admin" className="profile-img" />
+                        <img src={adminLogo} alt="Admin" className="profile-img" />
                     </div>
                 )}
             </div>
