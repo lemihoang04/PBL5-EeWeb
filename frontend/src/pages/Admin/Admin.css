@@ -1,0 +1,157 @@
+.admin-container {
+    display: flex;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* Sidebar Styles */
+.sidebar {
+    width: 280px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    border-right: 1px solid #eaeaea;
+}
+
+.sidebar.collapsed {
+    width: 100px;
+}
+
+.sidebar-header {
+    border-bottom: 1px solid #eaeaea;
+}
+
+.admin-logo {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+.sidebar-menu {
+    flex: 1;
+    padding: 1rem 0;
+}
+
+.sidebar-item {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1.5rem;
+    color: #495057;
+    border-left: 4px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.sidebar-item:hover {
+    background-color: #f8f9fa;
+    color: #2196F3;
+    border-left-color: #2196F3;
+}
+
+.sidebar-item.active {
+    background-color: #e3f2fd;
+    color: #2196F3;
+    border-left-color: #2196F3;
+    font-weight: 500;
+}
+
+.sidebar-item i {
+    font-size: 1.1rem;
+    width: 20px;
+    text-align: center;
+}
+
+.sidebar-footer {
+    padding: 1rem;
+    border-top: 1px solid #eaeaea;
+}
+
+.logout-btn {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 0.75rem 1.5rem;
+    background: none;
+    border: none;
+    color: #dc3545;
+    border-radius: 0.25rem;
+    transition: all 0.3s ease;
+}
+
+.logout-btn:hover {
+    background-color: #ffebee;
+}
+
+/* Content Area Styles */
+.content-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: #f8f9fa;
+    overflow: hidden;
+}
+
+.top-navbar {
+    padding: 1rem 1.5rem;
+}
+
+.notification-bell {
+    cursor: pointer;
+}
+
+.notification-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    font-size: 0.65rem;
+    background-color: #dc3545;
+    color: white;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.user-profile {
+    cursor: pointer;
+}
+
+.main-content {
+    padding: 1.5rem;
+    overflow-y: auto;
+    height: 100%;
+}
+
+.profile-img {
+
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 80px;
+    }
+
+    .admin-info,
+    .sidebar-item span,
+    .logout-btn span {
+        display: none;
+    }
+
+    .sidebar-item,
+    .logout-btn {
+        justify-content: center;
+        padding: 0.75rem;
+    }
+
+    .sidebar-item i,
+    .logout-btn i {
+        margin: 0 !important;
+    }
+}

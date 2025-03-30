@@ -1,5 +1,6 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router } from 'react-router-dom';
+import ClientRoute from './routers/ClientRouter';
 import Header from './components/Header';
 import Banner from './components/Banner';
 import ProductList from './components/ProductList';
@@ -11,6 +12,7 @@ import AppContextProvider from './context/AppContext';
 
 function App() {
   return (
+<<<<<<< HEAD
     <AppContextProvider>
       <Router>
         <div className="App">
@@ -32,6 +34,9 @@ function App() {
         </div>
       </Router>
     </AppContextProvider>
+=======
+    <ClientRoute />
+>>>>>>> 462fe7d4a79762370932dbf85a7adc3d1b7a427f
   );
 }
 
