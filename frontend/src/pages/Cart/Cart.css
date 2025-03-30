@@ -1,0 +1,27 @@
+.cart-item {
+    background-color: #fff;
+    border-radius: 5px;
+}
+
+.cart-item h5 {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+}
+
+.cart-item p {
+    margin-bottom: 0.3rem;
+}
+
+
+.btn-primary {
+    background-color: #0f79af !important;
+    border-color: #0f79af !important;
+}
+
+.text-primary {
+    color: #007185 !important;
+}
+
+.text-muted {
+    color: #565959 !important;
+}
