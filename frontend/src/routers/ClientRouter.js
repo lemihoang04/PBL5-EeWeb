@@ -9,8 +9,8 @@ import Cart from "../pages/Cart/Cart";
 import Login from "../pages/Login/Login";
 import Register from "../pages/Register/Register";
 import AppContextProvider from "../context/AppContext"; // Import your context provider
-import Sidebar from "../pages/Home/ShoppingPage";
-import AppContextProvider from "../context/AppContext";
+import ShoppingPage from "../pages/Home/ShoppingPage";
+
 
 const ClientRoute = () => {
     return (
@@ -20,11 +20,11 @@ const ClientRoute = () => {
                     <Route path="/home" element={<Home />} />
                     <Route path="/admin" element={<Admin />} />
                     <Route path="/" element={<Home />} />
-                    <Route path="/cart" element={<Cart />} /> 
-                    <Route path="/login" element={<Login />} /> 
+                    <Route path="/cart" element={<Cart />} />
+                    <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
                     <Route path="/product-info/:productId" element={<ProductInfo />} />
-                    <Route path="/sidebar" element={<Sidebar />} /> {/* Add a route for the sidebar page */}
+                    <Route path="/ShoppingPage" element={<ShoppingPage />} /> {/* Add a route for the sidebar page */}
                 </Routes>
             </Router>
         </AppContextProvider>

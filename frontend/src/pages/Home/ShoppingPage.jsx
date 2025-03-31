@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './ShoppingPage.css';
+
 
 const ShoppingPage = () => {
   const [minPrice, setMinPrice] = useState(8);
@@ -20,24 +20,24 @@ const ShoppingPage = () => {
           <h3>Price</h3>
           <div className="price-values">{updatePriceValues()}</div>
           <div className="price-range">
-            <input 
-              type="range" 
-              min="8" 
-              max="11200" 
+            <input
+              type="range"
+              min="8"
+              max="11200"
               value={minPrice}
               onChange={(e) => setMinPrice(parseInt(e.target.value))}
             />
-            <input 
-              type="range" 
-              min="8" 
-              max="11200" 
+            <input
+              type="range"
+              min="8"
+              max="11200"
               value={maxPrice}
               onChange={(e) => setMaxPrice(parseInt(e.target.value))}
             />
             <button>Go</button>
           </div>
         </div>
-        
+
         <div className="filter">
           <h3>Display Size</h3>
           <label><input type="checkbox" /> 17 Inches & Above</label><br />
@@ -182,7 +182,7 @@ const ShoppingPage = () => {
           <label><input type="checkbox" /> DDR5 RAM</label>
         </div>
 
-        
+
       </div>
 
       <div className="content">
@@ -194,7 +194,7 @@ const ShoppingPage = () => {
             <p className="price">$399.99</p>
             <p>16GB RAM, 640GB Storage, Touchscreen</p>
           </div>
-          
+
           <div className="product">
             <img src="laptop2.jpg" alt="Laptop 2" />
             <h4>Gaming Laptop, 16" FHD Display</h4>
