@@ -5,6 +5,11 @@ import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import Home from "../pages/Home";
 import AdminDashboard from "../pages/Admin/AdminDashboard";
 import Admin from "../pages/Admin/Admin";
+import ProductInfo from "../pages/ProductInfo";
+import Cart from "../pages/Cart/Cart";
+import Login from "../pages/Login/Login";
+import Register from "../pages/Register/Register";
+import AppContextProvider from "../context/AppContext"; // Import your context provider
 
 const ClientRoute = () => {
     return (
