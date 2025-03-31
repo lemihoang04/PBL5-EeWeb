@@ -10,6 +10,7 @@ import Cart from "../pages/Cart/Cart";
 import Login from "../pages/Login/Login";
 import Register from "../pages/Register/Register";
 import AppContextProvider from "../context/AppContext"; // Import your context provider
+import Sidebar from "../pages/Home/ShoppingPage";
 
 const ClientRoute = () => {
     return (
@@ -25,6 +26,7 @@ const ClientRoute = () => {
                     <Route path="/login" element={<Login />} /> {/* Add a route for the login page */}
                     <Route path="/register" element={<Register />} /> {/* Add a route for the register page */}
                     <Route path="/product-info/:productId" element={<ProductInfo />} />
+                    <Route path="/sidebar" element={<Sidebar />} /> {/* Add a route for the sidebar page */}
                 </Routes>
             </Router>
         </AppContextProvider>
