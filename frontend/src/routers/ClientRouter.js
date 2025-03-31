@@ -4,12 +4,11 @@ import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 // Dummy components for demonstration
 import Home from "../pages/Home";
 import Admin from "../pages/Admin/Admin";
-import AppContextProvider from "../context/AppContext";
 import ProductInfo from "../pages/ProductInfo";
-import Cart from "../pages/Cart/Cart"
-import Login from "../pages/Login/Login"
-import Register from "../pages/Register/Register"
-
+import Cart from "../pages/Cart/Cart";
+import Login from "../pages/Login/Login";
+import Register from "../pages/Register/Register";
+import AppContextProvider from "../context/AppContext";
 
 const ClientRoute = () => {
     return (
