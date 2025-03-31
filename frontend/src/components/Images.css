@@ -1,0 +1,45 @@
+.carousel-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .main-image {
+    margin-bottom: 10px;
+  }
+  
+  .thumbnail-navigation {
+    display: flex;
+    align-items: center;
+  }
+  
+  .nav-button {
+    background-color: transparent;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .thumbnail-container {
+    display: flex;
+    gap: 10px;
+    overflow: hidden;
+  }
+  
+  .thumbnail {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: border 0.3s;
+  }
+  
+  .thumbnail.selected {
+    border-color: #007bff;
+  }
+  

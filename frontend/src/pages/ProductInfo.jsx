@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { AppContext } from "../context/AppContext.jsx";
+import Images from "../components/Images.jsx";
 import "./ProductInfo.css";
 
 const ProductInfo = () => {
@@ -9,79 +10,63 @@ const ProductInfo = () => {
   const [productInfo, setProductInfo] = useState(null);
 
   useEffect(() => {
-    const fetchProductInfo = () => {
-      const foundProduct = products.find((prod) => prod._id === productId);
-      setProductInfo(foundProduct);
-    };
-
-    fetchProductInfo();
+    if (!products || products.length === 0) return;
+    const foundProduct = products.find((prod) => Number(prod.id) === Number(productId));
+    setProductInfo(foundProduct || null);
   }, [products, productId]);
 
-  // Lọc các sản phẩm khác (không bao gồm sản phẩm hiện tại)
-  const otherProducts = products.filter((prod) => prod._id !== productId).slice(0,8);
+  const otherProducts = products?.filter((prod) => Number(prod.id) !== Number(productId)).slice(0, 8) || [];
 
   return (
     <div className="product-info-container">
       <div className="product-info-sidebar-left">
-        <div style={{ textAlign: "center", width: "100%" }}>
-          <h2>Ảnh Minh Họa</h2>
-        </div>
-        {productInfo && productInfo.image ? (
-          <img
-            src={productInfo.image}
-            alt={productInfo.name}
-            className="product-image"
-          />
-        ) : (
-          <p>Không có hình ảnh</p>
-        )}
+        <h2>Ảnh Minh Họa</h2>
+        {productInfo?.image ? <Images productId={productInfo.id} /> : <p>Không có hình ảnh</p>}
       </div>
-
+      
       <div className="product-info-main-content">
         <h2>Thông tin sản phẩm</h2>
         {productInfo ? (
           <div className="product-info-details">
-            <h3>{productInfo.name}</h3>
-            <p>{productInfo.description}</p>
-            <p>Giá: {productInfo.price.toLocaleString()} VNĐ</p>
+            <h3>{productInfo.title || "Không có tên sản phẩm"}</h3>
+            <p>{productInfo.description || "Không có mô tả"}</p>
+            <p>Giá: {productInfo.price ? productInfo.price.toLocaleString() : "Không có giá"} $</p>
+            <p>Đánh giá: {productInfo.rating || "Chưa có đánh giá"}</p>
           </div>
         ) : (
           <p>Không tìm thấy sản phẩm.</p>
         )}
 
-        <h2>Các sản phẩm khác</h2>
-        <div className="other-products-container">
-          {otherProducts.map((product) => (
-            <div key={product._id} className="other-product-item">
-              <img src={product.image} alt={product.name} className="other-product-image" />
-              <h4>{product.name}</h4>
-              <p>{product.price.toLocaleString()} VNĐ</p>
-            </div>
-          ))}
-        </div>
+        {productInfo && (
+          <>
+            <h2>Thông tin chi tiết</h2>
+            <table className="product-specs">
+              <tbody>
+                {Object.entries(productInfo).map(([key, value]) => (
+                  key === "image" ? (
+                    <tr key={key}><td>Hình ảnh</td><td><img src={Array.isArray(value) ? value[0] : value} alt="Product" className="product-spec-image"/></td></tr>
+                  ) : (
+                    value && <tr key={key}><td>{key.replace(/_/g, ' ')}</td><td>{value}</td></tr>
+                  )
+                ))}
+              </tbody>
+            </table>
+          </>
+        )}
       </div>
 
-      <div className="product-info-sidebar-right">
-        {productInfo ? (
+      {productInfo && (
+        <div className="product-info-sidebar-right">
           <div className="order-summary">
-            <img src={productInfo.image} alt={productInfo.name} className="order-image" />
-            <h3>{productInfo.name}</h3>
-            <p className="product-color">Xanh Đậm</p>
-            <p className="product-quantity">Số Lượng</p>
-            <div className="quantity-control">
-              <button>-</button>
-              <span>1</span>
-              <button>+</button>
-            </div>
+            <img src={productInfo.image || "/default-image.jpg"} alt={productInfo.title} className="order-image" />
+            <h3>{productInfo.title || "Không có tên sản phẩm"}</h3>
             <p className="product-price">Tạm tính</p>
-            <p className="total-price">{productInfo.price.toLocaleString()}đ</p>
+            {productInfo.price && <p className="total-price">{productInfo.price.toLocaleString()}đ</p>}
             <button className="buy-now">Mua ngay</button>
             <button className="add-to-cart">Thêm vào giỏ</button>
           </div>
-        ) : (
-          <p>Không tìm thấy sản phẩm.</p>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };
