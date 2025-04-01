@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-
+import './ShoppingPage.css';
 
 const ShoppingPage = () => {
   const [minPrice, setMinPrice] = useState(8);
