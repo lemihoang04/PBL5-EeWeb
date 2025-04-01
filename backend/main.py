@@ -69,7 +69,6 @@ def api_delete_user(user_id):
 @app.route('/login', methods=['POST'])
 def api_login():
     session.clear()
-    print("Content-Type received:", request.content_type)  # Debug
     data = request.form
     email = data.get('email')
     password = data.get('password')
