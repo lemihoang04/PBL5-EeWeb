@@ -55,4 +55,10 @@
   .thumbnail.selected {
     border-color: #007bff;
   }
-  
+  .divder{
+    height: 3px; /* Độ dày của đường */
+    background-color: #333; /* Màu sắc của đường */
+    margin: 10px 0;
+    width: 100%;
+    border: none;
+  }  

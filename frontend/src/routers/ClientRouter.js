@@ -1,14 +1,13 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 
-// Dummy components for demonstration
 import Home from "../pages/Home";
 import Admin from "../pages/Admin/Admin";
 import ProductInfo from "../pages/ProductInfo";
 import Cart from "../pages/Cart/Cart";
 import Login from "../pages/Login/Login";
 import Register from "../pages/Register/Register";
-import AppContextProvider from "../context/AppContext"; // Import your context provider
+import AppContextProvider from "../context/AppContext";
 import ShoppingPage from "../pages/Home/ShoppingPage";
 
 
@@ -24,7 +23,7 @@ const ClientRoute = () => {
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
                     <Route path="/product-info/:productId" element={<ProductInfo />} />
-                    <Route path="/ShoppingPage" element={<ShoppingPage />} /> {/* Add a route for the sidebar page */}
+                    <Route path="/ShoppingPage" element={<ShoppingPage />} /> 
                 </Routes>
             </Router>
         </AppContextProvider>
