@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import './ShoppingPage.css';
+import './Products.css';
 
-const ShoppingPage = () => {
+const Products = () => {
   const [minPrice, setMinPrice] = useState(8);
   const [maxPrice, setMaxPrice] = useState(11200);
 
@@ -207,4 +207,4 @@ const ShoppingPage = () => {
   );
 };
 
-export default ShoppingPage;
+export default Products;

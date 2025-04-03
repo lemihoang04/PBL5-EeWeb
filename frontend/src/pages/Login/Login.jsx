@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from 'react-router-dom';
@@ -11,10 +11,19 @@ import './Login.css';
 import LoginImg from '../../assets/images/logintem.png';
 
 const Login = () => {
-    const { loginUser } = useContext(UserContext);
+    const { user, loginUser } = useContext(UserContext);
+    const navigate = useNavigate();
+    useEffect(() => {
+        if (user && user.isAuthenticated) {
+            navigate("/home");
+        }
+    }, [user, navigate]);
+
     const [formValues, setFormValues] = useState({ email: '', password: '' });
     const [showPassword, setShowPassword] = useState(false);
-    const navigate = useNavigate();
+
+
+
 
     const handleChange = (e) => {
         setFormValues({ ...formValues, [e.target.name]: e.target.value });

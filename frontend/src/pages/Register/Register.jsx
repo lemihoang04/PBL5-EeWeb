@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { toast } from 'react-toastify';
+import { UserContext } from '../../context/UserProvider';
+import { useNavigate } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
@@ -8,8 +10,16 @@ import './Register.css';
 import LoginImg from '../../assets/images/logintem.png';
 import { CreateNewUser } from '../../services/userService';
 
-
 const Register = () => {
+    const { user } = useContext(UserContext);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (user && user.isAuthenticated) {
+            navigate("/home");
+        }
+    }, [user, navigate]);
+
     const [formData, setFormData] = useState({
         fullName: '',
         email: '',
@@ -39,7 +49,7 @@ const Register = () => {
 
             if (response && response.errCode === 0) {
                 toast.success("Registration successful!");
-                setTimeout(() => window.location.href = '/login', 2000);
+                setTimeout(() => window.location.href = '/login', 500);
             } else {
                 toast.error(response.error || "Registration failed!");
             }
