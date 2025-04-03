@@ -3,8 +3,6 @@ import { toast } from 'react-toastify';
 import { UserContext } from '../../context/UserProvider';
 import { useNavigate } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
-import Header from '../../components/Header';
-import Footer from '../../components/Footer';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './Register.css';
 import LoginImg from '../../assets/images/logintem.png';
@@ -61,7 +59,6 @@ const Register = () => {
 
     return (
         <div className="register-page">
-            <Header />
             <div className="container-fluid d-flex align-items-center justify-content-center my-5">
                 <div className="row w-75 shadow-lg rounded-3 overflow-hidden">
                     <div className="col-md-6 d-none d-md-block p-0">
@@ -96,7 +93,6 @@ const Register = () => {
                     </div>
                 </div>
             </div>
-            <Footer />
         </div>
     );
 };

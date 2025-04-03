@@ -4,8 +4,6 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from 'react-router-dom';
 import { LoginUser } from '../../services/userService';
 import { UserContext } from '../../context/UserProvider';
-import Header from '../../components/Header';
-import Footer from '../../components/Footer';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './Login.css';
 import LoginImg from '../../assets/images/logintem.png';
@@ -64,7 +62,6 @@ const Login = () => {
 
     return (
         <div className="login-page">
-            <Header />
             <div className="container-fluid vh-100 d-flex align-items-center justify-content-center">
                 <div className="row w-75 shadow-lg rounded-3 overflow-hidden">
                     <div className="col-md-7 d-none d-md-block p-0">
@@ -114,7 +111,6 @@ const Login = () => {
                     </div>
                 </div>
             </div>
-            <Footer />
         </div>
     );
 };

@@ -1,7 +1,4 @@
 import React, { useState } from 'react';
-import Header from '../../components/Header';
-import Footer from '../../components/Footer';
-import Banner from '../../components/Banner';
 import './Cart.css'; // Import custom CSS for Cart component
 import Laptop from '../../assets/images/laptop1.jpg'; // Example image import
 
@@ -50,8 +47,7 @@ const Cart = () => {
 
     return (
         <div className="App">
-            {/* Header */}
-            <Header />
+
 
             {/* Main Cart Section */}
             <div className="container my-4">
@@ -138,9 +134,6 @@ const Cart = () => {
                     </div>
                 </div>
             </div>
-
-            {/* Footer */}
-            <Footer />
         </div>
     );
 };
