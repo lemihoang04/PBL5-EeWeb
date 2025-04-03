@@ -1,20 +1,27 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { useNavigate } from 'react-router-dom'; // Điều hướng sau khi login
+import { useNavigate } from 'react-router-dom';
 import { LoginUser } from '../../services/userService';
-import { UserContext } from '../../context/UserProvider'; // Import UserContext
-import Header from '../../components/Header';
-import Footer from '../../components/Footer';
+import { UserContext } from '../../context/UserProvider';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './Login.css';
 import LoginImg from '../../assets/images/logintem.png';
 
 const Login = () => {
-    const { loginUser } = useContext(UserContext); // Lấy hàm login từ context
+    const { user, loginUser } = useContext(UserContext);
+    const navigate = useNavigate();
+    useEffect(() => {
+        if (user && user.isAuthenticated) {
+            navigate("/home");
+        }
+    }, [user, navigate]);
+
     const [formValues, setFormValues] = useState({ email: '', password: '' });
     const [showPassword, setShowPassword] = useState(false);
-    const navigate = useNavigate(); // Điều hướng
+
+
+
 
     const handleChange = (e) => {
         setFormValues({ ...formValues, [e.target.name]: e.target.value });
@@ -23,12 +30,16 @@ const Login = () => {
     const handleLogin = async (e) => {
         e.preventDefault();
 
+        if (!formValues.email || !formValues.password) {
+            toast.error('Please enter both email and password');
+            return;
+        }
+
         try {
             const response = await LoginUser(formValues);
             if (response && response.errCode === 0) {
-                toast.success('Login successful!', { position: "top-right" });
+                toast.success('Login successful!');
 
-                // Lưu thông tin user vào UserProvider
                 let data = {
                     isAuthenticated: true,
                     account: response.user,
@@ -36,21 +47,21 @@ const Login = () => {
                 };
                 loginUser(data);
 
-                // Chuyển hướng sau khi login thành công
                 setTimeout(() => {
                     navigate("/");
                 }, 500);
             } else {
                 toast.error(response.error);
+                setFormValues({ ...formValues, password: '' });
             }
         } catch (err) {
-            toast.error('Invalid email or password', { position: "top-right" });
+            toast.error('Invalid email or password');
+            setFormValues({ ...formValues, password: '' });
         }
     };
 
     return (
         <div className="login-page">
-            <Header />
             <div className="container-fluid vh-100 d-flex align-items-center justify-content-center">
                 <div className="row w-75 shadow-lg rounded-3 overflow-hidden">
                     <div className="col-md-7 d-none d-md-block p-0">
@@ -94,13 +105,12 @@ const Login = () => {
                                 </div>
                                 <a href="#" className="text-decoration-none text-primary">Forgot password?</a>
                             </div>
-                            <button onClick={handleLogin} className="btn btn-primary w-100">Login</button>
+                            <button type="submit" className="btn btn-primary w-100">Login</button>
                         </form>
                         <p className="mt-3 text-center">Don't have an account? <a href="/Register" className="text-decoration-none text-primary">Sign up now</a></p>
                     </div>
                 </div>
             </div>
-            <Footer />
         </div>
     );
 };
