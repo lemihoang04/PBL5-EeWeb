@@ -2,8 +2,6 @@ import React, { useContext, useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { AppContext } from "../context/AppContext.jsx";
 import Images from "../components/Images.jsx";
-import Header from "../components/Header/Header.jsx";
-import Footer from "../components/Footer.jsx";
 import "./ProductInfo.css";
 import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
 
@@ -46,7 +44,6 @@ const ProductInfo = () => {
   const rating = productInfo ? extractRating(productInfo.rating) : null;
   const productIndex = products?.findIndex((prod) => Number(prod.id) === Number(productId));
 
-  // Chọn sản phẩm liên quan (nếu sản phẩm cuối danh sách, lấy các sản phẩm phía trước)
   const otherProducts =
     productIndex !== -1
       ? products.slice(Math.max(0, productIndex - 4), productIndex).concat(products.slice(productIndex + 1, productIndex + 5))
@@ -54,10 +51,8 @@ const ProductInfo = () => {
 
   return (
     <>
-      <Header />
       <div className="product-info-container">
         <div className="product-info-sidebar-left">
-          {/* <h2 style={{ textAlign: "center" }}>Ảnh Minh Họa</h2> */}
           {productInfo?.image ? <Images productId={productInfo.id} /> : <p>Không có hình ảnh</p>}
         </div>
 
@@ -126,7 +121,6 @@ const ProductInfo = () => {
                     alt={product.brand || "Sản phẩm"}
                     className="other-product-image"
                   />
-                  {/* <h4>{product.brand || "Không có tên"}</h4> */}
                   <h4>
                     {product.brand
                       ? product.brand.charAt(0).toUpperCase() + product.brand.slice(1).toLowerCase()
@@ -159,7 +153,6 @@ const ProductInfo = () => {
           </div>
         )}
       </div>
-      <Footer />
     </>
   );
 };
