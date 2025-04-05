@@ -2,8 +2,6 @@ import React, { useContext, useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { AppContext } from "../context/AppContext.jsx";
 import Images from "../components/Images.jsx";
-import Header from "../components/Header.jsx";
-import Footer from "../components/Footer.jsx";
 import "./ProductInfo.css";
 import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
 
@@ -53,7 +51,6 @@ const ProductInfo = () => {
 
   return (
     <>
-      <Header />
       <div className="product-info-container">
         <div className="product-info-sidebar-left">
           {productInfo?.image ? <Images productId={productInfo.id} /> : <p>Không có hình ảnh</p>}
@@ -155,7 +152,6 @@ const ProductInfo = () => {
           </div>
         )}
       </div>
-      <Footer />
     </>
   );
 };

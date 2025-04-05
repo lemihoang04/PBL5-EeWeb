@@ -8,6 +8,7 @@ import Products from "../pages/Products/Products";
 import UserLayout from "../layouts/UserLayout";
 import NotFound from "../components/NotFound";
 
+
 const UserRoutes = () => {
     return (
         <Routes>
@@ -19,6 +20,7 @@ const UserRoutes = () => {
                 <Route path="/products" element={<Products />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
+                {/* <Route path="/profile" element={<Profile />} /> */}
                 <Route path="*" element={<NotFound />} />
             </Route>
 

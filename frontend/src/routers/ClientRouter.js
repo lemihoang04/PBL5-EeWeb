@@ -9,7 +9,6 @@ const AppRoutes = () => {
             <Router>
                 <UserRoutes />
                 <AdminRoutes />
-
             </Router>
         </AppContextProvider>
     );
