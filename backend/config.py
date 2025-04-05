@@ -1,7 +1,13 @@
+import mysql.connector
 
-from pymongo import MongoClient
+DATABASE_CONFIG = {
+    'user': 'root',
+    'password': '',
+    'host': 'localhost',  
+    'port': 3306,        
+    'database': 'ecommerceshop',
+}
 
-# Kết nối MongoDB Cloud
-MONGO_URI = "mongodb+srv://anhzai2002:matzOtWu83LITqD6@plb5.t2lrlri.mongodb.net/?retryWrites=true&w=majority&appName=PLB5&tls=true"  # Thay bằng connect string của bạn
-client = MongoClient(MONGO_URI)  # Kết nối đến MongoDB
-db = client["ecommercedata"]  # Truy cập database "hotel_db"
+def get_db_connection():
+    connection = mysql.connector.connect(**DATABASE_CONFIG)
+    return connection
