@@ -43,6 +43,12 @@ const Images = ({ productId }) => {
           <p>Không có hình ảnh</p>
         )}
       </div>
+      <hr className="divder" style={{
+        border: '0', 
+        borderTop: '2px solid #ccc', 
+        margin: '20px 0' 
+      }} />
+
       <div className="thumbnail-navigation">
         <button className="nav-button left" onClick={handlePrev} disabled={startIndex === 0}>
           <FaChevronLeft />

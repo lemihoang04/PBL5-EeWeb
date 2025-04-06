@@ -1,16 +1,27 @@
-import React, { useState } from 'react';
-import { toast, ToastContainer } from 'react-toastify';
+import React, { useState, useContext, useEffect } from 'react';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useNavigate } from 'react-router-dom';
 import { LoginUser } from '../../services/userService';
-import Header from '../../components/Header';
-import Footer from '../../components/Footer';
+import { UserContext } from '../../context/UserProvider';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './Login.css';
 import LoginImg from '../../assets/images/logintem.png';
 
 const Login = () => {
+    const { user, loginUser } = useContext(UserContext);
+    const navigate = useNavigate();
+    useEffect(() => {
+        if (user && user.isAuthenticated) {
+            navigate("/home");
+        }
+    }, [user, navigate]);
+
     const [formValues, setFormValues] = useState({ email: '', password: '' });
-    const [showPassword, setShowPassword] = useState(false); // New state for toggling password visibility
+    const [showPassword, setShowPassword] = useState(false);
+
+
+
 
     const handleChange = (e) => {
         setFormValues({ ...formValues, [e.target.name]: e.target.value });
@@ -19,37 +30,44 @@ const Login = () => {
     const handleLogin = async (e) => {
         e.preventDefault();
 
+        if (!formValues.email || !formValues.password) {
+            toast.error('Please enter both email and password');
+            return;
+        }
+
         try {
             const response = await LoginUser(formValues);
             if (response && response.errCode === 0) {
-                toast.success('Login successful!', { position: "top-right" });
-                console.log('Login successful:', response);
-                // Handle successful login (e.g., store token, redirect user)
+                toast.success('Login successful!');
+
+                let data = {
+                    isAuthenticated: true,
+                    account: response.user,
+                    isLoading: false,
+                };
+                loginUser(data);
+
+                setTimeout(() => {
+                    navigate("/");
+                }, 500);
             } else {
                 toast.error(response.error);
+                setFormValues({ ...formValues, password: '' });
             }
         } catch (err) {
-            toast.error('Invalid email or password', { position: "top-right" });
+            toast.error('Invalid email or password');
+            setFormValues({ ...formValues, password: '' });
         }
-    };
-
-    const togglePasswordVisibility = () => {
-        setShowPassword(!showPassword); // Toggle the state
     };
 
     return (
         <div className="login-page">
-            <Header />
-            <ToastContainer />
             <div className="container-fluid vh-100 d-flex align-items-center justify-content-center">
                 <div className="row w-75 shadow-lg rounded-3 overflow-hidden">
-                    {/* Image on the left */}
-                    <div className="col-md-6 d-none d-md-block p-0">
+                    <div className="col-md-7 d-none d-md-block p-0">
                         <img src={LoginImg} alt="Background" className="img-fluid h-100 w-100 object-fit-cover" />
                     </div>
-
-                    {/* Login form on the right */}
-                    <div className="col-md-6 bg-white p-5 d-flex flex-column justify-content-center">
+                    <div className="col-md-5 bg-white p-5 d-flex flex-column justify-content-center">
                         <h2 className="text-primary fw-bold text-center mb-4">Login</h2>
                         <form onSubmit={handleLogin}>
                             <div className="mb-3">
@@ -66,7 +84,7 @@ const Login = () => {
                             <div className="mb-3">
                                 <label className="form-label">Password</label>
                                 <input
-                                    type={showPassword ? "text" : "password"} // Toggle between text and password
+                                    type={showPassword ? "text" : "password"}
                                     name="password"
                                     className="form-control"
                                     placeholder="Enter password"
@@ -81,7 +99,7 @@ const Login = () => {
                                         className="form-check-input"
                                         id="showPassword"
                                         checked={showPassword}
-                                        onChange={togglePasswordVisibility} // Toggle visibility on change
+                                        onChange={() => setShowPassword(!showPassword)}
                                     />
                                     <label className="form-check-label" htmlFor="showPassword">Show password</label>
                                 </div>
@@ -93,7 +111,6 @@ const Login = () => {
                     </div>
                 </div>
             </div>
-            <Footer />
         </div>
     );
 };
