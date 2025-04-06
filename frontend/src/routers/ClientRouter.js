@@ -1,8 +1,7 @@
-import { BrowserRouter as Router } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import AppContextProvider from "../context/AppContext";
 import UserRoutes from "./UserRoutes";
 import AdminRoutes from "./AdminRoutes";
-
 
 const AppRoutes = () => {
     return (
@@ -10,6 +9,7 @@ const AppRoutes = () => {
             <Router>
                 <UserRoutes />
                 <AdminRoutes />
+
             </Router>
         </AppContextProvider>
     );

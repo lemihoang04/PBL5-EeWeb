@@ -2,8 +2,6 @@ import React, { useContext, useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { AppContext } from "../context/AppContext.jsx";
 import Images from "../components/Images.jsx";
-import Header from "../components/Header.jsx";
-import Footer from "../components/Footer.jsx";
 import "./ProductInfo.css";
 import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
 
@@ -53,7 +51,6 @@ const ProductInfo = () => {
 
   return (
     <>
-      <Header />
       <div className="product-info-container">
         <div className="product-info-sidebar-left">
           {productInfo?.image ? <Images productId={productInfo.id} /> : <p>Không có hình ảnh</p>}
@@ -64,8 +61,9 @@ const ProductInfo = () => {
             <div className="product-info-details">
               <h3>{productInfo.title || "Không có tên sản phẩm"}</h3>
               <p>{productInfo.description || ""}</p>
-              <p 
-                className="product-price" 
+              {/* <p className="product-price">Giá: {productInfo.price ? `${productInfo.price.toLocaleString()} $` : "Không có giá"}</p> */}
+              <p
+                className="product-price"
                 style={{ color: "red", fontSize: "1.5rem", fontWeight: "bold" }}
               >
                 Giá: {productInfo.price ? `${productInfo.price.toLocaleString()} $` : "Không có giá"}
@@ -155,7 +153,6 @@ const ProductInfo = () => {
           </div>
         )}
       </div>
-      <Footer />
     </>
   );
 };

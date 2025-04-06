@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { AppContext } from '../../context/AppContext';
 import { fetchLaptops } from '../../services/laptopService'; // Adjust the import path as necessary
 import './LaptopSearch.css';
+import { useNavigate } from 'react-router-dom';
 
 const LaptopSearch = () => {
   const [laptops, setLaptops] = useState([]);
@@ -12,8 +13,9 @@ const LaptopSearch = () => {
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentLaptops = laptops.slice(indexOfFirstItem, indexOfLastItem);
-
   const totalPages = Math.ceil(laptops.length / itemsPerPage);
+
+  const navigate = useNavigate();
 
 const handleNextPage = () => {
   if (currentPage < totalPages) {
@@ -36,67 +38,7 @@ const handlePreviousPage = () => {
     loadLaptops();
   }, []);
  
-  
-  // const laptopss = [
-  //   {
-  //     id: 1,
-  //     name: 'HP 14 Laptop, Intel Celeron N4020, 4 GB RAM, 64 GB Storage, 14-inch Micro-edge HD Display, Windows 11 Home, Thin & Portable, 4K Graphics',
-  //     price: 179.00,
-  //     originalPrice: 299.99,
-  //     rating: 4.5,
-  //     ratingCount: 7708,
-  //     purchaseCount: '70+ bought in past month',
-  //     displaySize: '14 inches',
-  //     diskSize: '64 GB',
-  //     ram: '4 GB',
-  //     os: 'Windows 11 S',
-  //     image: 'https://m.media-amazon.com/images/I/41X799Q-wjL.jpg',
-  //     delivery: {
-  //       free: true,
-  //       dates: 'Apr 16 - May 4',
-  //       expedited: 'Apr 14 - 30',
-  //       stock: '4 left in stock'
-  //     }
-  //   },
-  //   {
-  //     id: 2,
-  //     name: 'Acer Aspire 3 A315-24P-R7VH Slim Laptop | 15.6" Full HD IPS Display | AMD Ryzen 3 7320U Quad-Core Processor | AMD Radeon Graphics | 8GB LPDDR5 | 128GB NVMe SSD | Wi-Fi 6',
-  //     price: 329.99,
-  //     rating: 4,
-  //     ratingCount: 4112,
-  //     purchaseCount: '4x+ bought in past month',
-  //     displaySize: '15.6 inches',
-  //     diskSize: '128 GB',
-  //     ram: '8 GB',
-  //     os: 'Windows 11 S',
-  //     image: 'https://m.media-amazon.com/images/I/41X799Q-wjL.jpg',
-  //     delivery: {
-  //       free: true,
-  //       dates: 'Wed, Apr 9',
-  //       expedited: 'Tomorrow, Apr 5'
-  //     }
-  //   },
-  //   {
-  //     id: 3,
-  //     name: 'HP 15.6" Business Laptop, Free Microsoft Office 2024 Lifetime License, Copilot AI Chat, HD Touchscreen Display, Intel 6-Core i3-1215U 4.4 GHz, 16GB RAM, 1TB SSD, Long Battery Life',
-  //     price: 418.99,
-  //     rating: 4.5,
-  //     ratingCount: 198,
-  //     purchaseCount: '20+ bought in past month',
-  //     displaySize: '15.6 inches',
-  //     diskSize: '1 TB',
-  //     ram: '16 GB',
-  //     os: 'Windows 11 Pro',
-  //     image: 'https://m.media-amazon.com/images/I/41X799Q-wjL.jpg',
-  //     delivery: {
-  //       free: true,
-  //       dates: 'Mon, Apr 7',
-  //       expedited: 'Tomorrow, Apr 5',
-  //       stock: '8 left in stock'
-  //     }
-  //   }
-  // ];
-
+ 
   
 
   return (
@@ -228,7 +170,13 @@ const handlePreviousPage = () => {
               
               <div className="laptop-details">
                 <div className="laptop-header">
-                  <h3>{laptop.title}</h3>
+                <h3
+                  className="laptop-title"
+                  onClick={() => navigate(`/product-info/${laptop.id}`)}
+                  style={{ cursor: 'pointer', color: '#0066c0' }}
+                >
+                  {laptop.title}
+                </h3>
                   <div className="rating">
                     <div className="stars" style={{ '--rating': laptop.rating }}></div>
                     <span className="rating-count">{laptop.rating}</span>
