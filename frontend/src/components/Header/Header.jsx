@@ -1,17 +1,24 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { UserContext } from "../context/UserProvider";
+import { UserContext } from "../../context/UserProvider";
 import { toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
-import { LogOutUser } from "../services/userService";
+import { LogOutUser } from "../../services/userService";
 import "@fortawesome/fontawesome-free/css/all.min.css";
-
+import "./Header.css";
 
 function Header() {
     const { user, logoutUser } = useContext(UserContext);
     const navigate = useNavigate();
     const [searchQuery, setSearchQuery] = useState("");
-
+    const [selectedValue, setSelectedValue] = useState("all");
+    const selectRef = useRef(null);
+    const spanRef = useRef(null);
+    const options = [
+        { value: "all", label: "All" },
+        { value: "toys", label: "Toys" },
+        { value: "games", label: "Games and pro" }
+    ];
     const handleLogout = async () => {
         try {
             let data = await LogOutUser();
@@ -26,7 +33,6 @@ function Header() {
             console.error("Logout failed:", error);
         }
     };
-
     const handleSearch = (e) => {
         e.preventDefault();
         if (searchQuery.trim()) {
@@ -46,10 +52,17 @@ function Header() {
                     {/* Thanh tìm kiếm ở giữa */}
                     <form className="d-flex mx-auto w-50" onSubmit={handleSearch}>
                         <div className="input-group">
-                            <select className="form-select form-select-sm" style={{ maxWidth: "65px" }}>
-                                <option value="all">All</option>
-                                <option value="toys">Toys</option>
-                                <option value="games">Games</option>
+                            <select
+                                className="form-select bg-light border-end-0"
+                                value={selectedValue}
+                                onChange={(e) => setSelectedValue(e.target.value)}
+                                style={{ maxWidth: '70px' }}
+                            >
+                                {options.map((opt) => (
+                                    <option key={opt.value} value={opt.value}>
+                                        {opt.label}
+                                    </option>
+                                ))}
                             </select>
                             <input
                                 type="text"
@@ -85,8 +98,8 @@ function Header() {
                         )}
                     </ul>
                 </div>
-            </div>
-        </nav>
+            </div >
+        </nav >
     );
 }
 

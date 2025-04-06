@@ -61,8 +61,9 @@ const ProductInfo = () => {
             <div className="product-info-details">
               <h3>{productInfo.title || "Không có tên sản phẩm"}</h3>
               <p>{productInfo.description || ""}</p>
-              <p 
-                className="product-price" 
+              {/* <p className="product-price">Giá: {productInfo.price ? `${productInfo.price.toLocaleString()} $` : "Không có giá"}</p> */}
+              <p
+                className="product-price"
                 style={{ color: "red", fontSize: "1.5rem", fontWeight: "bold" }}
               >
                 Giá: {productInfo.price ? `${productInfo.price.toLocaleString()} $` : "Không có giá"}
