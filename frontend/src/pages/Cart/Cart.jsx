@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
-import './Cart.css'; // Import custom CSS for Cart component
-import Laptop from '../../assets/images/laptop1.jpg'; // Example image import
+import { useNavigate } from "react-router-dom";
+import './Cart.css';
+import Laptop from '../../assets/images/laptop1.jpg';
+import { toast } from 'react-toastify';
 
 const Cart = () => {
-    // Sample dynamic data (this could come from an API or props)
+    const navigate = useNavigate();
     const [cartItems, setCartItems] = useState([
         {
             id: 1,
             name: "Kingston FURY Beast RGB 32GB (2x16GB) 6000MT/s DDR5 CL30 Desktop Memory",
             description: "AMD EXPO | Plug N Play | Kit of 2 | KF560C30BBEAK2-32",
-            image: Laptop, // Replace with actual image URL
+            image: Laptop,
             price: 124.99,
             quantity: 1,
             style: "6000MT/s",
@@ -26,10 +28,38 @@ const Cart = () => {
             capacity: "16GB RAM + 1TB SSD",
         },
     ]);
-
+    const handleCheckboxChange = (id) => {
+        setSelectedItems(prev =>
+            prev.includes(id) ? prev.filter(itemId => itemId !== id) : [...prev, id]
+        );
+    };
+    const handleCheckoutClick = () => {
+        if (selectedItems.length === 0) {
+            toast.error("Please select at least one item to proceed to checkout.");
+            return;
+        }
+        const formValue = {
+            items: cartItems.filter(item => selectedItems.includes(item.id)),
+            amount: calculateSubtotal(),
+        };
+        navigate("/checkout", {
+            state: { formValue }
+        });
+    };
+    const [selectedItems, setSelectedItems] = useState(cartItems.map(item => item.id));
+    const handleSelectToggle = () => {
+        if (selectedItems.length === cartItems.length) {
+            setSelectedItems([]);
+        } else {
+            setSelectedItems(cartItems.map(item => item.id));
+        }
+    };
     // Calculate subtotal dynamically
     const calculateSubtotal = () => {
-        return cartItems.reduce((total, item) => total + item.price * item.quantity, 0).toFixed(2);
+        return cartItems
+            .filter(item => selectedItems.includes(item.id))
+            .reduce((total, item) => total + item.price * item.quantity, 0)
+            .toFixed(2);
     };
 
     // Handle quantity change
@@ -55,12 +85,26 @@ const Cart = () => {
                     {/* Cart Items (Left Side) */}
                     <div className="col-md-8">
                         <h2 className="mb-3">Shopping Cart</h2>
-                        <a href="#" className="text-primary mb-3 d-block">Deselect all items</a>
+                        <a
+                            href="#"
+                            className="text-primary mb-3 d-block"
+                            onClick={(e) => {
+                                e.preventDefault();
+                                handleSelectToggle();
+                            }}
+                        >
+                            {selectedItems.length === cartItems.length ? "Deselect all items" : "Select all items"}
+                        </a>
 
                         {/* Dynamically render cart items */}
                         {cartItems.map((item) => (
                             <div key={item.id} className="cart-item border p-3 mb-3 d-flex align-items-center">
-                                <input type="checkbox" className="me-3" defaultChecked />
+                                <input
+                                    type="checkbox"
+                                    className="me-3"
+                                    checked={selectedItems.includes(item.id)}
+                                    onChange={() => handleCheckboxChange(item.id)}
+                                />
                                 <img
                                     src={item.image}
                                     alt={item.name}
@@ -108,15 +152,20 @@ const Cart = () => {
 
                         {/* Subtotal */}
                         <div className="text-end">
-                            <h5>Subtotal ({cartItems.length} items): ${calculateSubtotal()}</h5>
+                            <h5>
+                                {selectedItems.length !== 0 ? `Subtotal (${selectedItems.length} items): $${calculateSubtotal()}` : "No items selected"}
+                            </h5>
+
                         </div>
                     </div>
 
                     {/* Checkout Section (Right Side) */}
                     <div className="col-md-4">
                         <div className="border p-3 mb-3">
-                            <h5>Subtotal ({cartItems.length} items): ${calculateSubtotal()}</h5>
-                            <button className="btn btn-primary w-100">Proceed to checkout</button>
+                            <h5>
+                                {selectedItems.length !== 0 ? `Subtotal (${selectedItems.length} items): $${calculateSubtotal()}` : "No items selected"}
+                            </h5>
+                            <button onClick={handleCheckoutClick} className="btn btn-primary w-100">Proceed to checkout</button>
                         </div>
 
                         {/* International Top Sellers */}

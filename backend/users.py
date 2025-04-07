@@ -19,6 +19,16 @@ def create_user(name, email, password, phone):
     connection.commit()
     cursor.close()
     connection.close()
+    
+def check_existing_user(email, phone):
+    connection = get_db_connection()
+    cursor = connection.cursor()
+    query = "SELECT id FROM users WHERE email = %s OR phone = %s"
+    cursor.execute(query, (email, phone))
+    result = cursor.fetchone()
+    cursor.close()
+    connection.close()
+    return result is not None
 
 def get_all_users():
     connection = get_db_connection()

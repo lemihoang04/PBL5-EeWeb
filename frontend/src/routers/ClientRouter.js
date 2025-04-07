@@ -9,6 +9,8 @@ import Register from "../pages/Register/Register";
 import Products from "../pages/Products/Products";
 import Admin from "../pages/Admin/Admin";
 import NotFound from "../components/NotFound";
+import Checkout from "../pages/Checkout/Checkout";
+import ZaloPayButton from "../pages/Zalopaybutton";
 
 const AppRoutes = () => {
     return (
@@ -24,6 +26,8 @@ const AppRoutes = () => {
                         <Route path="/products" element={<Products />} />
                         <Route path="/login" element={<Login />} />
                         <Route path="/register" element={<Register />} />
+                        <Route path="/checkout" element={<Checkout />} />
+                        <Route path="/zalopay" element={<ZaloPayButton />} />
                     </Route>
 
                     {/* Route Admin */}
