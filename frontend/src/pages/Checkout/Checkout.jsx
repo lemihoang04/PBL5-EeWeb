@@ -1,11 +1,19 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { PaymentZaloPay } from "../../services/apiService.js";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const Checkout = () => {
+    const navigate = useNavigate();
     const location = useLocation();
-    const formValue = location.state?.formValue || { items: [], amount: 0 };
+    const formValue = location.state?.formValue || null;
+
+    useEffect(() => {
+        if (formValue === null) {
+            navigate("/home");
+        }
+    }, [formValue, navigate]);
+
     const [formData, setFormData] = useState({
         firstName: "",
         lastName: "",
