@@ -1,11 +1,7 @@
 from flask import Flask, jsonify, request, session
 from werkzeug.utils import secure_filename
-<<<<<<< HEAD
-import os
-=======
 import time, hmac, hashlib, json, requests, urllib.request, urllib.parse
->>>>>>> 4992574f25a9d4c14ca62fcf66c86152b255915a
-from users import *
+from backend.controllers.user_controller import *
 from flask_cors import CORS
 
 app = Flask(__name__)

@@ -82,7 +82,7 @@ CREATE TABLE product (
 );
 
 -- Bảng booking
-CREATE TABLE booking (
+CREATE TABLE order (
     booking_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT,
     product_id INT,

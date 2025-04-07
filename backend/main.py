@@ -1,9 +1,9 @@
 from flask import Flask, jsonify, request, session
 from werkzeug.utils import secure_filename
 import os
-from users import *
+from backend.controllers.user_controller import *
 from flask_cors import CORS
-from users import *
+from backend.controllers.user_controller import *
 import mysql.connector
 import os
 from dotenv import load_dotenv

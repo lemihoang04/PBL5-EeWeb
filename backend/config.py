@@ -5,7 +5,7 @@ DATABASE_CONFIG = {
     'password': '',
     'host': 'localhost',  
     'port': 3306,        
-    'database': 'ecommerceshop',
+    'database': 'computer_store',
 }
 
 def get_db_connection():
