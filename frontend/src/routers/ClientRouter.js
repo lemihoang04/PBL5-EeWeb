@@ -8,8 +8,13 @@ import Login from "../pages/Login/Login";
 import Register from "../pages/Register/Register";
 import Admin from "../pages/Admin/Admin";
 import NotFound from "../components/NotFound";
+<<<<<<< HEAD
 import LaptopSearch from "../pages/laptop/LaptopSearch";
 import Build from "../pages/Build/Build";
+=======
+import Checkout from "../pages/Checkout/Checkout";
+import ZaloPayButton from "../pages/Zalopaybutton";
+>>>>>>> c0319ba0ec4d96c34fe0e82e384c6f2ac896b00b
 
 const AppRoutes = () => {
     return (
@@ -24,8 +29,13 @@ const AppRoutes = () => {
                         <Route path="/product-info/:productId" element={<ProductInfo />} />
                         <Route path="/login" element={<Login />} />
                         <Route path="/register" element={<Register />} />
+<<<<<<< HEAD
                         <Route path="/laptops" element={<LaptopSearch />} />
                         <Route path="/build" element={<Build />} />
+=======
+                        <Route path="/checkout" element={<Checkout />} />
+                        <Route path="/zalopay" element={<ZaloPayButton />} />
+>>>>>>> c0319ba0ec4d96c34fe0e82e384c6f2ac896b00b
                     </Route>
 
                     {/* Route Admin */}

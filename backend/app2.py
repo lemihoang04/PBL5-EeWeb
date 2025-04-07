@@ -13,16 +13,16 @@ CORS(app, origins="http://localhost:3000", supports_credentials=True)
 db = mysql.connector.connect(
     host="localhost",
     user="root",
-    port=3307,
+    port=3306,
     password="",
-    database="amazon_db"
+    database="computer_store"
 )
 
 @app.route("/products", methods=["GET"])
 def get_products():
     try:
         cursor = db.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM amazon_laptops")
+        cursor.execute("SELECT * FROM laptop")
         products = cursor.fetchall()
         cursor.close()
         return jsonify(products)
@@ -36,16 +36,16 @@ def get_filters():
         cursor = db.cursor(dictionary=True)
 
         # Lấy các giá trị distinct từ các cột
-        cursor.execute("SELECT DISTINCT screen_size FROM amazon_laptops ")
+        cursor.execute("SELECT DISTINCT screen_size FROM laptop ")
         screen_sizes = [row["screen_size"] for row in cursor.fetchall()]
 
-        cursor.execute("SELECT DISTINCT ram FROM amazon_laptops")
+        cursor.execute("SELECT DISTINCT ram FROM laptop")
         ram_sizes = [row["ram"] for row in cursor.fetchall()]
 
-        cursor.execute("SELECT DISTINCT brand FROM amazon_laptops")
+        cursor.execute("SELECT DISTINCT brand FROM laptop")
         brands = [row["brand"] for row in cursor.fetchall()]
 
-        cursor.execute("SELECT DISTINCT operating_system FROM amazon_laptops")
+        cursor.execute("SELECT DISTINCT operating_system FROM laptop")
         operating_systems = [row["operating_system"] for row in cursor.fetchall()]
 
         # Trả về dữ liệu dưới dạng JSON
@@ -61,6 +61,20 @@ def get_filters():
     except Exception as e:
         print("Error fetching filters:", e)
         return jsonify({"error": "Internal Server Error"}), 500
+    
+@app.route("/product-images/<int:product_id>", methods=["GET"])
+def get_product_images(product_id):
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("SELECT image FROM laptop WHERE id = %s", (product_id,))
+    images = cursor.fetchone()
+    cursor.close()
+
+    if images and images["image"]:
+        image_urls = images["image"].split("; ")
+    else:
+        image_urls = []
+
+    return jsonify(image_urls)
 
 
 if __name__ == "__main__":
