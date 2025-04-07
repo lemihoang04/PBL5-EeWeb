@@ -6,9 +6,11 @@ import ProductInfo from "../pages/ProductInfo";
 import Cart from "../pages/Cart/Cart";
 import Login from "../pages/Login/Login";
 import Register from "../pages/Register/Register";
-import Products from "../pages/Products/Products";
 import Admin from "../pages/Admin/Admin";
 import NotFound from "../components/NotFound";
+import LaptopSearch from "../pages/laptop/LaptopSearch";
+import Header from "../pages/Nhap/nhap"
+import Build from "../pages/Build/Build";
 
 const AppRoutes = () => {
     return (
@@ -21,9 +23,11 @@ const AppRoutes = () => {
                         <Route path="/" element={<Home />} />
                         <Route path="/cart" element={<Cart />} />
                         <Route path="/product-info/:productId" element={<ProductInfo />} />
-                        <Route path="/products" element={<Products />} />
                         <Route path="/login" element={<Login />} />
                         <Route path="/register" element={<Register />} />
+                        <Route path="/laptops" element={<LaptopSearch />} />
+                        <Route path="/header" element={<Header />} />
+                        {/* <Route path="/build" element={<Build />} /> */}
                     </Route>
 
                     {/* Route Admin */}

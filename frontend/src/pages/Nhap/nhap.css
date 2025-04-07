@@ -1,0 +1,128 @@
+.header-container {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+.main-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #242936;
+  color: #ffffff;
+  padding: 0 16px;
+  height: 60px;
+}
+
+.header-items {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.header-item {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  padding: 0 16px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.header-item:hover, .header-item.active {
+  background-color: #2c3241;
+}
+
+.header-item .icon {
+  margin-right: 8px;
+}
+
+.header-item .arrow {
+  margin-left: 4px;
+  font-size: 0.7rem;
+  transition: transform 0.2s;
+}
+
+.header-item .arrow.up {
+  transform: rotate(180deg);
+}
+
+.search {
+  display: flex;
+  align-items: center;
+  color: #d0d0d0;
+  cursor: pointer;
+}
+
+.categories-container {
+  background-color: #1e2130;
+  color: #ffffff;
+  padding: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.categories-row {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.categories-column {
+  flex: 1;
+  min-width: 250px;
+  padding: 0 15px;
+}
+
+.category-section {
+  margin-bottom: 20px;
+}
+
+.main-items {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.main-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 10px;
+  background-color: #2c3241;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.main-item:hover {
+  background-color: #3a4156;
+}
+
+.category-image {
+  width: 60px;
+  height: 60px;
+  margin-bottom: 10px;
+  object-fit: contain;
+}
+
+.category-list-section h3 {
+  color: #9aa0b1;
+  font-size: 1rem;
+  margin-top: 15px;
+  margin-bottom: 10px;
+  font-weight: 500;
+}
+
+.category-list-section ul {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 15px 0;
+}
+
+.category-list-section li {
+  padding: 3px 0;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.category-list-section li:hover {
+  color: #ffffff;
+}

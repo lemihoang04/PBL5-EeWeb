@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "auto-resize-custom-select": "^0.3.1"
+    "auto-resize-custom-select": "^0.3.1",
+    "lucide-react": "^0.487.0"
   }
 }
