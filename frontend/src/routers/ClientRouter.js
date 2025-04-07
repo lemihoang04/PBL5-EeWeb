@@ -9,7 +9,6 @@ import Register from "../pages/Register/Register";
 import Admin from "../pages/Admin/Admin";
 import NotFound from "../components/NotFound";
 import LaptopSearch from "../pages/laptop/LaptopSearch";
-import Header from "../pages/Nhap/nhap"
 import Build from "../pages/Build/Build";
 
 const AppRoutes = () => {
@@ -26,8 +25,7 @@ const AppRoutes = () => {
                         <Route path="/login" element={<Login />} />
                         <Route path="/register" element={<Register />} />
                         <Route path="/laptops" element={<LaptopSearch />} />
-                        <Route path="/header" element={<Header />} />
-                        {/* <Route path="/build" element={<Build />} /> */}
+                        <Route path="/build" element={<Build />} />
                     </Route>
 
                     {/* Route Admin */}

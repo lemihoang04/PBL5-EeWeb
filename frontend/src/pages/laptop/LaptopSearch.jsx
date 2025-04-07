@@ -15,6 +15,9 @@ const LaptopSearch = () => {
   const currentLaptops = laptops.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(laptops.length / itemsPerPage);
 
+  const [filteredLaptops, setFilteredLaptops] = useState([]);
+  // const [searchTerm, setSearchTerm] = useState('');
+
   const navigate = useNavigate();
 
 const handleNextPage = () => {
@@ -28,6 +31,16 @@ const handlePreviousPage = () => {
     setCurrentPage(currentPage - 1);
   }
 };
+const handleSearch = (e) => {
+  const term = e.target.value.toLowerCase();
+  // setSearchTerm(term);
+
+  // Lọc danh sách laptop theo tiêu đề
+  const filtered = laptops.filter((laptop) =>
+    laptop.title.toLowerCase().includes(term)
+  );
+  setFilteredLaptops(filtered);
+};
 
   useEffect(() => {
     const loadLaptops = async () => {
@@ -37,9 +50,6 @@ const handlePreviousPage = () => {
     };
     loadLaptops();
   }, []);
- 
- 
-  
 
   return (
    
@@ -47,7 +57,7 @@ const handlePreviousPage = () => {
       <div className="sidebar">
         <div className="filter-section">
           <h3>Display Size</h3>
-          <div className="checkbox-group">
+          <div className="checkbox-gr</div>oup">
             <label><input type="checkbox" /> 17 inches & Above</label>
             <label><input type="checkbox" /> 16 to 16.9 inches</label>
             <label><input type="checkbox" /> 15 to 15.9 inches</label>
@@ -83,13 +93,7 @@ const handlePreviousPage = () => {
           </div>
         </div>
 
-        <div className="filter-section">
-          <h3>Deals & Discounts</h3>
-          <div className="checkbox-group">
-            <label><input type="checkbox" /> All Discounts</label>
-            <label><input type="checkbox" /> Today's Deals</label>
-          </div>
-        </div>
+       
 
         <div className="filter-section">
           <h3>RAM Size</h3>
@@ -120,9 +124,23 @@ const handlePreviousPage = () => {
         </div>
 
         <div className="filter-section">
-          <h3>Top Brands in Electronics</h3>
+          <h3>CPU Model Manufacture</h3>
           <div className="checkbox-group">
-            <label><input type="checkbox" /> Top Brands</label>
+            <label><input type="checkbox" /> Intel</label>
+            <label><input type="checkbox" /> AMD</label>
+            <label><input type="checkbox" /> MediaTek</label>
+            <label><input type="checkbox" /> Qualcomm</label>
+          </div>
+        </div>
+        <div className="filter-section">
+          <h3>Weight</h3>
+          <div className="checkbox-group">
+            <label><input type="checkbox" /> Up to 3 Pounds</label>
+            <label><input type="checkbox" /> 3 to 3.9 Pounds</label>
+            <label><input type="checkbox" /> 4 to 4.9 Pounds</label>
+            <label><input type="checkbox" /> 5 to 5.9 Pounds</label>
+            <label><input type="checkbox" /> 6 to 6.9 Pounds</label>
+            <label><input type="checkbox" /> 7 to 7.9 Pounds</label>
           </div>
         </div>
 
@@ -149,9 +167,29 @@ const handlePreviousPage = () => {
             <label><input type="checkbox" /> Windows 10 Home</label>
           </div>
         </div>
+        <div className="filter-section">
+          <h3>Graphics Coprocessor</h3>
+          <div className="checkbox-group">
+            <label><input type="checkbox" /> Intel Iris Xe Graphics</label>
+            <label><input type="checkbox" /> NVIDIA GeForce RTX 2060</label>
+            <label><input type="checkbox" /> NVIDIA GeForce RTX 2070</label>
+            <label><input type="checkbox" /> NVIDIA GeForce GTX 1650</label>
+            <label><input type="checkbox" /> NVIDIA GeForce RTX 2080</label>
+            <label><input type="checkbox" /> NVIDIA GeForce RTX 3050 Ti</label>
+            <label><input type="checkbox" /> NVIDIA GeForce RTX 3070</label>
+          </div>
+        </div>
       </div>
 
       <div className="results-container">
+        <div className="search-bar">
+          <input
+            type="text"
+            placeholder="Search for laptops..."
+            // value={searchTerm}
+            onChange={handleSearch}
+          />
+        </div>
         <div className="results-header">
           <h2>Results</h2>
           <p>Check each product page for other buying options.</p>
@@ -159,6 +197,7 @@ const handlePreviousPage = () => {
             <span className="pick-label">Overall Pick</span>
           </div>
         </div>
+        
 
         <div className="laptop-listings">
           {currentLaptops.map((laptop) => (

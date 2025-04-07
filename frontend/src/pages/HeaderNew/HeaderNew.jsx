@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import './nhap.css';
-import { Search } from 'lucide-react';
+import './HeaderNew.css';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate từ react-router-dom
 
 const Header = () => {
   const [isProductsOpen, setIsProductsOpen] = useState(false);
+  const navigate = useNavigate(); // Khởi tạo useNavigate
 
   const toggleProducts = () => {
     setIsProductsOpen(!isProductsOpen);
@@ -13,13 +14,23 @@ const Header = () => {
     <div className="header-container">
       <div className="main-header">
         <div className="header-items">
-          <div className="header-item">
+        <div className="header-item" onClick={() => navigate('/home')}>
+          <img
+            src="https://cdn-icons-png.flaticon.com/128/5974/5974636.png"
+            alt="Builder Icon"
+            className="icon"
+            width="25"
+            height="25"
+          />
+            <span>Home</span>
+          </div>
+          <div className="header-item" onClick={() => navigate('/build')}>
           <img
             src="https://cdn-icons-png.flaticon.com/128/7414/7414141.png"
             alt="Builder Icon"
             className="icon"
-            width="35"
-            height="35"
+            width="25"
+            height="25"
           />
             <span>Builder</span>
           </div>
@@ -31,19 +42,19 @@ const Header = () => {
             src="https://cdn-icons-png.flaticon.com/128/4275/4275113.png"
             alt="Builder Icon"
             className="icon"
-            width="35"
-            height="35"
+            width="25"
+            height="25"
           />
             <span>Components</span>
             <span className={`arrow ${isProductsOpen ? 'up' : 'down'}`}>▼</span>
           </div>
-          <div className="header-item">
+          <div className="header-item" onClick={() => navigate('/laptops')}>
           <img
             src="https://cdn-icons-png.flaticon.com/128/4639/4639905.png"
             alt="Builder Icon"
             className="icon"
-            width="35"
-            height="35"
+            width="25"
+            height="25"
           />
             <span>Laptop</span>
           </div>
@@ -52,15 +63,34 @@ const Header = () => {
             src="https://cdn-icons-png.flaticon.com/128/4961/4961759.png"
             alt="Builder Icon"
             className="icon"
-            width="35"
-            height="35"
+            width="25"
+            height="25"
           />
             <span>Support</span>
           </div>
+         
+          <div className="header-item" style={{marginLeft: '600px'}}>
+          <img
+            src="https://cdn-icons-png.flaticon.com/128/891/891407.png"
+            alt="Builder Icon"
+            className="icon"
+            width="25"
+            height="25"
+          />
+            
+          </div>
+          <div className="header-item">
+          <img
+            src="https://cdn-icons-png.flaticon.com/128/17446/17446833.png"
+            alt="Builder Icon"
+            className="icon"
+            width="25"
+            height="25"
+          />
+            <span>Login</span>
+          </div>
         </div>
-        <div className="search">
-          <Search size={20} />
-        </div>
+        
       </div>
 
       {isProductsOpen && (

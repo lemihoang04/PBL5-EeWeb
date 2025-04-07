@@ -4,13 +4,14 @@ import './Build.css';
 const Build = () => {
   const [components, setComponents] = useState([
     {
-      id: 'cpu',
-      name: 'CPU',
-      selected: {
-        name: 'AMD Ryzen 7 9800X3D 4.7 GHz 8-Core Processor',
-        price: 479.00,
-        image: 'https://m.media-amazon.com/images/I/51D3BmtA+GL._AC_UF1000,1000_QL80_.jpg'
-      }
+      // id: 'cpu',
+      // name: 'CPU',
+      // selected: {
+      //   name: 'AMD Ryzen 7 9800X3D 4.7 GHz 8-Core Processor',
+      //   price: 479.00,
+      //   image: 'https://m.media-amazon.com/images/I/51D3BmtA+GL._AC_UF1000,1000_QL80_.jpg'
+      // }
+      id : 'cpu', name : 'CPU', selected: null
     },
     { id: 'cpuCooler', name: 'CPU Cooler', selected: null },
     { id: 'motherboard', name: 'Motherboard', selected: null },
