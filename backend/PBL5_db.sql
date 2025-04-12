@@ -53,14 +53,22 @@ CREATE TABLE laptop (
 -- Linh kiện
 CREATE TABLE component (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    type ENUM('ram', 'cpu', 'vga', 'ssd', 'hdd', 'mainboard', 'psu', 'case', 'monitor') NOT NULL,
+    type ENUM(
+        'storage',         -- tương ứng với storage_cleaned
+        'psu',             -- power_supplies_cleaned
+        'mainboard',       -- motherboards_cleaned
+        'gpu',             -- gpus_cleaned
+        'cpu',             -- cpus_cleaned
+        'ram',             -- memory_cleaned
+        'cpu_cooler',      -- cpu_coolers_cleaned
+        'case'             -- cases_cleaned
+    ) NOT NULL,
     title TEXT,
     price DOUBLE,
-    rating TEXT,
     image TEXT,
     brand VARCHAR(100),
     series VARCHAR(100),
-    model_number VARCHAR(100),
+    model_number VARCHAR(255),
     specs JSON,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -74,7 +82,7 @@ CREATE TABLE product (
 );
 
 -- Bảng booking
-CREATE TABLE booking (
+CREATE TABLE order (
     booking_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT,
     product_id INT,

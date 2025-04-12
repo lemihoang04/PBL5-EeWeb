@@ -6,9 +6,10 @@ import ProductInfo from "../pages/ProductInfo";
 import Cart from "../pages/Cart/Cart";
 import Login from "../pages/Login/Login";
 import Register from "../pages/Register/Register";
-import Products from "../pages/Products/Products";
 import Admin from "../pages/Admin/Admin";
 import NotFound from "../components/NotFound";
+import LaptopSearch from "../pages/laptop/LaptopSearch";
+import Build from "../pages/Build/Build";
 import Checkout from "../pages/Checkout/Checkout";
 import ZaloPayButton from "../pages/Zalopaybutton";
 
@@ -23,9 +24,10 @@ const AppRoutes = () => {
                         <Route path="/" element={<Home />} />
                         <Route path="/cart" element={<Cart />} />
                         <Route path="/product-info/:productId" element={<ProductInfo />} />
-                        <Route path="/products" element={<Products />} />
                         <Route path="/login" element={<Login />} />
                         <Route path="/register" element={<Register />} />
+                        <Route path="/laptops" element={<LaptopSearch />} />
+                        <Route path="/build" element={<Build />} />
                         <Route path="/checkout" element={<Checkout />} />
                         <Route path="/zalopay" element={<ZaloPayButton />} />
                     </Route>
