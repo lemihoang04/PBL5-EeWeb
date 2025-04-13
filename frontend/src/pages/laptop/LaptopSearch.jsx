@@ -164,7 +164,12 @@ const handlePreviousPage = () => {
           {currentLaptops.map((laptop) => (
             <div className="laptop-item" key={laptop.id}>
               <div className="laptop-image">
-                <img src={laptop.image.split("; ")[0]} alt={laptop.title} />
+                {/* <img src={laptop.image.split("; ")[0]} alt={laptop.title} /> */}
+                <img 
+                  src={laptop.image ? laptop.image.split("; ")[0] : "default-image.jpg"} 
+                  alt={laptop.title} 
+                />
+
                 
               </div>
               

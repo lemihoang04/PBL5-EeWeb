@@ -11,6 +11,7 @@ import Admin from "../pages/Admin/Admin";
 import NotFound from "../components/NotFound";
 import Checkout from "../pages/Checkout/Checkout";
 import ZaloPayButton from "../pages/Zalopaybutton";
+import LaptopSearch from "../pages/laptop/LaptopSearch";
 
 const AppRoutes = () => {
     return (
@@ -27,6 +28,7 @@ const AppRoutes = () => {
                         <Route path="/login" element={<Login />} />
                         <Route path="/register" element={<Register />} />
                         <Route path="/checkout" element={<Checkout />} />
+                        <Route path="/laptops" element={<LaptopSearch />} />
                         <Route path="/zalopay" element={<ZaloPayButton />} />
                     </Route>
 

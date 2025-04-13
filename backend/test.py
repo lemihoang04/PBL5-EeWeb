@@ -17,14 +17,14 @@ db = mysql.connector.connect(
     user="root",
     port=3306,
     password="",
-    database="amazon_db"
+    database="computer_store"
 )
 
 @app.route("/products", methods=["GET"])
 def get_products():
     try:
         cursor = db.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM amazon_laptops")
+        cursor.execute("SELECT * FROM laptop")
         products = cursor.fetchall()
         cursor.close()
         return jsonify(products)
@@ -38,16 +38,16 @@ def get_filters():
         cursor = db.cursor(dictionary=True)
 
         # Lấy các giá trị distinct từ các cột
-        cursor.execute("SELECT DISTINCT screen_size FROM amazon_laptops ")
+        cursor.execute("SELECT DISTINCT screen_size FROM laptop ")
         screen_sizes = [row["screen_size"] for row in cursor.fetchall()]
 
-        cursor.execute("SELECT DISTINCT ram FROM amazon_laptops")
+        cursor.execute("SELECT DISTINCT ram FROM laptop")
         ram_sizes = [row["ram"] for row in cursor.fetchall()]
 
-        cursor.execute("SELECT DISTINCT brand FROM amazon_laptops")
+        cursor.execute("SELECT DISTINCT brand FROM laptop")
         brands = [row["brand"] for row in cursor.fetchall()]
 
-        cursor.execute("SELECT DISTINCT operating_system FROM amazon_laptops")
+        cursor.execute("SELECT DISTINCT operating_system FROM laptop")
         operating_systems = [row["operating_system"] for row in cursor.fetchall()]
 
         # Trả về dữ liệu dưới dạng JSON
@@ -69,7 +69,7 @@ def get_filters():
 @app.route("/product-images/<int:product_id>", methods=["GET"])
 def get_product_images(product_id):
     cursor = db.cursor(dictionary=True)
-    cursor.execute("SELECT image FROM amazon_laptops WHERE id = %s", (product_id,))
+    cursor.execute("SELECT image FROM laptop WHERE id = %s", (product_id,))
     images = cursor.fetchone()
     cursor.close()
 
@@ -83,7 +83,7 @@ def get_product_images(product_id):
 # @app.route("/product/<int:product_id>", methods=["GET"])
 # def get_product_details(product_id):
 #     cursor = db.cursor(dictionary=True)
-#     cursor.execute("SELECT * FROM amazon_laptops WHERE id = %s", (product_id,))
+#     cursor.execute("SELECT * FROM laptop WHERE id = %s", (product_id,))
 #     product = cursor.fetchone()
 #     cursor.close()
     
