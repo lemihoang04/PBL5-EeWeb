@@ -79,7 +79,7 @@ function Header() {
 
                     <ul className="navbar-nav ms-auto">
                         <li className="nav-item"><Link className="nav-link" to="/">Home</Link></li>
-                        <li className="nav-item"><Link className="nav-link" to="/products">Products</Link></li>
+                        <li className="nav-item"><Link className="nav-link" to="/laptops">Laptop</Link></li>
                         <li className="nav-item"><Link className="nav-link" to="/cart">Cart</Link></li>
                         {user && user.isAuthenticated ? (
                             <li className="nav-item dropdown">

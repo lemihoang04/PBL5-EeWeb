@@ -7,7 +7,13 @@ DATABASE_CONFIG = {
     'port': 3306,        
     'database': 'computer_store',
 }
-
+ZALOPAY_CONFIG = {
+    "app_id": "2553",
+    "key1": "PcY4iZIKFCIdgZvA6ueMcMHHUbRLYjPL",
+    "key2": "kLtgPl8HHhfvMuDHPwKfgfsY4Ydm9eIz",
+    "create_order_endpoint": "https://sb-openapi.zalopay.vn/v2/create",
+    "query_order_endpoint": "https://sb-openapi.zalopay.vn/v2/query",
+}
 def get_db_connection():
     connection = mysql.connector.connect(**DATABASE_CONFIG)
     return connection

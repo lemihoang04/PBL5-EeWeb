@@ -7,9 +7,7 @@ import os
 # # Load biến môi trường từ .env
 # load_dotenv()
 app = Flask(__name__)
-
 CORS(app, origins="http://localhost:3000", supports_credentials=True)
-
 
 # Kết nối MySQL
 db = mysql.connector.connect(
@@ -17,7 +15,11 @@ db = mysql.connector.connect(
     user="root",
     port=3306,
     password="",
+<<<<<<< HEAD
     database="amazon_db"
+=======
+    database="computer_store",
+>>>>>>> 848e43d4ae25388cb24e190e4ec3f2f2696d7f41
 )
 
 @app.route("/products", methods=["GET"])
