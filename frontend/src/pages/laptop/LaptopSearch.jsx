@@ -203,21 +203,11 @@ const LaptopSearch = () => {
           {currentLaptops.map((laptop) => (
             <div className="laptop-item" key={laptop.id}>
               <div className="laptop-image">
-<<<<<<< HEAD
-                {/* <img src={laptop.image.split("; ")[0]} alt={laptop.title} /> */}
-                <img 
-                  src={laptop.image ? laptop.image.split("; ")[0] : "default-image.jpg"} 
-                  alt={laptop.title} 
-                />
-
-                
-=======
                 <img
                   src={laptop.image ? laptop.image.split("; ")[0] : "default-image.jpg"}
                   alt={laptop.title}
                 />
 
->>>>>>> 848e43d4ae25388cb24e190e4ec3f2f2696d7f41
               </div>
 
               <div className="laptop-details">

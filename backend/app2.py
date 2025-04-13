@@ -15,11 +15,7 @@ db = mysql.connector.connect(
     user="root",
     port=3306,
     password="",
-<<<<<<< HEAD
-    database="amazon_db"
-=======
     database="computer_store",
->>>>>>> 848e43d4ae25388cb24e190e4ec3f2f2696d7f41
 )
 
 @app.route("/products", methods=["GET"])
