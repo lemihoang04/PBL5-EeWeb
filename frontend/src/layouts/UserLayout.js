@@ -6,7 +6,8 @@ const UserLayout = () => {
     return (
         <>
             <Header />
-            <main style={{ minHeight: "80vh" }}>
+            {/* <main style={{ minHeight: "80vh" }}> */}
+            <main>
                 <Outlet />
             </main>
             <Footer />

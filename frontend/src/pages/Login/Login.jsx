@@ -19,10 +19,6 @@ const Login = () => {
 
     const [formValues, setFormValues] = useState({ email: '', password: '' });
     const [showPassword, setShowPassword] = useState(false);
-
-
-
-
     const handleChange = (e) => {
         setFormValues({ ...formValues, [e.target.name]: e.target.value });
     };

@@ -133,11 +133,16 @@ def api_update_user(user_id):
     email = data.get('email')
     password = data.get('password')
     phone = data.get('phone')
+    address = data.get('address')  
 
-    if not any([name, email, password, phone]):
+    user = get_user_by_id(user_id)
+    if not any([name, email, password, phone, address]):
         return jsonify({"error": "No information to update"}), 400
-
-    update_user(user_id, name=name, email=email, password=password, phone=phone)
+    
+    if check_existing_user(email, phone) and (user['email'] != email or user['phone'] != phone):
+        return jsonify({"errCode": 1, "error": "Phone already exists"}), 409
+    
+    update_user(user_id, name=name, email=email, password=password, phone=phone, address=address)
     return jsonify({"errCode": 0, "message": "User information successfully updated"}), 200
 
 @app.route('/users/<int:user_id>', methods=['DELETE'])
@@ -164,10 +169,28 @@ def api_login():
     else:
         return jsonify({"error": "Wrong email or password"}), 404
 
+@app.route('/changePassword', methods=['PUT'])
+def api_change_password():    
+    data = request.json
+    user_id = data.get('userid')
+    if not user_id:
+        return jsonify({"errCode": 1, "message": "Not authenticated"}), 401
+    old_password = data.get('oldPassword')
+    new_password = data.get('newPassword')
+
+    if not old_password or not new_password:
+        return jsonify({"errCode": 1, "message": "Missing old or new password"}), 400
+    success = change_password(user_id, old_password, new_password)
+    if success:
+        return jsonify({"errCode": 0, "message": "Password changed successfully"}), 200
+    else:
+        return jsonify({"errCode": 1, "message": "Old password is incorrect"}), 400
+
 @app.route('/logout', methods=['POST'])
 def api_logout():
     session.clear()
     return jsonify({"errCode": 0, "message": "Logged out successfully"}), 200
+
 @app.route("/products", methods=["GET"])
 def get_products():
     try:
