@@ -54,14 +54,14 @@ CREATE TABLE laptop (
 CREATE TABLE component (
     id INT AUTO_INCREMENT PRIMARY KEY,
     type ENUM(
-        'storage',         -- tương ứng với storage_cleaned
-        'psu',             -- power_supplies_cleaned
-        'mainboard',       -- motherboards_cleaned
-        'gpu',             -- gpus_cleaned
-        'cpu',             -- cpus_cleaned
-        'ram',             -- memory_cleaned
-        'cpu_cooler',      -- cpu_coolers_cleaned
-        'case'             -- cases_cleaned
+        'storage', 
+        'psu',            
+        'mainboard', 
+        'gpu',            
+        'cpu',            
+        'ram',            
+        'cpu_cooler',     
+        'case'             
     ) NOT NULL,
     title TEXT,
     price DOUBLE,

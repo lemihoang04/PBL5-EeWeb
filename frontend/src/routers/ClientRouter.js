@@ -8,7 +8,6 @@ import Login from "../pages/Login/Login";
 import Register from "../pages/Register/Register";
 import Admin from "../pages/Admin/Admin";
 import NotFound from "../components/NotFound";
-import LaptopSearch from "../pages/laptop/LaptopSearch";
 import Build from "../pages/Build/Build";
 import Checkout from "../pages/Checkout/Checkout";
 import Profile from "../pages/UserInfo/Profile";
