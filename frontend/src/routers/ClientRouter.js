@@ -10,8 +10,9 @@ import Admin from "../pages/Admin/Admin";
 import NotFound from "../components/NotFound";
 import Build from "../pages/Build/Build";
 import Checkout from "../pages/Checkout/Checkout";
-import ZaloPayButton from "../pages/Zalopaybutton";
-import LaptopSearch from "../pages/laptop/LaptopSearch";
+import Profile from "../pages/UserInfo/Profile";
+import ChangePassword from "../pages/ChangePass/ChangePass";
+
 
 const AppRoutes = () => {
     return (
@@ -26,11 +27,11 @@ const AppRoutes = () => {
                         <Route path="/product-info/:productId" element={<ProductInfo />} />
                         <Route path="/login" element={<Login />} />
                         <Route path="/register" element={<Register />} />
+                        <Route path="/profile" element={<Profile />} />
+                        <Route path="/change-password" element={<ChangePassword />} />
                         <Route path="/laptops" element={<LaptopSearch />} />
                         <Route path="/build" element={<Build />} />
                         <Route path="/checkout" element={<Checkout />} />
-                        <Route path="/laptops" element={<LaptopSearch />} />
-                        <Route path="/zalopay" element={<ZaloPayButton />} />
                     </Route>
 
                     {/* Route Admin */}

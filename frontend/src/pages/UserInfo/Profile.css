@@ -1,0 +1,130 @@
+.profile_container {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 24px;
+    background-color: #ffffff;
+    border-radius: 8px;
+
+}
+
+.profile_title {
+    font-size: 35px;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 24px;
+    text-align: left;
+}
+
+.profile_form {
+    width: 100%;
+}
+
+.profile_form_content {
+    margin-bottom: 24px;
+}
+
+.profile_form_row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.profile_label {
+    width: 100px;
+    text-align: right;
+    padding-right: 16px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #4b5563;
+}
+
+.profile_input_container {
+    flex: 1;
+    position: relative;
+    max-width: 400px;
+}
+
+.profile_icon_wrapper {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    padding-left: 12px;
+    pointer-events: none;
+}
+
+.profile_field_icon {
+    color: #6b7280;
+}
+
+.profile_input {
+    width: 100%;
+    padding: 8px 12px 8px 36px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 14px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.profile_input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+}
+
+.profile_input_disabled {
+    background-color: #f3f4f6;
+    color: #6b7280;
+    cursor: not-allowed;
+}
+
+.profile_button_container {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.profile_submit_button {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 16px;
+    background-color: #2563eb;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.profile_submit_button:hover {
+    background-color: #1d4ed8;
+}
+
+.profile_button_icon {
+    margin-right: 8px;
+}
+
+.profile_change_password_button {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 16px;
+    background-color: #6b7280;
+    /* Màu xám */
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    margin-right: 12px;
+    /* Khoảng cách với nút Save Changes */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.profile_change_password_button:hover {
+    background-color: #4b5563;
+    /* Màu xám đậm hơn khi hover */
+}

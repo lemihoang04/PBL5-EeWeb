@@ -79,19 +79,32 @@ const getAdminAccount = () => {
 const LogOutUser = () => {
 	return axios.post("/logout");
 };
-const EditUserService = (user_edit, formValue) => {
-	return axios.put(`/users/${user_edit}`, formValue, {
-		headers: {
-			"Content-Type": "application/x-www-form-urlencoded",
-		},
-	});
-};
 const DeleteUser = (idUser) => {
 	return axios.delete(`/users/${idUser}`, {
 		headers: {
 			"Content-Type": "application/x-www-form-urlencoded",
 		},
 	});
+};
+const EditUser = (user_edit, formValue) => {
+	return axios.put(`/users/${user_edit}`, formValue, {
+		headers: {
+			"Content-Type": "application/x-www-form-urlencoded",
+		},
+	});
+};
+const changePassword = async (userId, oldPassword, newPassword) => {
+	try {
+		const response = await axios.put('/changePassword', {
+			userid: userId,
+			oldPassword,
+			newPassword,
+		});
+		return response;
+	} catch (error) {
+		console.error("Error changing password:", error);
+		throw error.response.data;
+	}
 };
 export {
 	LoginUser,
@@ -101,7 +114,8 @@ export {
 	getAdminAccount,
 	getUserAccount,
 	LogOutUser,
-	EditUserService,
+	EditUser,
 	DeleteUser,
 	GetUserID,
+	changePassword,
 };

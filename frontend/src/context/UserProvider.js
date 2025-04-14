@@ -37,6 +37,11 @@ const UserProvider = ({ children }) => {
 		sessionStorage.setItem("user", JSON.stringify(userData));
 	};
 
+	const updateUser = (userData) => {
+		setUser((prev) => ({ ...prev, account: { ...prev.account, ...userData } }));
+		sessionStorage.setItem("user", JSON.stringify({ ...user, account: { ...user.account, ...userData } }));
+	};
+
 	const loginAdmin = (adminData) => {
 		setAdmin(adminData);
 		sessionStorage.setItem("admin", JSON.stringify(adminData));
@@ -53,7 +58,7 @@ const UserProvider = ({ children }) => {
 	};
 
 	return (
-		<UserContext.Provider value={{ user, admin, loginUser, loginAdmin, logoutUser, logoutAdmin }}>
+		<UserContext.Provider value={{ user, admin, loginUser, updateUser, loginAdmin, logoutUser, logoutAdmin }}>
 			{children}
 		</UserContext.Provider>
 	);

@@ -7,6 +7,7 @@ def user_to_json(user_data):
         "name": user_data['name'],
         "email": user_data['email'],
         "phone": user_data['phone'],
+        "address": user_data['address'],  
         "created_at": user_data['created_at'].isoformat(),
     }
 
@@ -60,7 +61,7 @@ def login(email, password):
 
 
 
-def update_user(user_id, name=None, email=None, password=None, phone=None):
+def update_user(user_id, name=None, email=None, password=None, phone=None, address=None):
     connection = get_db_connection()
     cursor = connection.cursor()
     updates = []
@@ -78,6 +79,9 @@ def update_user(user_id, name=None, email=None, password=None, phone=None):
     if phone is not None:
         updates.append("phone = %s")
         values.append(phone)
+    if address is not None:  # Thêm address
+        updates.append("address = %s")
+        values.append(address)
 
     if updates:  # Chỉ cập nhật nếu có dữ liệu thay đổi
         values.append(user_id)
@@ -87,6 +91,23 @@ def update_user(user_id, name=None, email=None, password=None, phone=None):
 
     cursor.close()
     connection.close()
+
+def change_password(user_id, old_password, new_password):
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+
+    cursor.execute("SELECT * FROM users WHERE id = %s AND password = %s", (user_id, old_password))
+    user = cursor.fetchone()
+
+    if not user:
+        cursor.close()
+        connection.close()
+        return False  
+    cursor.execute("UPDATE users SET password = %s WHERE id = %s", (new_password, user_id))
+    connection.commit()
+    cursor.close()
+    connection.close()
+    return True 
 
 def delete_user(user_id):
     connection = get_db_connection()

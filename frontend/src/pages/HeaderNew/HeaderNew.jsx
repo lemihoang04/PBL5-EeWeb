@@ -112,7 +112,7 @@ const Header = () => {
                   </div>
                   <ul className={`dropdown-menu dropdown-menu-end ${isDropdownOpen ? 'show' : ''}`} aria-labelledby="userDropdown">
                     <li>
-                      <button className="dropdown-item" onClick={() => navigate('/account')}>
+                      <button className="dropdown-item" onClick={() => navigate('/profile')}>
                         Account
                       </button>
                     </li>
