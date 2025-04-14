@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useEffect } from 'react';
-import { AppContext } from '../../context/AppContext';
 import { fetchLaptops } from '../../services/laptopService'; // Adjust the import path as necessary
 import './LaptopSearch.css';
 import { useNavigate } from 'react-router-dom';
