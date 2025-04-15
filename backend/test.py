@@ -140,7 +140,7 @@ def delete_user(user_id):
         db.close()
 
 ###########PRODUCT################
-@app.route("/products", methods=["GET"])
+@app.route("/laptops", methods=["GET"])
 def get_products():
     db = get_db_connection()
     if not db:
