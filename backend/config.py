@@ -5,7 +5,7 @@ DATABASE_CONFIG = {
     'password': '',
     'host': 'localhost',  
     'port': 3306,        
-    'database': 'computer_store',
+    'database': 'techshop_db',
 }
 ZALOPAY_CONFIG = {
     "app_id": "2553",

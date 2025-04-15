@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import AppContextProvider from "../context/AppContext";
 import UserLayout from "../layouts/UserLayout";
 import Home from "../pages/Home";
-import ProductInfo from "../pages/ProductInfo";
+import ProductInfo from "../pages/ProductInfo/ProductInfo";
 import Cart from "../pages/Cart/Cart";
 import Login from "../pages/Login/Login";
 import Register from "../pages/Register/Register";
@@ -12,6 +12,7 @@ import Build from "../pages/Build/Build";
 import Checkout from "../pages/Checkout/Checkout";
 import Profile from "../pages/UserInfo/Profile";
 import ChangePassword from "../pages/ChangePass/ChangePass";
+import LaptopSearch from "../pages/laptop/LaptopSearch";
 
 
 const AppRoutes = () => {

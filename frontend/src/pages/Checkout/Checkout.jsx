@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { toast } from "react-toastify";
 import { PaymentZaloPay } from "../../services/apiService.js";
+import { UserContext } from "../../context/UserProvider";
 import { useLocation, useNavigate } from "react-router-dom";
-
+import "./Checkout.css";
 const Checkout = () => {
     const navigate = useNavigate();
     const location = useLocation();
+    const { user } = useContext(UserContext);
     const formValue = location.state?.formValue || null;
 
     useEffect(() => {
@@ -15,14 +17,24 @@ const Checkout = () => {
     }, [formValue, navigate]);
 
     const [formData, setFormData] = useState({
-        firstName: "",
-        lastName: "",
+        fullName: "",
         email: "",
         phone: "",
         country: "Viet Nam",
         address: "",
         payment: "payLater",
     });
+
+    useEffect(() => {
+        if (user?.account) {
+            setFormData({
+                fullName: user.account.name || '',
+                email: user.account.email || '',
+                phone: user.account.phone || '',
+                address: user.account.address || ''
+            });
+        }
+    }, [user]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -63,40 +75,14 @@ const Checkout = () => {
                 <div className="col-md-7">
                     <h3 className="mb-4 p-2 border-bottom">Billing Details</h3>
 
-                    <div className="row mb-3">
-                        <div className="col">
-                            <label className="form-label">First Name*</label>
-                            <input
-                                type="text"
-                                className="form-control"
-                                name="firstName"
-                                placeholder="First Name"
-                                value={formData.firstName}
-                                onChange={handleChange}
-                                required
-                            />
-                        </div>
-                        <div className="col">
-                            <label className="form-label">Last Name*</label>
-                            <input
-                                type="text"
-                                className="form-control"
-                                name="lastName"
-                                placeholder="Last Name"
-                                value={formData.lastName}
-                                onChange={handleChange}
-                                required
-                            />
-                        </div>
-                    </div>
                     <div className="mb-3">
-                        <label className="form-label">Email*</label>
+                        <label className="form-label">Full Name*</label>
                         <input
-                            type="email"
+                            type="text"
                             className="form-control"
-                            name="email"
-                            placeholder="Email"
-                            value={formData.email}
+                            name="fullName"
+                            placeholder="Full Name"
+                            value={formData.fullName}
                             onChange={handleChange}
                             required
                         />
@@ -147,7 +133,10 @@ const Checkout = () => {
                         </div>
                         {formValue.items.map((item) => (
                             <div className="d-flex justify-content-between mb-1" key={item.id}>
-                                <span>{item.name} x {item.quantity}</span>
+                                <span className="d-flex align-items-center">
+                                    <span className="product-name me-2">{item.name}</span> {/* Tên sản phẩm */}
+                                    <strong><span>x {item.quantity}</span></strong> {/* Số lượng */}
+                                </span>
                                 <span>${(item.price * item.quantity)}</span>
                             </div>
                         ))}

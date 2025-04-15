@@ -19,7 +19,7 @@ db = mysql.connector.connect(
     user="root",
     port=3306,
     password="",
-    database="computer_store",
+    database="techshop_db",
 )
 ZALOPAY_CONFIG = {
     "app_id": "2553",
@@ -238,7 +238,7 @@ def get_filters():
 @app.route("/product-images/<int:product_id>", methods=["GET"])
 def get_product_images(product_id):
     cursor = db.cursor(dictionary=True)
-    cursor.execute("SELECT image FROM laptop WHERE id = %s", (product_id,))
+    cursor.execute("SELECT image FROM products WHERE product_id = %s", (product_id,))
     images = cursor.fetchone()
     cursor.close()
 
@@ -249,6 +249,200 @@ def get_product_images(product_id):
 
     return jsonify(image_urls)
 
+@app.route('/laptops', methods=['GET'])
+def get_laptops():
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+    try:
+        cursor.execute("""
+            SELECT 
+                p.product_id,
+                p.title,
+                p.price,
+                p.image,
+                p.rating,
+                pa.attribute_name,
+                pa.attribute_value
+            FROM Products p
+            LEFT JOIN Product_Attributes pa ON p.product_id = pa.product_id
+            WHERE p.category_id = 4
+        """)
+        rows = cursor.fetchall()
 
+        products = {}
+        for row in rows:
+            product_id = row['product_id']
+            if product_id not in products:
+                products[product_id] = {
+                    'id': product_id,
+                    'title': row['title'],
+                    'price': row['price'],
+                    'image': row['image'],
+                    'rating': row['rating'],
+                }
+
+            attr_name = row['attribute_name']
+            attr_value = row['attribute_value']
+            if attr_name:
+                products[product_id][attr_name] = attr_value  
+
+        return jsonify(list(products.values()))
+    finally:
+        cursor.close()
+        connection.close()
+
+@app.route('/addToCart', methods=['POST'])
+def add_to_cart():
+    data = request.json
+    user_id = data.get('user_id')
+    product_id = data.get('product_id')
+    quantity = data.get('quantity', 1)
+
+    if not user_id or not product_id:
+        return jsonify({'error': 'user_id and product_id are required'}), 400
+
+    connection = get_db_connection()
+    cursor = connection.cursor()
+
+    try:
+        cursor.execute("""
+            SELECT quantity FROM cart 
+            WHERE user_id = %s AND product_id = %s
+        """, (user_id, product_id))
+        row = cursor.fetchone()
+
+        if row:
+            new_quantity = row[0] + quantity
+            cursor.execute("""
+                UPDATE cart
+                SET quantity = %s
+                WHERE user_id = %s AND product_id = %s
+            """, (new_quantity, user_id, product_id))
+        else:
+            cursor.execute("""
+                INSERT INTO cart (user_id, product_id, quantity)
+                VALUES (%s, %s, %s)
+            """, (user_id, product_id, quantity))
+
+        connection.commit()
+        return jsonify({"errCode": 0, 'message': 'Cart updated successfully'}), 200
+
+    except Exception as e:
+        connection.rollback()
+        return jsonify({"errCode": 1, 'error': str(e)}), 500
+
+    finally:
+        cursor.close()
+        connection.close()
+        
+@app.route('/cart/<int:user_id>', methods=['GET'])
+def get_cart(user_id):
+    if not user_id:
+        return jsonify({'error': 'Missing user_id'}), 400
+
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+    try:
+        cursor.execute("""
+            SELECT 
+                c.cart_id,
+                c.product_id,
+                c.quantity,
+                p.title,
+                p.price,
+                p.image
+            FROM cart c
+            JOIN products p ON c.product_id = p.product_id
+            WHERE c.user_id = %s
+        """, (user_id,))
+        rows = cursor.fetchall()
+
+        cart_items = []
+        for row in rows:
+            cart_items.append({
+                'cart_id': row['cart_id'],
+                'product_id': row['product_id'],
+                'name': row['title'],
+                'price': row['price'],
+                'quantity': row['quantity'],
+                'image': row['image'],
+            })
+
+        return jsonify({"errCode": 0, "data": cart_items})
+    finally:
+        cursor.close()
+        connection.close()
+
+@app.route('/delete_cart/<int:cart_id>', methods=['DELETE'])
+def delete_cart(cart_id):
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+
+    try:
+        cursor.execute("SELECT * FROM cart WHERE cart_id = %s", (cart_id,))
+        cart = cursor.fetchone()
+        if not cart:
+            return jsonify({"message": "Cart not found"}), 404
+        cursor.execute("DELETE FROM cart WHERE cart_id = %s", (cart_id,))
+        connection.commit()
+        return jsonify({"errCode": 0, "message": "Cart deleted successfully"}), 200
+    except mysql.connector.Error as err:
+        connection.rollback()
+        return jsonify({"errCode": 1, "message": f"Error: {err}"}), 500
+    finally:
+        cursor.close()
+        connection.close()
+
+def checkout(user_id, order_items, total_amount, payment_method):
+    connection = get_db_connection()
+    if not connection:
+        raise Exception("Database connection failed")
+    cursor = connection.cursor()
+    try:
+        order_id = int(f"{int(datetime.now().timestamp())}{user_id}")
+        for item in order_items:
+            cursor.execute("""
+                SELECT product_id 
+                FROM Product_Attributes 
+                WHERE attribute_name = 'model_number' AND attribute_value = %s
+            """, (item['model_number'],))
+            product = cursor.fetchone()
+
+            if not product:
+                raise ValueError(f"Product with model_number {item['model_number']} not found")
+
+            product_id = product[0]
+            quantity = item['quantity']
+            price_per_item = item['total_price'] / quantity
+
+            cursor.execute("""
+                INSERT INTO `Order` (order_id, user_id, product_id, quantity, price, status)
+                VALUES (%s, %s, %s, %s, %s, %s)
+            """, (order_id, user_id, product_id, quantity, price_per_item, 'pending'))
+
+        # 2. Tạo thanh toán
+        cursor.execute("""
+            INSERT INTO Payments (order_id, user_id, amount, payment_method, payment_status)
+            VALUES (%s, %s, %s, %s, %s)
+        """, (order_id, user_id, total_amount, payment_method, 'pending'))
+
+        # Commit giao dịch
+        connection.commit()
+        return {
+            'message': 'Order placed successfully',
+            'order_id': order_id
+        }
+
+    except Error as e:
+        connection.rollback()
+        raise Exception(f"Database error: {str(e)}")
+
+    except ValueError as e:
+        connection.rollback()
+        raise Exception(str(e))
+
+    finally:
+        cursor.close()
+        connection.close()
 if __name__ == "__main__":
     app.run(debug=True, port=5000)

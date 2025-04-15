@@ -1,9 +1,13 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { AppContext } from "../context/AppContext.jsx";
-import Images from "../components/Images.jsx";
+import { AppContext } from "../../context/AppContext.jsx";
+import { UserContext } from "../../context/UserProvider";
+import Images from "../../components/Images.jsx";
 import "./ProductInfo.css";
 import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
+import { fetchLaptops } from '../../services/laptopService';
+import { toast } from "react-toastify";
+import { addToCart } from "../../services/apiService.js";
 
 const extractRating = (ratingText) => {
   if (!ratingText) return null;
@@ -31,7 +35,17 @@ const RatingStars = ({ rating }) => {
 
 const ProductInfo = () => {
   const { productId } = useParams();
-  const { products } = useContext(AppContext);
+  const { user } = useContext(UserContext);
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    const loadLaptops = async () => {
+      const data = await fetchLaptops();
+      setProducts(data);
+    };
+    loadLaptops();
+  }, []);
+
   const navigate = useNavigate();
   const [productInfo, setProductInfo] = useState(null);
 
@@ -48,6 +62,28 @@ const ProductInfo = () => {
     productIndex !== -1
       ? products.slice(Math.max(0, productIndex - 4), productIndex).concat(products.slice(productIndex + 1, productIndex + 5))
       : [];
+
+  const handleAddToCart = async () => {
+    if (!productInfo) {
+      toast.error("Product not found!");
+      return;
+    }
+    if (!(user && user.isAuthenticated)) {
+      toast.error("You must be logged in to add products to the cart!");
+      return;
+    }
+    try {
+      const response = await addToCart(user.account.id, productInfo.id, 1);
+      if (response && response.errCode === 0) {
+        toast.success("Product added to cart successfully!");
+      } else {
+        toast.error(response.error || "Failed to add product to cart.");
+      }
+    } catch (error) {
+      console.error("Error adding product to cart:", error);
+      toast.error("An error occurred while adding the product to the cart.");
+    }
+  };
 
   return (
     <>
@@ -140,15 +176,15 @@ const ProductInfo = () => {
           <div className="product-info-sidebar-right">
             <div className="order-summary">
               <img
-                src={productInfo.image || "/default-image.jpg"}
+                src={productInfo.image ? productInfo.image.split("; ")[0] : "default-image.jpg"}
                 alt={productInfo.title}
                 className="order-image"
               />
               <h3>{productInfo.brand || "Không có tên sản phẩm"}</h3>
               <p className="product-price">Tạm tính</p>
               {productInfo.price && <p className="total-price">{productInfo.price.toLocaleString()}$</p>}
-              <button className="buy-now">Mua ngay</button>
-              <button className="add-to-cart">Thêm vào giỏ</button>
+              <button className="buy-now">Buy now</button>
+              <button onClick={handleAddToCart} className="add-to-cart">Add to cart</button>
             </div>
           </div>
         )}

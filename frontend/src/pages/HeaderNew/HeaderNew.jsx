@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect, useRef } from 'react';
 import './HeaderNew.css';
 import { useNavigate } from 'react-router-dom';
 import { UserContext } from "../../context/UserProvider";
@@ -9,7 +9,25 @@ const Header = () => {
   const { user, logoutUser } = useContext(UserContext);
   const [isProductsOpen, setIsProductsOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const productsRef = useRef(null);
+  const dropdownRef = useRef(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (productsRef.current && !productsRef.current.contains(event.target) && !event.target.closest('.categories-container')) {
+        setIsProductsOpen(false);
+      }
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target) && !event.target.closest('.dropdown-menu')) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   const toggleProducts = () => {
     setIsProductsOpen(!isProductsOpen);
@@ -60,6 +78,7 @@ const Header = () => {
           <div
             className={`header-item ${isProductsOpen ? 'active' : ''}`}
             onClick={toggleProducts}
+            ref={productsRef}
           >
             <img
               src="https://cdn-icons-png.flaticon.com/128/4275/4275113.png"
@@ -106,7 +125,11 @@ const Header = () => {
                   <span>Cart</span>
                 </div>
 
-                <div className="header-item dropdown" onClick={() => toggleDropdown()}>
+                <div
+                  className="header-item dropdown"
+                  onClick={toggleDropdown}
+                  ref={dropdownRef}
+                >
                   <div className="dropdown-toggle" id="userDropdown" aria-expanded="false">
                     <span>Welcome, {user.account.name}</span>
                   </div>
