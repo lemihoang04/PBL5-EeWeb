@@ -9,7 +9,7 @@ const AppContextProvider = (props) => {
   useEffect(() => {
     axios.get("http://127.0.0.1:5000/products")
       .then((response) => {
-        console.log("Fetched Products:", response.data);
+        // console.log("Fetched Products:", response.data);
         setProducts(response.data);
       })
       .catch((error) => console.error("Error fetching products:", error));
