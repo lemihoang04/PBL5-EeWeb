@@ -13,14 +13,12 @@ def checkout(user_id, billing_details, order_items, total_amount, payment_method
         # 1. Tạo đơn hàng
         # Sinh order_id
         order_id = int(f"{int(datetime.now().timestamp())}{user_id}")
-
         # Lấy thông tin giao hàng từ billing_details
         shipping_address = None
         if billing_details:
             shipping_address = f"{billing_details.get('street_address', '')}, {billing_details.get('country', '')}".strip()
             if not shipping_address:
                 raise ValueError("Shipping address is required")
-
         for item in order_items:
             # Tìm product_id dựa trên model_number
             cursor.execute("""

@@ -1,8 +1,8 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import AppContextProvider from "../context/AppContext";
+import AppContextProvider from "../services/AppContext";
 import UserLayout from "../layouts/UserLayout";
 import Home from "../pages/Home";
-import ProductInfo from "../pages/ProductInfo";
+import ProductInfo from "../pages/ProductInfo/ProductInfo";
 import Cart from "../pages/Cart/Cart";
 import Login from "../pages/Login/Login";
 import Register from "../pages/Register/Register";

@@ -1,5 +1,36 @@
 import axios from "../setup/axios";
 
+const loadCart = async (userId) => {
+	try {
+		const response = await axios.get(`/cart/${userId}`);
+		return response;
+	} catch (error) {
+		console.error("Error loading cart:", error);
+		throw error.response.data;
+	}
+};
+const addToCart = async (userId, product_id, quantity = 1) => {
+	try {
+		const response = await axios.post('/addToCart', {
+			user_id: userId,
+			product_id: product_id,
+			quantity: quantity,
+		});
+		return response;
+	} catch (error) {
+		console.error("Error adding to cart:", error);
+		throw error.response.data;
+	}
+};
+const removeFromCart = async (cart_id) => {
+	try {
+		const response = await axios.delete(`/delete_cart/${cart_id}`);
+		return response;
+	} catch (error) {
+		console.error("Error removing from cart:", error);
+		throw error.response.data;
+	}
+}
 const CreatePayment = (form) => {
 	return axios
 		.post("/payments", form, {
@@ -62,6 +93,9 @@ const DeleteRooms = async (id_rooms) => {
 	});
 };
 export {
+	loadCart,
+	addToCart,
+	removeFromCart,
 	UpdatePayment,
 	CreatePayment,
 	CheckPayment,

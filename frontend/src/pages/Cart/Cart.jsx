@@ -1,36 +1,43 @@
-import React, { useState } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
 import './Cart.css';
 import Laptop from '../../assets/images/laptop1.jpg';
+import { UserContext } from "../../context/UserProvider";
 import { toast } from 'react-toastify';
+import { loadCart, removeFromCart } from '../../services/apiService';
+
 
 const Cart = () => {
     const navigate = useNavigate();
-    const [cartItems, setCartItems] = useState([
-        {
-            id: 1,
-            name: "Kingston FURY Beast RGB 32GB (2x16GB) 6000MT/s DDR5 CL30 Desktop Memory",
-            description: "AMD EXPO | Plug N Play | Kit of 2 | KF560C30BBEAK2-32",
-            image: Laptop,
-            price: 124.99,
-            quantity: 1,
-            style: "6000MT/s",
-            size: "32GB (2x16GB)",
-        },
-        {
-            id: 2,
-            name: "NIAKUN 16 Inch Laptop Computer, Gaming Laptop",
-            description: "16GB RAM 1TB SSD, N95 Processor, FHD 1920 x 1200, 180 Angle Open, Backlit Keyboard",
-            image: "https://via.placeholder.com/100", // Replace with actual image URL
-            price: 369.99,
-            quantity: 1,
-            style: "N95",
-            capacity: "16GB RAM + 1TB SSD",
-        },
-    ]);
+    const [cartItems, setCartItems] = useState([]);
+    const { user } = useContext(UserContext);
+
+    useEffect(() => {
+        if (user && user.account.id) {
+            const loadCartData = async () => {
+                try {
+                    const response = await loadCart(user.account.id);
+                    if (response && response.errCode === 0) {
+                        setCartItems(response.data);
+                    } else {
+                        toast.error("Failed to load cart items.");
+                    }
+                } catch (error) {
+                    console.error('Error loading cart:', error);
+                    toast.error("Failed to load cart items.");
+                }
+            };
+
+            loadCartData();
+        }
+    }, [user]);
+
+
     const handleCheckboxChange = (id) => {
-        setSelectedItems(prev =>
-            prev.includes(id) ? prev.filter(itemId => itemId !== id) : [...prev, id]
+        setSelectedItems((prev) =>
+            prev.includes(id)
+                ? prev.filter((itemId) => itemId !== id) // Bỏ chọn nếu đã được chọn
+                : [...prev, id] // Thêm vào nếu chưa được chọn
         );
     };
     const handleCheckoutClick = () => {
@@ -39,34 +46,52 @@ const Cart = () => {
             return;
         }
         const formValue = {
-            items: cartItems.filter(item => selectedItems.includes(item.id)),
+            items: cartItems.filter(item => selectedItems.includes(item.product_id)),
             amount: calculateSubtotal(),
         };
         navigate("/checkout", {
             state: { formValue }
         });
     };
-    const [selectedItems, setSelectedItems] = useState(cartItems.map(item => item.id));
+
+    const handleDeleteClick = async (cart_id) => {
+        try {
+            const response = await removeFromCart(cart_id);
+            if (response && response.errCode === 0) {
+                setCartItems((prevCartItems) =>
+                    prevCartItems.filter((item) => item.cart_id !== cart_id)
+                );
+
+                toast.success("Item removed from the cart.");
+            } else {
+                toast.error("Failed to delete items.");
+            }
+        } catch (error) {
+            console.error('Error deleting item:', error);
+            toast.error("Failed to delete items.");
+        }
+    };
+    const [selectedItems, setSelectedItems] = useState([]);
     const handleSelectToggle = () => {
         if (selectedItems.length === cartItems.length) {
             setSelectedItems([]);
         } else {
-            setSelectedItems(cartItems.map(item => item.id));
+            setSelectedItems(cartItems.map(item => item.product_id));
         }
     };
     // Calculate subtotal dynamically
     const calculateSubtotal = () => {
         return cartItems
-            .filter(item => selectedItems.includes(item.id))
+            .filter(item => selectedItems.includes(item.product_id))
             .reduce((total, item) => total + item.price * item.quantity, 0)
             .toFixed(2);
     };
 
     // Handle quantity change
-    const handleQuantityChange = (id, delta) => {
+    const handleQuantityChange = (product_id, delta) => {
         setCartItems(
             cartItems.map((item) => {
-                if (item.id === id) {
+                if (item.product_id === product_id) {
                     const newQuantity = Math.max(1, item.quantity + delta); // Prevent quantity from going below 1
                     return { ...item, quantity: newQuantity };
                 }
@@ -77,9 +102,6 @@ const Cart = () => {
 
     return (
         <div className="App">
-
-
-            {/* Main Cart Section */}
             <div className="container my-4">
                 <div className="row">
                     {/* Cart Items (Left Side) */}
@@ -87,7 +109,7 @@ const Cart = () => {
                         <h2 className="mb-3">Shopping Cart</h2>
                         <a
                             href="#"
-                            className="text-primary mb-3 d-block"
+                            className="text-primary mb-3 d-block text-decoration-none"
                             onClick={(e) => {
                                 e.preventDefault();
                                 handleSelectToggle();
@@ -102,26 +124,22 @@ const Cart = () => {
                                 <input
                                     type="checkbox"
                                     className="me-3"
-                                    checked={selectedItems.includes(item.id)}
-                                    onChange={() => handleCheckboxChange(item.id)}
+                                    checked={selectedItems.includes(item.product_id)} // Kiểm tra trạng thái
+                                    onChange={() => handleCheckboxChange(item.product_id)} // Cập nhật trạng thái khi thay đổi
                                 />
                                 <img
-                                    src={item.image}
+                                    src={item.image ? item.image.split("; ")[0] : "default-image.jpg"}
                                     alt={item.name}
                                     className="me-3"
                                     style={{ width: '100px', height: 'auto' }}
                                 />
                                 <div className="flex-grow-1">
                                     <h5>{item.name}</h5>
-                                    <p className="text-muted">{item.description}</p>
-                                    {item.style && <p><strong>Style:</strong> {item.style}</p>}
-                                    {item.size && <p><strong>Size:</strong> {item.size}</p>}
-                                    {item.capacity && <p><strong>Capacity:</strong> {item.capacity}</p>}
                                     <div className="d-flex align-items-center">
                                         <div className="input-group w-auto me-3">
                                             <button
                                                 className="btn btn-outline-secondary"
-                                                onClick={() => handleQuantityChange(item.id, -1)}
+                                                onClick={() => handleQuantityChange(item.product_id, -1)}
                                             >
                                                 -
                                             </button>
@@ -134,12 +152,12 @@ const Cart = () => {
                                             />
                                             <button
                                                 className="btn btn-outline-secondary"
-                                                onClick={() => handleQuantityChange(item.id, 1)}
+                                                onClick={() => handleQuantityChange(item.product_id, 1)}
                                             >
                                                 +
                                             </button>
                                         </div>
-                                        <a href="#" className="text-primary me-3">Delete</a>
+                                        <a onClick={() => handleDeleteClick(item.cart_id)} href="#" className="text-primary me-3">Delete</a>
                                         <a href="#" className="text-primary me-3">Compare with similar items</a>
                                         <a href="#" className="text-primary">Share</a>
                                     </div>
