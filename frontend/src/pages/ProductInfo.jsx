@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { AppContext } from "../context/AppContext.jsx";
-import Images from "../components/Images.jsx";
+import { AppContext } from "../context/AppContext";
+import Images from "../components/Images";
 import "./ProductInfo.css";
 import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
 
@@ -31,23 +31,32 @@ const RatingStars = ({ rating }) => {
 
 const ProductInfo = () => {
   const { productId } = useParams();
-  const { products } = useContext(AppContext);
+  const { products, fetchProducts } = useContext(AppContext);
   const navigate = useNavigate();
   const [productInfo, setProductInfo] = useState(null);
 
+  // Gọi fetchProducts nếu products chưa được tải
   useEffect(() => {
-    if (!products || products.length === 0) return;
-    const foundProduct = products.find((prod) => Number(prod.id) === Number(productId));
-    setProductInfo(foundProduct || null);
+    if (!products) {
+      fetchProducts();
+    }
+  }, [products, fetchProducts]);
+
+  // Cập nhật productInfo khi products hoặc productId thay đổi
+  useEffect(() => {
+    if (products) {
+      const foundProduct = products.find((prod) => Number(prod.id) === Number(productId));
+      setProductInfo(foundProduct || null);
+    }
   }, [products, productId]);
 
   const rating = productInfo ? extractRating(productInfo.rating) : null;
-  const productIndex = products?.findIndex((prod) => Number(prod.id) === Number(productId));
+  const productIndex = products ? products.findIndex((prod) => Number(prod.id) === Number(productId)) : -1;
 
-  const otherProducts =
-    productIndex !== -1
-      ? products.slice(Math.max(0, productIndex - 4), productIndex).concat(products.slice(productIndex + 1, productIndex + 5))
-      : [];
+  // Tính otherProducts chỉ khi products có giá trị
+  const otherProducts = products && productIndex !== -1
+    ? products.slice(Math.max(0, productIndex - 4), productIndex).concat(products.slice(productIndex + 1, productIndex + 5))
+    : [];
 
   return (
     <>
@@ -61,7 +70,6 @@ const ProductInfo = () => {
             <div className="product-info-details">
               <h3>{productInfo.title || "Không có tên sản phẩm"}</h3>
               <p>{productInfo.description || ""}</p>
-              {/* <p className="product-price">Giá: {productInfo.price ? `${productInfo.price.toLocaleString()} $` : "Không có giá"}</p> */}
               <p
                 className="product-price"
                 style={{ color: "red", fontSize: "1.5rem", fontWeight: "bold" }}
@@ -95,7 +103,6 @@ const ProductInfo = () => {
                     ) : (
                       value && (
                         <tr key={key}>
-                          {/* <td>{key.replace(/_/g, " ")}</td> */}
                           <td>{key.replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase())}</td>
                           <td>{value}</td>
                         </tr>
@@ -126,7 +133,6 @@ const ProductInfo = () => {
                       ? product.brand.charAt(0).toUpperCase() + product.brand.slice(1).toLowerCase()
                       : "Không có tên"}
                   </h4>
-
                   {product.price && <p>{product.price.toLocaleString()} $</p>}
                 </div>
               ))
