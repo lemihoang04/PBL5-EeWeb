@@ -14,7 +14,6 @@ import Profile from "../pages/UserInfo/Profile";
 import ChangePassword from "../pages/ChangePass/ChangePass";
 import LaptopSearch from "../pages/laptop/LaptopSearch"
 import ComponentSearch from "../pages/Component/ComponentSearch"
-import CPUSeach from "../pages/CPU/CPUSearch"
 
 const AppRoutes = () => {
     return (
@@ -34,7 +33,6 @@ const AppRoutes = () => {
                         <Route path="/laptops" element={<LaptopSearch />} />
                         <Route path="/build" element={<Build />} />
                         <Route path="/checkout" element={<Checkout />} />
-                        <Route path="/cpus" element={<CPUSeach />} />
                         <Route path="/components/:type" element={<ComponentSearch />} />
                     </Route>
 

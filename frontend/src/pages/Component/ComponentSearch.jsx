@@ -9,51 +9,94 @@ const ComponentSearch = () => {
   const [filteredComponents, setFilteredComponents] = useState([]);
   const [priceRange, setPriceRange] = useState([0, 5000]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  const validTypes = ['storage', 'psu', 'mainboard', 'gpu', 'cpu', 'ram', 'cpu_cooler', 'case'];
+  const validTypes = ['Storage', 'PSU', 'Mainboard', 'GPU', 'CPU', 'RAM', 'CPU Cooler', 'Case'];
+
+  // Normalize the type parameter to match validTypes
+  const normalizeType = (inputType) => {
+    if (!inputType) return null;
+    const lowerType = inputType.toLowerCase();
+    return validTypes.find((validType) => validType.toLowerCase() === lowerType) || null;
+  };
+
+  const normalizedType = normalizeType(type);
 
   useEffect(() => {
-    console.log('Type from useParams:', type);
-    if (!validTypes.includes(type)) {
-      return; 
-    }
+    console.log('Type from useParams:', type, 'Normalized:', normalizedType);
     const loadComponents = async () => {
-      const data = await fetchComponents(type);
-      if (!data) {
-        
-        console.error('No data returned from fetchComponents');
-        setComponents([]);
-        setFilteredComponents([]);
+      setError(null);
+      setComponents([]);
+      setFilteredComponents([]);
+      if (!normalizedType) {
+        console.log('Invalid type, clearing components');
         return;
       }
-      if (data.error) {
-        console.error(data.error);
-        setComponents([]);
-        setFilteredComponents([]);
-      } else {
-        setComponents(data);
-        setFilteredComponents(data);
+      try {
+        const data = await fetchComponents(normalizedType);
+        console.log('Received data in ComponentSearch:', data);
+        if (data && data.error) {
+          console.error('API returned error:', data.error);
+          setError(data.error);
+          return;
+        }
+        if (!Array.isArray(data)) {
+          console.error('Expected array but got:', data);
+          setError('Invalid data format from server');
+          return;
+        }
+        console.log('Number of components received:', data.length);
+        if (data.length === 0) {
+          console.log('API returned empty array');
+          setComponents([]);
+          setFilteredComponents([]);
+          return;
+        }
+        // Parse attributes and price
+        const parsedComponents = data.map((component, index) => {
+          let attributes = {};
+          try {
+            if (component.attributes && typeof component.attributes === 'string') {
+              attributes = Object.fromEntries(
+                component.attributes.split(',').map((attr) => {
+                  const [name, value] = attr.split(':').map((s) => s?.trim() || '');
+                  return [name, value];
+                })
+              );
+            }
+          } catch (err) {
+            console.error(`Error parsing attributes for component ${index}:`, component, err);
+          }
+          // Parse price to float, default to 0 if invalid
+          const parsedPrice = parseFloat(component.price) || 0;
+          return { ...component, price: parsedPrice, attributes };
+        });
+        console.log('Parsed Components:', parsedComponents);
+        console.log('Number of components:', parsedComponents.length);
+        setComponents(parsedComponents);
+        setFilteredComponents(parsedComponents);
+      } catch (err) {
+        console.error('Unexpected error in loadComponents:', err);
+        setError('Failed to load components');
       }
     };
     loadComponents();
-  }, [type]);
-
-  if (!validTypes.includes(type)) {
-    return <div>Invalid component type</div>;
-  }
+  }, [normalizedType]);
 
   const itemsPerPage = 20;
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentComponents = filteredComponents.slice(indexOfFirstItem, indexOfLastItem);
+  console.log('Current Components for rendering:', currentComponents);
   const totalPages = Math.ceil(filteredComponents.length / itemsPerPage);
 
   const handleSearch = (e) => {
     const term = e.target.value.toLowerCase();
     const filtered = components.filter((component) =>
-      component.title.toLowerCase().includes(term)
+      component.title?.toLowerCase().includes(term)
     );
+    console.log('Filtered Components after search:', filtered);
     setFilteredComponents(filtered);
     setCurrentPage(1);
   };
@@ -71,78 +114,231 @@ const ComponentSearch = () => {
   };
 
   const getComponentSpecificFilters = () => {
-    switch (type) {
-      case 'storage':
+    const applyAttributeFilter = (attributeName, values) => {
+      const filtered = components.filter((component) =>
+        values.includes(component.attributes?.[attributeName])
+      );
+      console.log(`Filtered Components after ${attributeName} filter:`, filtered);
+      setFilteredComponents(filtered);
+      setCurrentPage(1);
+    };
+
+    switch (normalizedType) {
+      case 'Storage':
         return (
           <div className="filter-section">
             <h3>Storage Type</h3>
             <div className="checkbox-group">
-              <label><input type="checkbox" /> SSD</label>
-              <label><input type="checkbox" /> HDD</label>
-              <label><input type="checkbox" /> NVMe</label>
+              <label>
+                <input
+                  type="checkbox"
+                  onChange={(e) =>
+                    e.target.checked &&
+                    applyAttributeFilter('Storage Type', ['SSD'])
+                  }
+                /> SSD
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  onChange={(e) =>
+                    e.target.checked &&
+                    applyAttributeFilter('Storage Type', ['HDD'])
+                  }
+                /> HDD
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  onChange={(e) =>
+                    e.target.checked &&
+                    applyAttributeFilter('Storage Type', ['NVMe'])
+                  }
+                /> NVMe
+              </label>
             </div>
           </div>
         );
-      case 'psu':
+      case 'PSU':
         return (
           <div className="filter-section">
             <h3>Wattage</h3>
             <div className="checkbox-group">
-              <label><input type="checkbox" /> 400W-600W</label>
-              <label><input type="checkbox" /> 600W-800W</label>
-              <label><input type="checkbox" /> 800W+</label>
+              <label>
+                <input
+                  type="checkbox"
+                  onChange={(e) =>
+                    e.target.checked &&
+                    applyAttributeFilter('Wattage', ['400W-600W'])
+                  }
+                /> 400W-600W
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  onChange={(e) =>
+                    e.target.checked &&
+                    applyAttributeFilter('Wattage', ['600W-800W'])
+                  }
+                /> 600W-800W
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  onChange={(e) =>
+                    e.target.checked &&
+                    applyAttributeFilter('Wattage', ['800W+'])
+                  }
+                /> 800W+
+              </label>
             </div>
           </div>
         );
-      case 'mainboard':
+      case 'Mainboard':
         return (
           <div className="filter-section">
             <h3>Chipset</h3>
             <div className="checkbox-group">
-              <label><input type="checkbox" /> Intel Z790</label>
-              <label><input type="checkbox" /> AMD B650</label>
-              <label><input type="checkbox" /> Intel B760</label>
+              <label>
+                <input
+                  type="checkbox"
+                  onChange={(e) =>
+                    e.target.checked &&
+                    applyAttributeFilter('Chipset', ['Intel Z790'])
+                  }
+                /> Intel Z790
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  onChange={(e) =>
+                    e.target.checked &&
+                    applyAttributeFilter('Chipset', ['AMD B650'])
+                  }
+                /> AMD B650
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  onChange={(e) =>
+                    e.target.checked &&
+                    applyAttributeFilter('Chipset', ['Intel B760'])
+                  }
+                /> Intel B760
+              </label>
             </div>
           </div>
         );
-      case 'gpu':
+      case 'GPU':
         return (
           <div className="filter-section">
             <h3>GPU Brand</h3>
             <div className="checkbox-group">
-              <label><input type="checkbox" /> NVIDIA</label>
-              <label><input type="checkbox" /> AMD</label>
+              <label>
+                <input
+                  type="checkbox"
+                  onChange={(e) =>
+                    e.target.checked &&
+                    applyAttributeFilter('Brand', ['NVIDIA'])
+                  }
+                /> NVIDIA
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  onChange={(e) =>
+                    e.target.checked &&
+                    applyAttributeFilter('Brand', ['AMD'])
+                  }
+                /> AMD
+              </label>
             </div>
           </div>
         );
-      case 'ram':
+      case 'RAM':
         return (
           <div className="filter-section">
             <h3>Memory Type</h3>
             <div className="checkbox-group">
-              <label><input type="checkbox" /> DDR4</label>
-              <label><input type="checkbox" /> DDR5</label>
+              <label>
+                <input
+                  type="checkbox"
+                  onChange={(e) =>
+                    e.target.checked &&
+                    applyAttributeFilter('Memory Type', ['DDR4'])
+                  }
+                /> DDR4
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  onChange={(e) =>
+                    e.target.checked &&
+                    applyAttributeFilter('Memory Type', ['DDR5'])
+                  }
+                /> DDR5
+              </label>
             </div>
           </div>
         );
-      case 'cpu_cooler':
+      case 'CPU Cooler':
         return (
           <div className="filter-section">
             <h3>Cooler Type</h3>
             <div className="checkbox-group">
-              <label><input type="checkbox" /> Air</label>
-              <label><input type="checkbox" /> Liquid</label>
+              <label>
+                <input
+                  type="checkbox"
+                  onChange={(e) =>
+                    e.target.checked &&
+                    applyAttributeFilter('Cooler Type', ['Air'])
+                  }
+                /> Air
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  onChange={(e) =>
+                    e.target.checked &&
+                    applyAttributeFilter('Cooler Type', ['Liquid'])
+                  }
+                /> Liquid
+              </label>
             </div>
           </div>
         );
-      case 'case':
+      case 'Case':
         return (
           <div className="filter-section">
             <h3>Case Size</h3>
             <div className="checkbox-group">
-              <label><input type="checkbox" /> ATX</label>
-              <label><input type="checkbox" /> Micro-ATX</label>
-              <label><input type="checkbox" /> Mini-ITX</label>
+              <label>
+                <input
+                  type="checkbox"
+                  onChange={(e) =>
+                    e.target.checked &&
+                    applyAttributeFilter('Case Size', ['ATX'])
+                  }
+                /> ATX
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  onChange={(e) =>
+                    e.target.checked &&
+                    applyAttributeFilter('Case Size', ['Micro-ATX'])
+                  }
+                /> Micro-ATX
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  onChange={(e) =>
+                    e.target.checked &&
+                    applyAttributeFilter('Case Size', ['Mini-ITX'])
+                  }
+                /> Mini-ITX
+              </label>
             </div>
           </div>
         );
@@ -150,6 +346,14 @@ const ComponentSearch = () => {
         return null;
     }
   };
+
+  if (!normalizedType) {
+    return <div>Invalid component type</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
 
   return (
     <div className="component-search-container">
@@ -184,44 +388,54 @@ const ComponentSearch = () => {
         <div className="search-bar">
           <input
             type="text"
-            placeholder={`Search for ${type}...`}
+            placeholder={`Search for ${normalizedType}...`}
             onChange={handleSearch}
           />
         </div>
 
-        <div className="component-listings">
-          {currentComponents.map((component) => (
-            <div className="component-item" key={component.id}>
-              <img
-                src={component.image || 'default-component.jpg'}
-                alt={component.title}
-              />
-              <h3
-                onClick={() => navigate(`/product-info/${component.id}`)}
-              >
-                {component.title}
-              </h3>
-              <p>${component.price?.toFixed(2) || 'N/A'}</p>
-              <button>Add to cart</button>
-            </div>
-          ))}
-        </div>
+        {filteredComponents.length === 0 ? (
+          <div>No components found for {normalizedType}</div>
+        ) : (
+          <div className="component-listings">
+            {currentComponents.map((component) => (
+              <div className="component-item" key={component.product_id}>
+                <img
+                  src={component.image || 'default-component.jpg'}
+                  alt={component.title}
+                />
+                <h3
+                  onClick={() => navigate(`/product-info/${component.product_id}`)}
+                >
+                  {component.title}
+                </h3>
+                <p>
+                  {typeof component.price === 'number' && !isNaN(component.price)
+                    ? `$${component.price.toFixed(2)}`
+                    : 'N/A'}
+                </p>
+                <button>Add to cart</button>
+              </div>
+            ))}
+          </div>
+        )}
 
-        <div className="pagination">
-          <button
-            onClick={handlePreviousPage}
-            disabled={currentPage === 1}
-          >
-            Previous
-          </button>
-          <span>Page {currentPage} of {totalPages}</span>
-          <button
-            onClick={handleNextPage}
-            disabled={currentPage === totalPages}
-          >
-            Next
-          </button>
-        </div>
+        {filteredComponents.length > 0 && (
+          <div className="pagination">
+            <button
+              onClick={handlePreviousPage}
+              disabled={currentPage === 1}
+            >
+              Previous
+            </button>
+            <span>Page {currentPage} of {totalPages}</span>
+            <button
+              onClick={handleNextPage}
+              disabled={currentPage === totalPages}
+            >
+              Next
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
