@@ -9,7 +9,7 @@ const AppContextProvider = (props) => {
   const fetchProducts = async () => {
     if (products !== null) return;
     try {
-      const response = await axios.get("http://127.0.0.1:5000/products");
+      const response = await axios.get("http://127.0.0.1:5000/laptops");
       setProducts(response.data);
     } catch (error) {
       console.error("Error fetching products:", error);
