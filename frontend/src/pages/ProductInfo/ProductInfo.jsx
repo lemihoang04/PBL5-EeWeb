@@ -5,7 +5,6 @@ import { UserContext } from "../../context/UserProvider";
 import Images from "../../components/Images.jsx";
 import "./ProductInfo.css";
 import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
-import { fetchLaptops } from '../../services/laptopService';
 import { toast } from "react-toastify";
 import { addToCart } from "../../services/apiService.js";
 
