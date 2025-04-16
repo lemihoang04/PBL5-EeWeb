@@ -5,6 +5,7 @@ import os
 import requests
 import time, hmac, hashlib, json, requests, urllib.request, urllib.parse
 from controllers.user_controller import *
+from controllers.service_controller import checkout
 # from dotenv import load_dotenv
 
 # # Load biến môi trường từ .env
@@ -139,7 +140,7 @@ def api_update_user(user_id):
     if not any([name, email, password, phone, address]):
         return jsonify({"error": "No information to update"}), 400
     
-    if check_existing_user(email, phone) and (user['email'] != email or user['phone'] != phone):
+    if check_phone_existing(phone) and user['phone'] != phone:
         return jsonify({"errCode": 1, "error": "Phone already exists"}), 409
     
     update_user(user_id, name=name, email=email, password=password, phone=phone, address=address)
@@ -393,56 +394,29 @@ def delete_cart(cart_id):
         cursor.close()
         connection.close()
 
-def checkout(user_id, order_items, total_amount, payment_method):
-    connection = get_db_connection()
-    if not connection:
-        raise Exception("Database connection failed")
-    cursor = connection.cursor()
-    try:
-        order_id = int(f"{int(datetime.now().timestamp())}{user_id}")
-        for item in order_items:
-            cursor.execute("""
-                SELECT product_id 
-                FROM Product_Attributes 
-                WHERE attribute_name = 'model_number' AND attribute_value = %s
-            """, (item['model_number'],))
-            product = cursor.fetchone()
-
-            if not product:
-                raise ValueError(f"Product with model_number {item['model_number']} not found")
-
-            product_id = product[0]
-            quantity = item['quantity']
-            price_per_item = item['total_price'] / quantity
-
-            cursor.execute("""
-                INSERT INTO `Order` (order_id, user_id, product_id, quantity, price, status)
-                VALUES (%s, %s, %s, %s, %s, %s)
-            """, (order_id, user_id, product_id, quantity, price_per_item, 'pending'))
-
-        # 2. Tạo thanh toán
-        cursor.execute("""
-            INSERT INTO Payments (order_id, user_id, amount, payment_method, payment_status)
-            VALUES (%s, %s, %s, %s, %s)
-        """, (order_id, user_id, total_amount, payment_method, 'pending'))
-
-        # Commit giao dịch
-        connection.commit()
-        return {
-            'message': 'Order placed successfully',
-            'order_id': order_id
-        }
-
-    except Error as e:
-        connection.rollback()
-        raise Exception(f"Database error: {str(e)}")
-
-    except ValueError as e:
-        connection.rollback()
-        raise Exception(str(e))
-
-    finally:
-        cursor.close()
         connection.close()
+
+@app.route('/checkout', methods=['POST'])
+def api_checkout():
+    try:
+        # Lấy dữ liệu từ request body
+        order_data = request.json
+
+        # Kiểm tra dữ liệu đầu vào
+        required_fields = ['user_id', 'order_items', 'total_amount', 'payment_method', 'shipping_address']
+        for field in required_fields:
+            if field not in order_data:
+                return jsonify({"errCode": 1, "message": f"Missing required field: {field}"}), 400
+
+        # Gọi hàm checkout từ service_controller
+        result = checkout(order_data)
+        return jsonify({"errCode": 0, "message": result['message'], "order_id": result['order_id']}), 200
+
+    except Exception as e:
+        return jsonify({"errCode": 1, "message": str(e)}), 500    
+
+    
+
+    
 if __name__ == "__main__":
     app.run(debug=True, port=5000)

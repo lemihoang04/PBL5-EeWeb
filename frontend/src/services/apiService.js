@@ -31,35 +31,6 @@ const removeFromCart = async (cart_id) => {
 		throw error.response.data;
 	}
 }
-const CreatePayment = (form) => {
-	return axios
-		.post("/payments", form, {
-			headers: {
-				"Content-Type": "application/x-www-form-urlencoded",
-			},
-		})
-		.then((response) => {
-			return response;
-		})
-		.catch((error) => {
-			console.error(error);
-		});
-};
-const UpdatePayment = (booking_id) => {
-	return axios
-		.put(`/payments/${booking_id}`, {
-			headers: {
-				"Content-Type": "application/x-www-form-urlencoded",
-			},
-		})
-		.then((response) => {
-			return response;
-		})
-		.catch((error) => {
-			console.error(error);
-		});
-};
-
 const CheckPayment = async (apptransid) => {
 	return axios.post(
 		"/payment/CheckZaloPay",
@@ -78,17 +49,23 @@ const PaymentZaloPay = async (user) => {
 		},
 	});
 };
-const ChangeRoomAva = async (form) => {
-	return axios.put(`/rooms/${form.RoomID}`, form, {
+const CheckOut = async (orderData) => {
+	// try {
+	// 	const response = await fetch("/api/checkout", {
+	// 		method: "POST",
+	// 		headers: {
+	// 			"Content-Type": "application/json",
+	// 		},
+	// 		body: JSON.stringify(orderData),
+	// 	});
+	// 	return await response.json();
+	// } catch (error) {
+	// 	console.error("Error during checkout:", error);
+	// 	throw error;
+	// }
+	return axios.post("/checkout", orderData, {
 		headers: {
-			"Content-Type": "application/x-www-form-urlencoded",
-		},
-	});
-};
-const DeleteRooms = async (id_rooms) => {
-	return axios.delete(`/rooms/${id_rooms}`, {
-		headers: {
-			"Content-Type": "application/x-www-form-urlencoded",
+			"Content-Type": "application/json",
 		},
 	});
 };
@@ -96,10 +73,7 @@ export {
 	loadCart,
 	addToCart,
 	removeFromCart,
-	UpdatePayment,
-	CreatePayment,
 	CheckPayment,
 	PaymentZaloPay,
-	ChangeRoomAva,
-	DeleteRooms,
+	CheckOut,
 };

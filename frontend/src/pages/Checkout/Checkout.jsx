@@ -3,6 +3,7 @@ import { toast } from "react-toastify";
 import { PaymentZaloPay } from "../../services/apiService.js";
 import { UserContext } from "../../context/UserProvider";
 import { useLocation, useNavigate } from "react-router-dom";
+import { CheckOut } from "../../services/apiService.js";
 import "./Checkout.css";
 const Checkout = () => {
     const navigate = useNavigate();
@@ -17,18 +18,18 @@ const Checkout = () => {
     }, [formValue, navigate]);
 
     const [formData, setFormData] = useState({
-        fullName: "",
+        name: "",
         email: "",
         phone: "",
         country: "Viet Nam",
         address: "",
-        payment: "payLater",
+        payment: "",
     });
 
     useEffect(() => {
         if (user?.account) {
             setFormData({
-                fullName: user.account.name || '',
+                name: user.account.name || '',
                 email: user.account.email || '',
                 phone: user.account.phone || '',
                 address: user.account.address || ''
@@ -46,15 +47,38 @@ const Checkout = () => {
     };
 
     const handleSubmit = async () => {
-        if (formData.payment === "payLater") {
-            // Xử lý logic cho thanh toán sau
-            toast.success("Đơn hàng của bạn đã được ghi nhận. Bạn sẽ thanh toán khi nhận hàng.");
-            // Có thể gọi thêm API lưu thông tin đơn hàng tại đây
-        } else if (formData.payment === "onlinePayment") {
+        if (!formData.payment) {
+            toast.error("Please select a payment method.");
+            return;
+        }
+        if (formData.payment === "pay_later") {
+            const orderData = {
+                user_id: user.account.id,
+                order_items: formValue.items.map((item) => ({
+                    cart_id: item.cart_id,
+                    product_id: item.product_id,
+                    quantity: item.quantity,
+                    total_price: item.price * item.quantity,
+                })),
+                total_amount: formValue.amount,
+                payment_method: formData.payment,
+                shipping_address: formData.address + ", " + formData.country,
+            };
+            try {
+                const response = await CheckOut(orderData);
+                if (response && response.errCode === 0) {
+                    toast.success("Order placed successfully. You will pay when you receive the goods.");
+                } else {
+                    toast.error(response.message);
+                }
+            } catch (error) {
+                toast.error("Error while saving order information: " + error.message);
+            }
+        } else if (formData.payment === "online_payment") {
             // Xử lý thanh toán online qua ZaloPay như cũ
             try {
                 let payment = await PaymentZaloPay({
-                    name: formData.firstName + " " + formData.lastName,
+                    name: formData.name,
                     amount: formValue.amount,
                 });
                 if (payment && payment.return_code === 1) {
@@ -82,7 +106,7 @@ const Checkout = () => {
                             className="form-control"
                             name="fullName"
                             placeholder="Full Name"
-                            value={formData.fullName}
+                            value={formData.name}
                             onChange={handleChange}
                             required
                         />
@@ -154,11 +178,11 @@ const Checkout = () => {
                                 className="form-check-input"
                                 type="radio"
                                 name="payment"
-                                id="payLater"
-                                checked={formData.payment === "payLater"}
+                                id="pay_later"
+                                checked={formData.payment === "pay_later"}
                                 onChange={handlePaymentChange}
                             />
-                            <label className="form-check-label" htmlFor="payLater">
+                            <label className="form-check-label" htmlFor="pay_later">
                                 Pay later
                             </label>
                         </div>
@@ -167,11 +191,11 @@ const Checkout = () => {
                                 className="form-check-input"
                                 type="radio"
                                 name="payment"
-                                id="onlinePayment"
-                                checked={formData.payment === "onlinePayment"}
+                                id="online_payment"
+                                checked={formData.payment === "online_payment"}
                                 onChange={handlePaymentChange}
                             />
-                            <label className="form-check-label" htmlFor="onlinePayment">
+                            <label className="form-check-label" htmlFor="online_payment">
                                 Online payment
                             </label>
                         </div>

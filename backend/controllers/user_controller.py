@@ -11,7 +11,6 @@ def user_to_json(user_data):
         "created_at": user_data['created_at'].isoformat(),
     }
 
-
 def create_user(name, email, password, phone):
     connection = get_db_connection()
     cursor = connection.cursor()
@@ -26,6 +25,16 @@ def check_existing_user(email, phone):
     cursor = connection.cursor()
     query = "SELECT id FROM users WHERE email = %s OR phone = %s"
     cursor.execute(query, (email, phone))
+    result = cursor.fetchone()
+    cursor.close()
+    connection.close()
+    return result is not None
+
+def check_phone_existing(phone):
+    connection = get_db_connection()
+    cursor = connection.cursor()
+    query = "SELECT id FROM users WHERE phone = %s"
+    cursor.execute(query, (phone,))
     result = cursor.fetchone()
     cursor.close()
     connection.close()
@@ -49,7 +58,6 @@ def get_user_by_id(user_id):
     connection.close()
     return user_to_json(user) if user else None
 
-
 def login(email, password):
     connection = get_db_connection()
     cursor = connection.cursor(dictionary=True)
@@ -59,14 +67,11 @@ def login(email, password):
     connection.close()
     return user_to_json(user) if user else None
 
-
-
 def update_user(user_id, name=None, email=None, password=None, phone=None, address=None):
     connection = get_db_connection()
     cursor = connection.cursor()
     updates = []
     values = []
-
     if name is not None:
         updates.append("name = %s")
         values.append(name)
@@ -95,10 +100,8 @@ def update_user(user_id, name=None, email=None, password=None, phone=None, addre
 def change_password(user_id, old_password, new_password):
     connection = get_db_connection()
     cursor = connection.cursor(dictionary=True)
-
     cursor.execute("SELECT * FROM users WHERE id = %s AND password = %s", (user_id, old_password))
     user = cursor.fetchone()
-
     if not user:
         cursor.close()
         connection.close()

@@ -16,12 +16,12 @@ const ComponentSearch = () => {
   useEffect(() => {
     console.log('Type from useParams:', type);
     if (!validTypes.includes(type)) {
-      return; 
+      return;
     }
     const loadComponents = async () => {
       const data = await fetchComponents(type);
       if (!data) {
-        
+
         console.error('No data returned from fetchComponents');
         setComponents([]);
         setFilteredComponents([]);
