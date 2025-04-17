@@ -9,7 +9,7 @@ const Header = () => {
   const { user, logoutUser } = useContext(UserContext);
   const [isProductsOpen, setIsProductsOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [cartCount, setCartCount] = useState(user.account.cart_items_count || 0); // State to store cart count
+  const [cartCount, setCartCount] = useState(0); // State to store cart count
   const productsRef = useRef(null);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
@@ -111,9 +111,9 @@ const Header = () => {
                 ref={dropdownRef}
               >
                 <div className="user-avatar">
-                  <span>{user.account.name.charAt(0).toUpperCase()}</span>
+                  <span>{user.account.name.split(' ').slice(-1)[0].charAt(0).toUpperCase()}</span>
                 </div>
-                <span className="user-name">Hi, {user.account.name.split(' ')[0]}</span>
+                <span className="user-name">Hi, {user.account.name.split(' ').slice(-1)[0]}</span>
                 <i className={`dropdown-arrow fas fa-chevron-${isDropdownOpen ? 'up' : 'down'}`}></i>
 
                 <div className={`user-menu ${isDropdownOpen ? 'show' : ''}`}>

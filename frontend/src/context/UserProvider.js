@@ -34,6 +34,7 @@ const UserProvider = ({ children }) => {
 
 	const loginUser = (userData) => {
 		setUser(userData);
+		fetchUser();
 		sessionStorage.setItem("user", JSON.stringify(userData));
 	};
 

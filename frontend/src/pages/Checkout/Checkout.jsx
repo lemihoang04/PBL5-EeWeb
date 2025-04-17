@@ -8,7 +8,7 @@ import "./Checkout.css";
 const Checkout = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const { user } = useContext(UserContext);
+    const { user, fetchUser } = useContext(UserContext);
     const formValue = location.state?.formValue || null;
 
     useEffect(() => {
@@ -138,7 +138,8 @@ const Checkout = () => {
                 const response = await CheckOut(orderData);
                 if (response && response.errCode === 0) {
                     toast.success("Order placed successfully. You will pay when you receive the goods.");
-                    setTimeout(() => navigate("/orders"), 2000);
+                    fetchUser();
+                    setTimeout(() => navigate("/orders"), 1000);
                 } else {
                     toast.error(response.message);
                 }
