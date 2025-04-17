@@ -53,8 +53,8 @@ const ProductImageGallery = ({ images }) => {
       </div>
       <div className="thumbnails">
         {images.map((image, index) => (
-          <div 
-            key={index} 
+          <div
+            key={index}
             className={`thumbnail-wrapper ${index === selectedIndex ? 'active' : ''}`}
             onClick={() => handleThumbnailClick(image, index)}
           >
@@ -68,13 +68,13 @@ const ProductImageGallery = ({ images }) => {
 
 const ProductInfo = () => {
   const { productId } = useParams();
-  const { user } = useContext(UserContext);
+  const { user, fetchUser } = useContext(UserContext);
   const { products, fetchProducts } = useContext(AppContext);
   const navigate = useNavigate();
   const [productInfo, setProductInfo] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
-  
+
   // Fetch products only if not already loaded
   useEffect(() => {
     if (!products) {
@@ -94,12 +94,12 @@ const ProductInfo = () => {
   }, [products, productId]);
 
   const rating = productInfo ? extractRating(productInfo.rating) : null;
-  
+
   // Find similar products (excluding current one)
-  const similarProducts = products 
+  const similarProducts = products
     ? products
-        .filter(prod => prod.id !== productInfo?.id)
-        .slice(0, 8)
+      .filter(prod => prod.id !== productInfo?.id)
+      .slice(0, 8)
     : [];
 
   // Prepare product images
@@ -130,6 +130,7 @@ const ProductInfo = () => {
       const response = await addToCart(user.account.id, productInfo.id, quantity);
       if (response && response.errCode === 0) {
         toast.success(`${quantity} ${quantity > 1 ? 'items' : 'item'} added to cart successfully!`);
+        fetchUser();
       } else {
         toast.error(response?.error || "Failed to add product to cart.");
       }
@@ -169,7 +170,7 @@ const ProductInfo = () => {
         <section className="product-details">
           <div className="product-header">
             <h1 className="product-title">{productInfo?.title || "Loading..."}</h1>
-            
+
             <div className="product-meta">
               <div className="product-rating-container">
                 <RatingStars rating={rating} />
@@ -177,7 +178,7 @@ const ProductInfo = () => {
                   {productInfo?.reviews ? `(${productInfo.reviews} reviews)` : ''}
                 </span>
               </div>
-              
+
               <div className="product-id">ID: {productInfo?.id || 'N/A'}</div>
             </div>
           </div>
@@ -199,8 +200,8 @@ const ProductInfo = () => {
               {productInfo?.description || "No description available."}
             </div>
             {productInfo?.description && productInfo.description.length > 200 && (
-              <button 
-                className="read-more" 
+              <button
+                className="read-more"
                 onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
               >
                 {isDescriptionExpanded ? 'Read less' : 'Read more'}
@@ -211,16 +212,16 @@ const ProductInfo = () => {
           <div className="product-actions">
             <div className="quantity-selector">
               <button onClick={decreaseQuantity} className="quantity-btn quantity-btn-left">-</button>
-              <input 
-                type="number" 
-                value={quantity} 
-                onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))} 
+              <input
+                type="number"
+                value={quantity}
+                onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
                 min="1"
                 className="quantity-input"
               />
               <button onClick={increaseQuantity} className="quantity-btn quantity-btn-right">+</button>
             </div>
-            
+
             <div className="action-buttons">
               <button onClick={handleAddToCart} className="add-to-cart-btn">
                 <FaShoppingCart /> Add to Cart
@@ -229,7 +230,7 @@ const ProductInfo = () => {
                 Buy Now
               </button>
             </div>
-            
+
             <div className="secondary-actions">
               <button className="wishlist-btn">
                 <FaHeart /> Save
@@ -278,9 +279,9 @@ const ProductInfo = () => {
                 </div>
                 <div className="similar-product-info">
                   <h3 className="similar-product-title">
-                    {product.title 
-                      ? product.title.length > 40 
-                        ? `${product.title.substring(0, 40)}...` 
+                    {product.title
+                      ? product.title.length > 40
+                        ? `${product.title.substring(0, 40)}...`
                         : product.title
                       : "No title"}
                   </h3>

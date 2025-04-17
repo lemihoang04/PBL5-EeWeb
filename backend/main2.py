@@ -109,8 +109,9 @@ def get_user():
         return jsonify({"errCode": 1, "message": "Not authenticated"}), 401
 
     user = get_user_by_id(user_id)
+    cart_items_count = get_number_of_cart_items(user_id)
     if user:
-        return jsonify({"errCode": 0, "user": user}), 200
+        return jsonify({"errCode": 0, "user": user, "cart_items_count": cart_items_count}), 200
     else:
         return jsonify({"errCode": 1, "message": "User not found"}), 404
 

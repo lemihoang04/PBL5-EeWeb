@@ -8,7 +8,7 @@ import './Cart.css'; // Đổi tên file CSS
 const CartPage = () => {
     const navigate = useNavigate();
     const [cartItems, setCartItems] = useState([]);
-    const { user } = useContext(UserContext);
+    const { user, fetchUser } = useContext(UserContext);
     const [selectedItems, setSelectedItems] = useState([]);
 
     useEffect(() => {
@@ -70,6 +70,7 @@ const CartPage = () => {
                 }));
 
                 toast.success("Item removed from the cart.");
+                fetchUser();
             } else {
                 toast.error("Failed to delete items.");
             }

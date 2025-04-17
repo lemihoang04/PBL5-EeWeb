@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 
 const Profile = () => {
     const navigate = useNavigate();
-    const { user, updateUser } = useContext(UserContext);
+    const { user, fetchUser } = useContext(UserContext);
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -40,7 +40,7 @@ const Profile = () => {
         try {
             const response = await EditUser(user.account.id, formData);
             if (response && response.errCode === 0) {
-                updateUser(formData);
+                fetchUser();
                 toast.success("Profile updated successfully!");
 
             } else {

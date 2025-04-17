@@ -3,17 +3,23 @@ import { useNavigate } from 'react-router-dom';
 import { UserContext } from "../../context/UserProvider";
 import { LogOutUser } from "../../services/userService";
 import { toast } from "react-toastify";
-import { loadCart } from '../../services/apiService';
 import './HeaderNew.css';
 
 const Header = () => {
   const { user, logoutUser } = useContext(UserContext);
   const [isProductsOpen, setIsProductsOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [cartCount, setCartCount] = useState(0); // State to store cart count
+  const [cartCount, setCartCount] = useState(user.account.cart_items_count || 0); // State to store cart count
   const productsRef = useRef(null);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+
+    if (user && user.account) {
+      setCartCount(user.account.cart_items_count || 0);
+    }
+  }, [user]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -31,21 +37,6 @@ const Header = () => {
     };
   }, []);
 
-  useEffect(() => {
-    const fetchCartCount = async () => {
-      if (user && user.isAuthenticated) {
-        try {
-          const cart = await loadCart(user.account.id); // Fetch cart using user ID
-          setCartCount(cart.data.length); // Set the cart count based on the number of items
-          console.log("Cart count fetched:", cart.length);
-        } catch (error) {
-          console.error("Failed to fetch cart count:", error);
-        }
-      }
-    };
-
-    fetchCartCount();
-  }, [user]); // Re-run when user changes
 
   const toggleProducts = () => {
     setIsProductsOpen(!isProductsOpen);

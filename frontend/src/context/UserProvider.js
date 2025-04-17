@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect } from "react";
-
+import { getUserAccount } from "../services/userService";
 export const UserContext = createContext();
 
 const UserProvider = ({ children }) => {
@@ -47,6 +47,25 @@ const UserProvider = ({ children }) => {
 		sessionStorage.setItem("admin", JSON.stringify(adminData));
 	};
 
+	const fetchUser = async () => {
+		try {
+			const response = await getUserAccount();
+			if (response && response.errCode === 0) {
+				setUser({
+					isAuthenticated: true,
+					account: { ...response.user, cart_items_count: response.cart_items_count },
+					isLoading: false,
+				});
+			} else {
+				setUser({ ...userDefault, isLoading: false });
+			}
+		} catch (error) {
+			console.error("Error fetching user:", error);
+			setUser({ ...userDefault, isLoading: false });
+		}
+	};
+
+
 	const logoutUser = () => {
 		setUser(null);
 		sessionStorage.removeItem("user");
@@ -56,9 +75,18 @@ const UserProvider = ({ children }) => {
 		setAdmin(null);
 		sessionStorage.removeItem("admin");
 	};
-
+	useEffect(() => {
+		if (
+			window.location.pathname !== "/login" &&
+			window.location.pathname !== "/register"
+		) {
+			fetchUser();
+		} else {
+			setUser({ ...user, isLoading: false });
+		}
+	}, []);
 	return (
-		<UserContext.Provider value={{ user, admin, loginUser, updateUser, loginAdmin, logoutUser, logoutAdmin }}>
+		<UserContext.Provider value={{ user, loginUser, updateUser, logoutUser, fetchUser }}>
 			{children}
 		</UserContext.Provider>
 	);
