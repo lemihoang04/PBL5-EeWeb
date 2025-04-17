@@ -439,7 +439,6 @@ def get_components_by_type(type):
         cursor.close()
         db.close()
 
-        connection.close()
 
 @app.route('/checkout', methods=['POST'])
 def api_checkout():
@@ -467,6 +466,7 @@ def api_get_orders_by_user(user_id):
         return jsonify({"errCode": 0, "orders": orders}), 200
     except Exception as e:
         return jsonify({"errCode": 1, "message": str(e)}), 500
+
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)

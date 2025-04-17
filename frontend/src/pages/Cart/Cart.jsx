@@ -48,9 +48,11 @@ const CartPage = () => {
             items: cartItems.filter(item => selectedItems.includes(item.product_id)),
             amount: calculateSubtotal(),
         };
-        navigate("/checkout", {
-            state: { formValue }
-        });
+        setTimeout(() => {
+            navigate("/checkout", {
+                state: { formValue }
+            });
+        }, 1000);
     };
 
     const handleDeleteClick = async (cart_id) => {

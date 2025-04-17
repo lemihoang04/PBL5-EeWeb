@@ -29,25 +29,14 @@ const Order = () => {
         const fetchOrders = async () => {
             try {
                 setLoading(true);
-
-                // if (!user || !user.account || !user.account.id) {
-                //     toast.error("Please log in to view your orders");
-                //     navigate('/login');
-                //     return;
-                // }
-
+                setOrders([]);
                 const response = await GetOrdersData(user.account.id);
                 if (response && response.errCode === 0) {
-                    // Không dùng items, trả về dữ liệu phẳng
                     const orders = (response.orders || []).map(item => ({
                         id: item.order_id,
                         orderNumber: `ORD-${item.id}`,
                         date: item.created_at || new Date().toISOString(),
-                        // Normalize status: trim and lowercase - store lowercase for filtering
                         status: (item.status || '').trim().toLowerCase(),
-                        // Store original or capitalized status for display
-                        statusDisplay: (item.status || 'pending').trim().charAt(0).toUpperCase() +
-                            (item.status || 'pending').trim().slice(1).toLowerCase(),
                         productId: item.product_id,
                         productName: item.title,
                         productImage: item.image,
@@ -66,18 +55,18 @@ const Order = () => {
         };
 
         fetchOrders();
+
+        // Cleanup function to clear orders when component unmounts or dependencies change
+        return () => {
+            setOrders([]);
+        };
     }, [user, navigate]);
 
-    // Lọc đơn hàng theo trạng thái - đã sửa logic filter
     const filteredOrders = orders.filter(order => {
         if (filter === 'all') return true;
-
-        // Ensure order.status exists before comparing
-        const orderStatus = (order.status || '').toLowerCase();
-        return orderStatus === filter.toLowerCase();
+        return order.status.toLowerCase() === filter.toLowerCase();
     });
 
-    // Sắp xếp đơn hàng
     const sortedOrders = [...filteredOrders].sort((a, b) => {
         let comparison = 0;
         if (sortBy === 'date') {
@@ -85,7 +74,7 @@ const Order = () => {
         } else if (sortBy === 'total') {
             comparison = a.total - b.total;
         } else if (sortBy === 'status') {
-            comparison = (a.status || '').localeCompare(b.status || '');
+            comparison = a.status.localeCompare(b.status);
         }
         return sortOrder === 'desc' ? -comparison : comparison;
     });
@@ -196,17 +185,21 @@ const Order = () => {
                     {filter !== 'all' ? (
                         <p>Try changing your filter or checking back later.</p>
                     ) : (
-                        <p>You haven't placed any orders yet. Start shopping to see your orders here!</p>
+                        <>
+                            <p>You haven't placed any orders yet. Start shopping to see your orders here!</p>
+                            <button
+                                className="odrs__button odrs__primary-button"
+                                onClick={() => navigate('/products')}
+                            >
+                                Shop Now
+                            </button>
+                        </>
                     )}
-                    <button
-                        className="odrs__button odrs__primary-button"
-                        onClick={() => navigate('/products')}
-                    >
-                        Shop Now
-                    </button>
+
                 </div>
             ) : (
-                <div className="odrs__orders-list">
+                // Add a unique key to the parent container of the orders list
+                <div key={`${filter}-${sortBy}-${sortOrder}`} className="odrs__orders-list">
                     {sortedOrders.map((order) => (
                         <div key={order.id} className="odrs__order-card">
                             <div className="odrs__order-header">
@@ -221,8 +214,7 @@ const Order = () => {
                                     </div>
                                 </div>
                                 <div className={`odrs__status odrs__status-${order.status}`}>
-                                    {/* Use statusDisplay if available, otherwise capitalize status */}
-                                    {order.statusDisplay || order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                                    {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                                 </div>
                             </div>
 

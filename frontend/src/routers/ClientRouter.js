@@ -14,7 +14,6 @@ import Profile from "../pages/UserInfo/Profile";
 import ChangePassword from "../pages/ChangePass/ChangePass";
 import LaptopSearch from "../pages/laptop/LaptopSearch"
 import ComponentSearch from "../pages/Component/ComponentSearch"
-import CPUSeach from "../pages/CPU/CPUSearch"
 import Order from "../pages/Order/Order";
 
 const AppRoutes = () => {
