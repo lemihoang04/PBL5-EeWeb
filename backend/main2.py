@@ -5,7 +5,7 @@ import os
 import requests
 import time, hmac, hashlib, json, requests, urllib.request, urllib.parse
 from controllers.user_controller import *
-from controllers.service_controller import checkout
+from controllers.service_controller import *
 # from dotenv import load_dotenv
 
 # # Load biến môi trường từ .env
@@ -415,8 +415,13 @@ def api_checkout():
     except Exception as e:
         return jsonify({"errCode": 1, "message": str(e)}), 500    
 
-    
+@app.route('/orders/<int:user_id>', methods=['GET'])
+def api_get_orders_by_user(user_id):
+    try:
+        orders = get_orders_by_user_id(user_id)
+        return jsonify({"errCode": 0, "orders": orders}), 200
+    except Exception as e:
+        return jsonify({"errCode": 1, "message": str(e)}), 500
 
-    
 if __name__ == "__main__":
     app.run(debug=True, port=5000)

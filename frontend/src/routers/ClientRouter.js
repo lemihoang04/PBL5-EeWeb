@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import AppContextProvider from "../context/AppContext";
+import AppContextProvider from "../services/AppContext";
 import UserLayout from "../layouts/UserLayout";
 import Home from "../pages/Home";
 import ProductInfo from "../pages/ProductInfo/ProductInfo";
@@ -15,6 +15,7 @@ import ChangePassword from "../pages/ChangePass/ChangePass";
 import LaptopSearch from "../pages/laptop/LaptopSearch"
 import ComponentSearch from "../pages/Component/ComponentSearch"
 import CPUSeach from "../pages/CPU/CPUSearch"
+import Order from "../pages/Order/Order";
 
 const AppRoutes = () => {
     return (
@@ -31,6 +32,7 @@ const AppRoutes = () => {
                         <Route path="/register" element={<Register />} />
                         <Route path="/profile" element={<Profile />} />
                         <Route path="/change-password" element={<ChangePassword />} />
+                        <Route path="/orders" element={<Order />} />
                         <Route path="/laptops" element={<LaptopSearch />} />
                         <Route path="/build" element={<Build />} />
                         <Route path="/checkout" element={<Checkout />} />

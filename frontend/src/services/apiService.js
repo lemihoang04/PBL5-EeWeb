@@ -69,6 +69,13 @@ const CheckOut = async (orderData) => {
 		},
 	});
 };
+const GetOrdersData = async (user_id) => {
+	return axios.get(`/orders/${user_id}`, {
+		headers: {
+			"Content-Type": "application/json",
+		},
+	});
+};
 export {
 	loadCart,
 	addToCart,
@@ -76,4 +83,5 @@ export {
 	CheckPayment,
 	PaymentZaloPay,
 	CheckOut,
+	GetOrdersData,
 };

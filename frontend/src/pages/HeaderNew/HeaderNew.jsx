@@ -179,19 +179,19 @@ const Header = () => {
               <div className="categories-column">
                 <div className="category-section">
                   <div className="main-items">
-                    <div className="main-item">
+                    <div className="main-item" onClick={() => { navigate('/components/cpu'); setIsProductsOpen(false); }}>
                       <img src="https://cdna.pcpartpicker.com/static/forever/img/nav-cpu-2023.png" alt="CPU" className="category-image" />
                       <span>CPUs</span>
                     </div>
-                    <div className="main-item">
+                    <div className="main-item" onClick={() => { navigate('/components/cpu_cooler'); setIsProductsOpen(false); }}>
                       <img src="//cdna.pcpartpicker.com/static/forever/img/nav-cpucooler-2023.png" alt="CPU Cooler" className="category-image" />
                       <span>CPU Coolers</span>
                     </div>
-                    <div className="main-item">
+                    <div className="main-item" onClick={() => { navigate('/components/mainboard'); setIsProductsOpen(false); }}>
                       <img src="//cdna.pcpartpicker.com/static/forever/img/nav-motherboard-2023.png" alt="Motherboard" className="category-image" />
                       <span>Motherboards</span>
                     </div>
-                    <div className="main-item">
+                    <div className="main-item" onClick={() => { navigate('/components/ram'); setIsProductsOpen(false); }}>
                       <img src="//cdna.pcpartpicker.com/static/forever/img/nav-memory-2023.png" alt="Memory" className="category-image" />
                       <span>Memory</span>
                     </div>
@@ -200,19 +200,19 @@ const Header = () => {
 
                 <div className="category-section">
                   <div className="main-items">
-                    <div className="main-item">
+                    <div className="main-item" onClick={() => { navigate('/components/storage'); setIsProductsOpen(false); }}>
                       <img src="//cdna.pcpartpicker.com/static/forever/img/nav-ssd-2023.png" alt="Storage" className="category-image" />
                       <span>Storage</span>
                     </div>
-                    <div className="main-item">
+                    <div className="main-item" onClick={() => { navigate('/components/gpu'); setIsProductsOpen(false); }}>
                       <img src="//cdna.pcpartpicker.com/static/forever/img/nav-videocard-2023.png" alt="Video Card" className="category-image" />
                       <span>Video Card</span>
                     </div>
-                    <div className="main-item">
+                    <div className="main-item" onClick={() => { navigate('/components/psu'); setIsProductsOpen(false); }}>
                       <img src="//cdna.pcpartpicker.com/static/forever/img/nav-powersupply-2023.png" alt="Power Supplies" className="category-image" />
                       <span>Power Supplies</span>
                     </div>
-                    <div className="main-item">
+                    <div className="main-item" onClick={() => { navigate('/components/case'); setIsProductsOpen(false); }}>
                       <img src="//cdna.pcpartpicker.com/static/forever/img/nav-case-2023.png" alt="Cases" className="category-image" />
                       <span>Cases</span>
                     </div>

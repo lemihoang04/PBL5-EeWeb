@@ -1,16 +1,15 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
-import './Cart.css';
-import Laptop from '../../assets/images/laptop1.jpg';
 import { UserContext } from "../../context/UserProvider";
 import { toast } from 'react-toastify';
 import { loadCart, removeFromCart } from '../../services/apiService';
+import './Cart.css'; // Đổi tên file CSS
 
-
-const Cart = () => {
+const CartPage = () => {
     const navigate = useNavigate();
     const [cartItems, setCartItems] = useState([]);
     const { user } = useContext(UserContext);
+    const [selectedItems, setSelectedItems] = useState([]);
 
     useEffect(() => {
         if (user && user.account.id) {
@@ -32,14 +31,14 @@ const Cart = () => {
         }
     }, [user]);
 
-
     const handleCheckboxChange = (id) => {
         setSelectedItems((prev) =>
             prev.includes(id)
-                ? prev.filter((itemId) => itemId !== id) // Bỏ chọn nếu đã được chọn
-                : [...prev, id] // Thêm vào nếu chưa được chọn
+                ? prev.filter((itemId) => itemId !== id)
+                : [...prev, id]
         );
     };
+
     const handleCheckoutClick = () => {
         if (selectedItems.length === 0) {
             toast.error("Please select at least one item to proceed to checkout.");
@@ -62,6 +61,12 @@ const Cart = () => {
                     prevCartItems.filter((item) => item.cart_id !== cart_id)
                 );
 
+                // Remove from selected items if necessary
+                setSelectedItems(prev => prev.filter(id => {
+                    const item = cartItems.find(item => item.cart_id === cart_id);
+                    return item?.product_id !== id;
+                }));
+
                 toast.success("Item removed from the cart.");
             } else {
                 toast.error("Failed to delete items.");
@@ -71,7 +76,7 @@ const Cart = () => {
             toast.error("Failed to delete items.");
         }
     };
-    const [selectedItems, setSelectedItems] = useState([]);
+
     const handleSelectToggle = () => {
         if (selectedItems.length === cartItems.length) {
             setSelectedItems([]);
@@ -79,6 +84,7 @@ const Cart = () => {
             setSelectedItems(cartItems.map(item => item.product_id));
         }
     };
+
     // Calculate subtotal dynamically
     const calculateSubtotal = () => {
         return cartItems
@@ -92,7 +98,7 @@ const Cart = () => {
         setCartItems(
             cartItems.map((item) => {
                 if (item.product_id === product_id) {
-                    const newQuantity = Math.max(1, item.quantity + delta); // Prevent quantity from going below 1
+                    const newQuantity = Math.max(1, item.quantity + delta);
                     return { ...item, quantity: newQuantity };
                 }
                 return item;
@@ -101,108 +107,118 @@ const Cart = () => {
     };
 
     return (
-        <div className="App">
-            <div className="container my-4">
-                <div className="row">
-                    {/* Cart Items (Left Side) */}
-                    <div className="col-md-8">
-                        <h2 className="mb-3">Shopping Cart</h2>
-                        <a
-                            href="#"
-                            className="text-primary mb-3 d-block text-decoration-none"
-                            onClick={(e) => {
-                                e.preventDefault();
-                                handleSelectToggle();
-                            }}
+        <div className="crt__container">
+            <div className="crt__content">
+                {/* Cart Items (Left Side) */}
+                <div className="crt__items-container">
+                    <h2 className="crt__title">Shopping Cart</h2>
+
+                    <div className="crt__select-all">
+                        <button
+                            className="crt__select-all-btn"
+                            onClick={handleSelectToggle}
                         >
                             {selectedItems.length === cartItems.length ? "Deselect all items" : "Select all items"}
-                        </a>
+                        </button>
+                    </div>
 
-                        {/* Dynamically render cart items */}
-                        {cartItems.map((item) => (
-                            <div key={item.id} className="cart-item border p-3 mb-3 d-flex align-items-center">
-                                <input
-                                    type="checkbox"
-                                    className="me-3"
-                                    checked={selectedItems.includes(item.product_id)} // Kiểm tra trạng thái
-                                    onChange={() => handleCheckboxChange(item.product_id)} // Cập nhật trạng thái khi thay đổi
-                                />
-                                <img
-                                    src={item.image ? item.image.split("; ")[0] : "default-image.jpg"}
-                                    alt={item.name}
-                                    className="me-3"
-                                    style={{ width: '100px', height: 'auto' }}
-                                />
-                                <div className="flex-grow-1">
-                                    <h5>{item.name}</h5>
-                                    <div className="d-flex align-items-center">
-                                        <div className="input-group w-auto me-3">
-                                            <button
-                                                className="btn btn-outline-secondary"
-                                                onClick={() => handleQuantityChange(item.product_id, -1)}
-                                            >
-                                                -
-                                            </button>
-                                            <input
-                                                type="text"
-                                                className="form-control text-center"
-                                                value={item.quantity}
-                                                readOnly
-                                                style={{ width: '50px' }}
-                                            />
-                                            <button
-                                                className="btn btn-outline-secondary"
-                                                onClick={() => handleQuantityChange(item.product_id, 1)}
-                                            >
-                                                +
-                                            </button>
+                    {cartItems.length === 0 ? (
+                        <div className="crt__empty">
+                            <h3>Your cart is empty</h3>
+                            <p>Browse our products and add something you like!</p>
+                        </div>
+                    ) : (
+                        <div className="crt__items-list">
+                            {cartItems.map((item) => (
+                                <div key={item.id} className="crt__item">
+                                    <div className="crt__item-checkbox">
+                                        <input
+                                            type="checkbox"
+                                            className="crt__checkbox"
+                                            checked={selectedItems.includes(item.product_id)}
+                                            onChange={() => handleCheckboxChange(item.product_id)}
+                                        />
+                                    </div>
+                                    <div className="crt__item-image">
+                                        <img
+                                            src={item.image ? item.image.split("; ")[0] : "default-image.jpg"}
+                                            alt={item.name}
+                                        />
+                                    </div>
+                                    <div className="crt__item-details">
+                                        <h3 className="crt__item-name">{item.name}</h3>
+                                        <div className="crt__item-actions">
+                                            <div className="crt__quantity-control">
+                                                <button
+                                                    className="crt__quantity-btn crt__quantity-decrease"
+                                                    onClick={() => handleQuantityChange(item.product_id, -1)}
+                                                >
+                                                    -
+                                                </button>
+                                                <span className="crt__quantity-value">{item.quantity}</span>
+                                                <button
+                                                    className="crt__quantity-btn crt__quantity-increase"
+                                                    onClick={() => handleQuantityChange(item.product_id, 1)}
+                                                >
+                                                    +
+                                                </button>
+                                            </div>
+                                            <div className="crt__item-links">
+                                                <button onClick={() => handleDeleteClick(item.cart_id)} className="crt__action-btn crt__delete-btn">Delete</button>
+                                                <button className="crt__action-btn">Compare</button>
+                                                <button className="crt__action-btn">Share</button>
+                                            </div>
                                         </div>
-                                        <a onClick={() => handleDeleteClick(item.cart_id)} href="#" className="text-primary me-3">Delete</a>
-                                        <a href="#" className="text-primary me-3">Compare with similar items</a>
-                                        <a href="#" className="text-primary">Share</a>
+                                    </div>
+                                    <div className="crt__item-price">
+                                        <span>${(item.price * item.quantity).toFixed(2)}</span>
                                     </div>
                                 </div>
-                                <div className="text-end">
-                                    <h5>${(item.price * item.quantity).toFixed(2)}</h5>
-                                </div>
-                            </div>
-                        ))}
+                            ))}
+                        </div>
+                    )}
 
-                        {/* Subtotal */}
-                        <div className="text-end">
-                            <h5>
+                    {cartItems.length > 0 && (
+                        <div className="crt__subtotal-mobile">
+                            <h3>
                                 {selectedItems.length !== 0 ? `Subtotal (${selectedItems.length} items): $${calculateSubtotal()}` : "No items selected"}
-                            </h5>
-
+                            </h3>
                         </div>
-                    </div>
-
-                    {/* Checkout Section (Right Side) */}
-                    <div className="col-md-4">
-                        <div className="border p-3 mb-3">
-                            <h5>
-                                {selectedItems.length !== 0 ? `Subtotal (${selectedItems.length} items): $${calculateSubtotal()}` : "No items selected"}
-                            </h5>
-                            <button onClick={handleCheckoutClick} className="btn btn-primary w-100">Proceed to checkout</button>
-                        </div>
-
-                        {/* International Top Sellers */}
-                        <div className="border p-3">
-                            <h6>International Top Sellers</h6>
-                            <div className="d-flex align-items-center mb-2">
-                                <img src="https://via.placeholder.com/50" alt="Product" className="me-2" />
-                                <div>
-                                    <p>FUJIFILM Instax Mini... <br /> $104.61 <br /> -30% $74.14 ($0.74/Count)</p>
-                                </div>
-                            </div>
-                            <p>List: $220.59 <br /> Get it Apr 25 - May 13</p>
-                            <a href="#" className="text-primary">See all buying options</a>
-                        </div>
-                    </div>
+                    )}
                 </div>
+
+                {/* Checkout Section (Right Side) */}
+                {cartItems.length > 0 && (
+                    <div className="crt__checkout-container">
+                        <div className="crt__checkout-card">
+                            <h3 className="crt__checkout-title">Order Summary</h3>
+                            <div className="crt__checkout-details">
+                                <div className="crt__checkout-row">
+                                    <span>Items ({selectedItems.length}):</span>
+                                    <span>${calculateSubtotal()}</span>
+                                </div>
+                                <div className="crt__checkout-row">
+                                    <span>Shipping:</span>
+                                    <span>TBD</span>
+                                </div>
+                                <div className="crt__checkout-total">
+                                    <span>Total:</span>
+                                    <span>${calculateSubtotal()}</span>
+                                </div>
+                            </div>
+                            <button
+                                className="crt__checkout-btn"
+                                onClick={handleCheckoutClick}
+                                disabled={selectedItems.length === 0}
+                            >
+                                Proceed to checkout
+                            </button>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );
 };
 
-export default Cart;
+export default CartPage;
