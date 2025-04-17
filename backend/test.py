@@ -12,7 +12,7 @@ db_config = {
     'user': 'root',
     'port': 3306,
     'password': '',
-    'database': 'computer_store',
+    'database': 'techshop_db',
     'pool_name': 'mypool',
     'pool_size': 5
 }
@@ -358,19 +358,64 @@ def get_cpus():
         cursor.close()
         db.close()
 
+# @app.route("/components/<string:type>", methods=["GET"])
+# def get_components_by_type(type):
+#     valid_types = ['storage', 'psu', 'mainboard', 'gpu', 'cpu', 'ram', 'cpu_cooler', 'case']
+#     if type not in valid_types:
+#         return jsonify({"error": "Invalid component type"}), 400
+#     db = get_db_connection()
+#     if not db:
+#         return jsonify({'error': 'Database connection failed'}), 500
+#     cursor = db.cursor(dictionary=True)
+#     try:
+#         cursor.execute("SELECT * FROM component WHERE type = %s", (type,))
+#         components = cursor.fetchall()
+#         return jsonify(components), 200
+#     except mysql.connector.Error as err:
+#         return jsonify({"error": str(err)}), 500
+#     finally:
+#         cursor.close()
+#         db.close()
+
 @app.route("/components/<string:type>", methods=["GET"])
 def get_components_by_type(type):
-    valid_types = ['storage', 'psu', 'mainboard', 'gpu', 'cpu', 'ram', 'cpu_cooler', 'case']
+    valid_types = ['Storage', 'PSU', 'Mainboard', 'GPU', 'CPU', 'RAM', 'CPU Cooler', 'Case']
     if type not in valid_types:
         return jsonify({"error": "Invalid component type"}), 400
+    
     db = get_db_connection()
     if not db:
         return jsonify({'error': 'Database connection failed'}), 500
+    
     cursor = db.cursor(dictionary=True)
     try:
-        cursor.execute("SELECT * FROM component WHERE type = %s", (type,))
+        query = """
+        SELECT 
+            p.product_id,
+            p.title,
+            p.price,
+            p.stock,
+            p.rating,
+            p.description,
+            p.image,
+            p.created_at,
+            p.updated_at,
+            c.category_name,
+            GROUP_CONCAT(pa.attribute_name, ':', pa.attribute_value) as attributes
+        FROM products p
+        JOIN categories c ON p.category_id = c.category_id
+        LEFT JOIN product_attributes pa ON p.product_id = pa.product_id
+        WHERE c.category_name = %s
+        GROUP BY p.product_id
+        """
+        cursor.execute(query, (type,))
         components = cursor.fetchall()
+        
+        if not components:
+            return jsonify({"message": "No components found for this type"}), 404
+            
         return jsonify(components), 200
+        
     except mysql.connector.Error as err:
         return jsonify({"error": str(err)}), 500
     finally:

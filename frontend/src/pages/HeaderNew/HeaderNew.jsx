@@ -183,7 +183,7 @@ const Header = () => {
                       <img src="https://cdna.pcpartpicker.com/static/forever/img/nav-cpu-2023.png" alt="CPU" className="category-image" />
                       <span>CPUs</span>
                     </div>
-                    <div className="main-item" onClick={() => { navigate('/components/cpu_cooler'); setIsProductsOpen(false); }}>
+                    <div className="main-item" onClick={() => { navigate('/components/cpu cooler'); setIsProductsOpen(false); }}>
                       <img src="//cdna.pcpartpicker.com/static/forever/img/nav-cpucooler-2023.png" alt="CPU Cooler" className="category-image" />
                       <span>CPU Coolers</span>
                     </div>

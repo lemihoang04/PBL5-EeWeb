@@ -36,7 +36,6 @@ const AppRoutes = () => {
                         <Route path="/laptops" element={<LaptopSearch />} />
                         <Route path="/build" element={<Build />} />
                         <Route path="/checkout" element={<Checkout />} />
-                        <Route path="/cpus" element={<CPUSeach />} />
                         <Route path="/components/:type" element={<ComponentSearch />} />
                     </Route>
 
