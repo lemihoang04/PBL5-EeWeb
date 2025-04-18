@@ -3,8 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../../context/UserProvider';
 import { toast } from 'react-toastify';
 import { GetOrdersData } from '../../services/apiService';
+import OrderDetailModal from './OrderDetailModal';
 
-import './Order.css';
+import './Orders.css';
 
 // Hàm định dạng ngày giờ
 const formatDate = (dateString) => {
@@ -16,7 +17,7 @@ const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString(undefined, options);
 };
 
-const Order = () => {
+const Orders = () => {
     const navigate = useNavigate();
     const { user } = useContext(UserContext);
     const [orders, setOrders] = useState([]);
@@ -24,6 +25,8 @@ const Order = () => {
     const [filter, setFilter] = useState('all');
     const [sortBy, setSortBy] = useState('date');
     const [sortOrder, setSortOrder] = useState('desc');
+    const [selectedOrderId, setSelectedOrderId] = useState(null);
+    const [showModal, setShowModal] = useState(false);
 
     useEffect(() => {
         const fetchOrders = async () => {
@@ -33,8 +36,9 @@ const Order = () => {
                 const response = await GetOrdersData(user.account.id);
                 if (response && response.errCode === 0) {
                     const orders = (response.orders || []).map(item => ({
-                        id: item.order_id,
-                        orderNumber: `ORD-${item.id}`,
+                        id: item.id,
+                        order_id: item.order_id, // Sử dụng order_id nếu có, nếu không thì dùng id
+                        orderNumber: `ORD-${item.order_id}`,
                         date: item.created_at || new Date().toISOString(),
                         status: (item.status || '').trim().toLowerCase(),
                         productId: item.product_id,
@@ -96,6 +100,18 @@ const Order = () => {
 
     // Lấy tên sản phẩm
     const getProductName = (order) => order.productName || 'Product';
+
+    // Mở modal chi tiết đơn hàng
+    const openOrderDetails = (order) => {
+        setSelectedOrderId({ id: order.id, order_id: order.order_id }); // Nếu có order.order_id riêng, thay order.id bằng order.order_id
+        setShowModal(true);
+    };
+
+    // Đóng modal
+    const closeOrderDetails = () => {
+        setShowModal(false);
+        setSelectedOrderId(null);
+    };
 
     // Hiển thị trạng thái đang tải
     if (loading) {
@@ -236,7 +252,7 @@ const Order = () => {
                             <div className="odrs__order-actions">
                                 <button
                                     className="odrs__button odrs__primary-button"
-                                    onClick={() => navigate(`/order/${order.id}`)}
+                                    onClick={() => openOrderDetails(order)}
                                 >
                                     View Details
                                 </button>
@@ -254,8 +270,18 @@ const Order = () => {
                     ))}
                 </div>
             )}
+
+            {/* Order Detail Modal */}
+            {showModal && selectedOrderId && (
+                <OrderDetailModal
+                    id={selectedOrderId.id}
+                    order_id={selectedOrderId.order_id}
+                    image={getProductImage(orders.find(order => order.id === selectedOrderId.id))}
+                    onClose={closeOrderDetails}
+                />
+            )}
         </div>
     );
 };
 
-export default Order;
+export default Orders;

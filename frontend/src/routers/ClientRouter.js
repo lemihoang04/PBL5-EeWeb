@@ -14,7 +14,7 @@ import Profile from "../pages/UserInfo/Profile";
 import ChangePassword from "../pages/ChangePass/ChangePass";
 import LaptopSearch from "../pages/laptop/LaptopSearch"
 import ComponentSearch from "../pages/Component/ComponentSearch"
-import Order from "../pages/Order/Order";
+import Orders from "../pages/Order/Orders";
 
 const AppRoutes = () => {
     return (
@@ -31,7 +31,7 @@ const AppRoutes = () => {
                         <Route path="/register" element={<Register />} />
                         <Route path="/profile" element={<Profile />} />
                         <Route path="/change-password" element={<ChangePassword />} />
-                        <Route path="/orders" element={<Order />} />
+                        <Route path="/orders" element={<Orders />} />
                         <Route path="/laptops" element={<LaptopSearch />} />
                         <Route path="/build" element={<Build />} />
                         <Route path="/checkout" element={<Checkout />} />

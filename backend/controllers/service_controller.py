@@ -2,6 +2,9 @@ from flask import jsonify
 from config import get_db_connection
 from mysql.connector import Error
 from datetime import datetime
+import uuid
+import random
+import string
 
 def checkout(order_data):
     connection = get_db_connection()
@@ -9,7 +12,11 @@ def checkout(order_data):
         raise Exception("Database connection failed")
     cursor = connection.cursor()
     try:
-        order_id = int(f"{int(datetime.now().strftime('%d%m%y'))}{order_data['user_id']}")
+        # Generate a more unique order_id using timestamp, user_id and a random string
+        timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
+        random_chars = ''.join(random.choices(string.ascii_uppercase + string.digits, k=4))
+        order_id = f"{timestamp}-{order_data['user_id']}-{random_chars}"
+        
         for item in order_data['order_items']:
             cursor.execute("""
                 INSERT INTO `Order` (order_id, user_id, product_id, quantity, price, status, shipping_address)
@@ -97,6 +104,40 @@ def get_number_of_cart_items(user_id):
         """, (user_id,))
         result = cursor.fetchone()
         return result['cart_count'] if result else 0
+    except Error as e:
+        raise Exception(f"Database error: {str(e)}")
+    finally:
+        cursor.close()
+        connection.close()
+
+def get_order_by_id(order_id):
+    connection = get_db_connection()
+    if not connection:
+        raise Exception("Database connection failed")
+    cursor = connection.cursor(dictionary=True)
+    try:
+        cursor.execute("""
+            SELECT * FROM `Order` WHERE id = %s
+        """, (order_id,))
+        order = cursor.fetchone()
+        return order
+    except Error as e:
+        raise Exception(f"Database error: {str(e)}")
+    finally:
+        cursor.close()
+        connection.close()
+
+def get_payment_by_order_id(order_id):
+    connection = get_db_connection()
+    if not connection:
+        raise Exception("Database connection failed")
+    cursor = connection.cursor(dictionary=True)
+    try:
+        cursor.execute("""
+            SELECT * FROM Payments WHERE order_id = %s
+        """, (order_id,))
+        payment = cursor.fetchone()
+        return payment
     except Error as e:
         raise Exception(f"Database error: {str(e)}")
     finally:

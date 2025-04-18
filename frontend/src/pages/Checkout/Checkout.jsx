@@ -10,6 +10,7 @@ const Checkout = () => {
     const location = useLocation();
     const { user, fetchUser } = useContext(UserContext);
     const formValue = location.state?.formValue || null;
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         if (formValue === null) {
@@ -120,6 +121,7 @@ const Checkout = () => {
         }
 
         if (formData.payment === "pay_later") {
+            setIsLoading(true);
             const orderData = {
                 user_id: user.account.id,
                 order_items: formValue.items.map((item) => ({
@@ -139,14 +141,17 @@ const Checkout = () => {
                 if (response && response.errCode === 0) {
                     toast.success("Order placed successfully. You will pay when you receive the goods.");
                     fetchUser();
-                    setTimeout(() => navigate("/orders"), 1000);
+                    setTimeout(() => navigate("/orders"), 2000); // Extended to 2 seconds to show the spinner
                 } else {
                     toast.error(response.message);
+                    setIsLoading(false);
                 }
             } catch (error) {
                 toast.error("Error while saving order information: " + error.message);
+                setIsLoading(false);
             }
         } else if (formData.payment === "online_payment") {
+            setIsLoading(true);
             try {
                 let payment = await PaymentZaloPay({
                     name: formData.name,
@@ -156,9 +161,11 @@ const Checkout = () => {
                     window.location.href = payment.order_url;
                 } else {
                     toast.error("Payment Failed");
+                    setIsLoading(false);
                 }
             } catch (e) {
                 toast.error("Error while processing payment");
+                setIsLoading(false);
             }
         }
     };
@@ -183,6 +190,12 @@ const Checkout = () => {
 
     return (
         <div className="checkout-wrapper">
+            {isLoading && (
+                <div className="checkout-loading-overlay">
+                    <div className="checkout-spinner"></div>
+                    <p className="checkout-loading-text">Processing your order...</p>
+                </div>
+            )}
             <div className="checkout-container">
                 <div className="checkout-header">
                     <h1 className="checkout-title">Checkout</h1>

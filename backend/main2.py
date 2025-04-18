@@ -468,6 +468,28 @@ def api_get_orders_by_user(user_id):
     except Exception as e:
         return jsonify({"errCode": 1, "message": str(e)}), 500
 
+@app.route('/order/<order_id>', methods=['GET'])
+def api_get_order_by_id(order_id):
+    try:
+        order = get_order_by_id(order_id)
+        if order:
+            return jsonify({"errCode": 0, "data": order}), 200
+        else:
+            return jsonify({"errCode": 1, "message": "Order not found"}), 404
+    except Exception as e:
+        return jsonify({"errCode": 1, "message": str(e)}), 500
+
+@app.route('/payment/<order_id>', methods=['GET'])
+def api_get_payment_by_order_id(order_id):
+    try:
+        payment = get_payment_by_order_id(order_id)
+        if payment:
+            return jsonify({"errCode": 0, "data": payment}), 200
+        else:
+            return jsonify({"errCode": 1, "message": "Payment not found"}), 404
+    except Exception as e:
+        return jsonify({"errCode": 1, "message": str(e)}), 500
+
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)

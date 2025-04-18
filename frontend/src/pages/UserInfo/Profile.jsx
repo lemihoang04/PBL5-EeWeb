@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { FaUser, FaEnvelope, FaPhone, FaMapMarkerAlt, FaSave, FaKey } from 'react-icons/fa';
+import { FaUser, FaEnvelope, FaPhone, FaMapMarkerAlt, FaPencilAlt, FaKey, FaCheckCircle } from 'react-icons/fa';
 import { UserContext } from "../../context/UserProvider";
 import { EditUser } from '../../services/userService';
 import './Profile.css';
@@ -15,6 +15,7 @@ const Profile = () => {
         phone: '',
         address: ''
     });
+    const [isEditing, setIsEditing] = useState(false);
 
     useEffect(() => {
         if (user?.account) {
@@ -42,7 +43,7 @@ const Profile = () => {
             if (response && response.errCode === 0) {
                 fetchUser();
                 toast.success("Profile updated successfully!");
-
+                setIsEditing(false);
             } else {
                 toast.error(response.error || "Failed to update profile.");
             }
@@ -54,104 +55,144 @@ const Profile = () => {
     };
 
     return (
-        <div className="profile_container">
-            <h1 className="profile_title">Account Details</h1>
-
-            <form onSubmit={handleSubmit} className="profile_form">
-                <div className="profile_form_content">
-                    {/* Name Field */}
-                    <div className="profile_form_row">
-                        <label htmlFor="name" className="profile_label">Name:</label>
-                        <div className="profile_input_container">
-                            <div className="profile_icon_wrapper">
-                                <FaUser size={18} className="profile_field_icon" />
-                            </div>
-                            <input
-                                type="text"
-                                id="name"
-                                name="name"
-                                value={formData.name}
-                                onChange={handleChange}
-                                className="profile_input"
-                                required
-                            />
-                        </div>
+        <div className="user-profile-container">
+            <div className="user-profile-card">
+                <div className="user-profile-header">
+                    <div className="user-profile-avatar">
+                        {user?.account?.name ? user.account.name.charAt(0).toUpperCase() : 'U'}
                     </div>
-
-                    {/* Email Field (Disabled) */}
-                    <div className="profile_form_row">
-                        <label htmlFor="email" className="profile_label">Email:</label>
-                        <div className="profile_input_container">
-                            <div className="profile_icon_wrapper">
-                                <FaEnvelope size={18} className="profile_field_icon" />
-                            </div>
-                            <input
-                                type="email"
-                                id="email"
-                                name="email"
-                                value={formData.email}
-                                className="profile_input profile_input_disabled"
-                                disabled
-                            />
-                        </div>
-                    </div>
-
-                    {/* Phone Field */}
-                    <div className="profile_form_row">
-                        <label htmlFor="phone" className="profile_label">Phone:</label>
-                        <div className="profile_input_container">
-                            <div className="profile_icon_wrapper">
-                                <FaPhone size={18} className="profile_field_icon" />
-                            </div>
-                            <input
-                                type="tel"
-                                id="phone"
-                                name="phone"
-                                value={formData.phone}
-                                onChange={handleChange}
-                                className="profile_input"
-                            />
-                        </div>
-                    </div>
-
-                    {/* Address Field */}
-                    <div className="profile_form_row">
-                        <label htmlFor="address" className="profile_label">Address:</label>
-                        <div className="profile_input_container">
-                            <div className="profile_icon_wrapper">
-                                <FaMapMarkerAlt size={18} className="profile_field_icon" />
-                            </div>
-                            <input
-                                type="text"
-                                id="address"
-                                name="address"
-                                value={formData.address}
-                                onChange={handleChange}
-                                className="profile_input"
-                            />
-                        </div>
+                    <div className="user-profile-title-container">
+                        <h1 className="user-profile-title">My Profile</h1>
+                        <p className="user-profile-subtitle">Manage your personal information</p>
                     </div>
                 </div>
 
-                {/* Submit Button */}
-                <div className="profile_button_container">
-                    <button
-                        type="button"
-                        className="profile_change_password_button"
-                        onClick={() => navigate('/change-password', { state: { userId: user.account.id } })}
-                    >
-                        <FaKey size={16} className="profile_button_icon" />
-                        Change Password
-                    </button>
-                    <button
-                        type="submit"
-                        className="profile_submit_button"
-                    >
-                        <FaSave size={16} className="profile_button_icon" />
-                        Save Changes
-                    </button>
-                </div>
-            </form>
+                <form onSubmit={handleSubmit} className="user-profile-form">
+                    <div className="user-profile-form-content">
+                        <div className="user-profile-form-group">
+                            <div className="user-profile-label-container">
+                                <FaUser className="user-profile-field-icon" />
+                                <label htmlFor="name" className="user-profile-label">Full Name</label>
+                            </div>
+                            <div className="user-profile-input-wrapper">
+                                <input
+                                    type="text"
+                                    id="name"
+                                    name="name"
+                                    value={formData.name}
+                                    onChange={handleChange}
+                                    className={`user-profile-input ${!isEditing ? 'user-profile-input-readonly' : ''}`}
+                                    readOnly={!isEditing}
+                                    required
+                                />
+                            </div>
+                        </div>
+
+                        <div className="user-profile-form-group">
+                            <div className="user-profile-label-container">
+                                <FaEnvelope className="user-profile-field-icon" />
+                                <label htmlFor="email" className="user-profile-label">Email Address</label>
+                            </div>
+                            <div className="user-profile-input-wrapper">
+                                <input
+                                    type="email"
+                                    id="email"
+                                    name="email"
+                                    value={formData.email}
+                                    className="user-profile-input user-profile-input-disabled"
+                                    disabled
+                                />
+                            </div>
+                        </div>
+
+                        <div className="user-profile-form-group">
+                            <div className="user-profile-label-container">
+                                <FaPhone className="user-profile-field-icon" />
+                                <label htmlFor="phone" className="user-profile-label">Phone Number</label>
+                            </div>
+                            <div className="user-profile-input-wrapper">
+                                <input
+                                    type="tel"
+                                    id="phone"
+                                    name="phone"
+                                    value={formData.phone}
+                                    onChange={handleChange}
+                                    className={`user-profile-input ${!isEditing ? 'user-profile-input-readonly' : ''}`}
+                                    readOnly={!isEditing}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="user-profile-form-group">
+                            <div className="user-profile-label-container">
+                                <FaMapMarkerAlt className="user-profile-field-icon" />
+                                <label htmlFor="address" className="user-profile-label">Address</label>
+                            </div>
+                            <div className="user-profile-input-wrapper">
+                                <input
+                                    type="text"
+                                    id="address"
+                                    name="address"
+                                    value={formData.address}
+                                    onChange={handleChange}
+                                    className={`user-profile-input ${!isEditing ? 'user-profile-input-readonly' : ''}`}
+                                    readOnly={!isEditing}
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="user-profile-actions">
+                        {!isEditing ? (
+                            <>
+                                <button
+                                    type="button"
+                                    className="user-profile-edit-button"
+                                    onClick={() => setIsEditing(true)}
+                                >
+                                    <FaPencilAlt className="user-profile-button-icon" />
+                                    Edit Profile
+                                </button>
+                                <button
+                                    type="button"
+                                    className="user-profile-password-button"
+                                    onClick={() => navigate('/change-password', { state: { userId: user.account.id } })}
+                                >
+                                    <FaKey className="user-profile-button-icon" />
+                                    Change Password
+                                </button>
+                            </>
+                        ) : (
+                            <>
+                                <button
+                                    type="button"
+                                    className="user-profile-cancel-button"
+                                    onClick={() => {
+                                        setIsEditing(false);
+                                        if (user?.account) {
+                                            setFormData({
+                                                name: user.account.name || '',
+                                                email: user.account.email || '',
+                                                phone: user.account.phone || '',
+                                                address: user.account.address || ''
+                                            });
+                                        }
+                                    }}
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="user-profile-save-button"
+                                >
+                                    <FaCheckCircle className="user-profile-button-icon" />
+                                    Save Changes
+                                </button>
+                            </>
+                        )}
+                    </div>
+                </form>
+            </div>
         </div>
     );
 };

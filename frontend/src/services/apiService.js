@@ -76,6 +76,20 @@ const GetOrdersData = async (user_id) => {
 		},
 	});
 };
+const GetOrderDetail = async (order_id) => {
+	return axios.get(`/order/${order_id}`, {
+		headers: {
+			"Content-Type": "application/json",
+		},
+	});
+};
+const GetOrderPayment = async (order_id) => {
+	return axios.get(`/payment/${order_id}`, {
+		headers: {
+			"Content-Type": "application/json",
+		},
+	});
+}
 export {
 	loadCart,
 	addToCart,
@@ -84,4 +98,6 @@ export {
 	PaymentZaloPay,
 	CheckOut,
 	GetOrdersData,
+	GetOrderDetail,
+	GetOrderPayment,
 };
