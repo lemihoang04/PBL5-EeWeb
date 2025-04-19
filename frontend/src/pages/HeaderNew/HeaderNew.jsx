@@ -69,7 +69,7 @@ const Header = () => {
             <span>Support</span>
           </div>
          
-          <div className="header-item" style={{marginLeft: '600px'}}>
+          <div className="header-item" style={{marginLeft: '600px'}}   onClick={() => navigate('/cart')} >
           <img
             src="https://cdn-icons-png.flaticon.com/128/891/891407.png"
             alt="Builder Icon"
@@ -79,7 +79,7 @@ const Header = () => {
           />
             
           </div>
-          <div className="header-item">
+          <div className="header-item" onClick={() => navigate('/login')}>
           <img
             src="https://cdn-icons-png.flaticon.com/128/17446/17446833.png"
             alt="Builder Icon"

@@ -55,10 +55,10 @@ const Build = () => {
           <span className="label">Compatibility:</span>
           <span className="notes">See <a href="#notes">notes</a> below.</span>
         </div>
-        <div className="wattage">
+        {/* <div className="wattage">
           <span className="icon">⚡</span>
           <span>Estimated Wattage: 120W</span>
-        </div>
+        </div> */}
       </div>
 
       <table className="components-table">

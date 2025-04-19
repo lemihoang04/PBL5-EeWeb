@@ -2,10 +2,12 @@ from flask import Flask, jsonify
 from flask_cors import CORS
 import mysql.connector
 import os
+
 # from dotenv import load_dotenv
 
 # # Load biến môi trường từ .env
 # load_dotenv()
+
 app = Flask(__name__)
 CORS(app, origins="http://localhost:3000", supports_credentials=True)
 
@@ -13,16 +15,16 @@ CORS(app, origins="http://localhost:3000", supports_credentials=True)
 db = mysql.connector.connect(
     host="localhost",
     user="root",
-    port=3306,
+    port=3307,
     password="",
-    database="computer_store"
+    database="amazon_db",
 )
 
 @app.route("/products", methods=["GET"])
 def get_products():
     try:
         cursor = db.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM laptop")
+        cursor.execute("SELECT * FROM amazon_laptops")
         products = cursor.fetchall()
         cursor.close()
         return jsonify(products)
@@ -65,7 +67,7 @@ def get_filters():
 @app.route("/product-images/<int:product_id>", methods=["GET"])
 def get_product_images(product_id):
     cursor = db.cursor(dictionary=True)
-    cursor.execute("SELECT image FROM laptop WHERE id = %s", (product_id,))
+    cursor.execute("SELECT image FROM amazon_laptops WHERE id = %s", (product_id,))
     images = cursor.fetchone()
     cursor.close()
 
@@ -75,6 +77,8 @@ def get_product_images(product_id):
         image_urls = []
 
     return jsonify(image_urls)
+
+
 
 
 if __name__ == "__main__":
