@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useEffect } from 'react';
-import { AppContext } from '../../context/AppContext';
 import { fetchLaptops } from '../../services/laptopService'; // Adjust the import path as necessary
 import './LaptopSearch.css';
 import { useNavigate } from 'react-router-dom';
@@ -20,27 +19,27 @@ const LaptopSearch = () => {
 
   const navigate = useNavigate();
 
-const handleNextPage = () => {
-  if (currentPage < totalPages) {
-    setCurrentPage(currentPage + 1);
-  }
-};
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
 
-const handlePreviousPage = () => {
-  if (currentPage > 1) {
-    setCurrentPage(currentPage - 1);
-  }
-};
-const handleSearch = (e) => {
-  const term = e.target.value.toLowerCase();
-  // setSearchTerm(term);
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+  const handleSearch = (e) => {
+    const term = e.target.value.toLowerCase();
+    // setSearchTerm(term);
 
-  // Lọc danh sách laptop theo tiêu đề
-  const filtered = laptops.filter((laptop) =>
-    laptop.title.toLowerCase().includes(term)
-  );
-  setFilteredLaptops(filtered);
-};
+    // Lọc danh sách laptop theo tiêu đề
+    const filtered = laptops.filter((laptop) =>
+      laptop.title.toLowerCase().includes(term)
+    );
+    setFilteredLaptops(filtered);
+  };
 
   useEffect(() => {
     const loadLaptops = async () => {
@@ -52,7 +51,7 @@ const handleSearch = (e) => {
   }, []);
 
   return (
-   
+
     <div className="laptop-search-container">
       <div className="sidebar">
         <div className="filter-section">
@@ -73,19 +72,19 @@ const handleSearch = (e) => {
           <h3>Price</h3>
           <div className="price-label">${priceRange[0]} - ${priceRange[1].toLocaleString()}</div>
           <div className="price-slider">
-            <input 
-              type="range" 
-              min="15" 
-              max="10000" 
-              value={priceRange[0]} 
-              onChange={(e) => setPriceRange([parseInt(e.target.value), priceRange[1]])} 
+            <input
+              type="range"
+              min="15"
+              max="10000"
+              value={priceRange[0]}
+              onChange={(e) => setPriceRange([parseInt(e.target.value), priceRange[1]])}
             />
-            <input 
-              type="range" 
-              min="15" 
-              max="10000" 
-              value={priceRange[1]} 
-              onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])} 
+            <input
+              type="range"
+              min="15"
+              max="10000"
+              value={priceRange[1]}
+              onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])}
             />
           </div>
           <div className="price-controls">
@@ -93,7 +92,7 @@ const handleSearch = (e) => {
           </div>
         </div>
 
-       
+
 
         <div className="filter-section">
           <h3>RAM Size</h3>
@@ -197,44 +196,47 @@ const handleSearch = (e) => {
             <span className="pick-label">Overall Pick</span>
           </div>
         </div>
-        
+
 
         <div className="laptop-listings">
           {currentLaptops.map((laptop) => (
             <div className="laptop-item" key={laptop.id}>
               <div className="laptop-image">
-                <img src={laptop.image.split("; ")[0]} alt={laptop.title} />
-                
+                <img
+                  src={laptop.image ? laptop.image.split("; ")[0] : "default-image.jpg"}
+                  alt={laptop.title}
+                />
+
               </div>
-              
+
               <div className="laptop-details">
                 <div className="laptop-header">
-                <h3
-                  className="laptop-title"
-                  onClick={() => navigate(`/product-info/${laptop.id}`)}
-                  style={{ cursor: 'pointer', color: '#0066c0' }}
-                >
-                  {laptop.title}
-                </h3>
+                  <h3
+                    className="laptop-title"
+                    onClick={() => navigate(`/product-info/${laptop.id}`)}
+                    style={{ cursor: 'pointer', color: '#0066c0' }}
+                  >
+                    {laptop.title}
+                  </h3>
                   <div className="rating">
                     <div className="stars" style={{ '--rating': laptop.rating }}></div>
                     <span className="rating-count">{laptop.rating}</span>
                   </div>
                   {/* <div className="purchase-info">{laptop.purchaseCount}</div> */}
                 </div>
-                
+
                 <div className="laptop-price">
                   <div className="current-price">
                     <span className="dollar">$</span>
                     <span className="amount">{Math.floor(laptop.price)}</span>
                     <span className="cents">{(laptop.price % 1).toFixed(2).substring(2)}</span>
                   </div>
-                  
+
                   {laptop.price && (
-                    <div className="original-price">List: ${laptop.price }</div>
+                    <div className="original-price">List: ${laptop.price}</div>
                   )}
                 </div>
-                
+
                 <div className="laptop-specs">
                   <div className="spec">
                     <div className="spec-label">Display Size</div>
@@ -253,7 +255,7 @@ const handleSearch = (e) => {
                     <div className="spec-value">{laptop.operating_system}</div>
                   </div>
                 </div>
-                
+
                 {/* <div className="delivery-options">
                   {laptop.delivery.free && <div className="prime-logo"></div>}
                   <div className="delivery-info">
@@ -265,7 +267,7 @@ const handleSearch = (e) => {
                   </div>
                 </div> */}
                 
-                {/* <button className="add-to-cart">Add to cart</button> */}
+                <button className="add-to-cart">Add to cart</button>
                 
                 {/* <div className="more-buying-choices">
                   <div className="buying-choices-header">More Buying Choices</div>

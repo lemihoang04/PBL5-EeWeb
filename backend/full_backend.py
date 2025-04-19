@@ -5,7 +5,6 @@ import os
 import requests
 import time, hmac, hashlib, json, requests, urllib.request, urllib.parse
 from controllers.user_controller import *
-from controllers.service_controller import *
 # from dotenv import load_dotenv
 
 # # Load biến môi trường từ .env
@@ -18,7 +17,7 @@ CORS(app, origins="http://localhost:3000", supports_credentials=True)
 db = mysql.connector.connect(
     host="localhost",
     user="root",
-    port=3306,
+    port=3307,
     password="",
     database="techshop_db",
 )
@@ -109,9 +108,8 @@ def get_user():
         return jsonify({"errCode": 1, "message": "Not authenticated"}), 401
 
     user = get_user_by_id(user_id)
-    cart_items_count = get_number_of_cart_items(user_id)
     if user:
-        return jsonify({"errCode": 0, "user": user, "cart_items_count": cart_items_count}), 200
+        return jsonify({"errCode": 0, "user": user}), 200
     else:
         return jsonify({"errCode": 1, "message": "User not found"}), 404
 
@@ -141,7 +139,7 @@ def api_update_user(user_id):
     if not any([name, email, password, phone, address]):
         return jsonify({"error": "No information to update"}), 400
     
-    if check_phone_existing(phone) and user['phone'] != phone:
+    if check_existing_user(email, phone) and (user['email'] != email or user['phone'] != phone):
         return jsonify({"errCode": 1, "error": "Phone already exists"}), 409
     
     update_user(user_id, name=name, email=email, password=password, phone=phone, address=address)
@@ -394,102 +392,57 @@ def delete_cart(cart_id):
     finally:
         cursor.close()
         connection.close()
-        
-@app.route("/components/<string:type>", methods=["GET"])
-def get_components_by_type(type):
-    valid_types = ['Storage', 'PSU', 'Mainboard', 'GPU', 'CPU', 'RAM', 'CPU Cooler', 'Case']
-    if type not in valid_types:
-        return jsonify({"error": "Invalid component type"}), 400
-    
-    db = get_db_connection()
-    if not db:
-        return jsonify({'error': 'Database connection failed'}), 500
-    
-    cursor = db.cursor(dictionary=True)
+
+def checkout(user_id, order_items, total_amount, payment_method):
+    connection = get_db_connection()
+    if not connection:
+        raise Exception("Database connection failed")
+    cursor = connection.cursor()
     try:
-        query = """
-        SELECT 
-            p.product_id,
-            p.title,
-            p.price,
-            p.stock,
-            p.rating,
-            p.description,
-            p.image,
-            p.created_at,
-            p.updated_at,
-            c.category_name,
-            GROUP_CONCAT(pa.attribute_name, ':', pa.attribute_value) as attributes
-        FROM products p
-        JOIN categories c ON p.category_id = c.category_id
-        LEFT JOIN product_attributes pa ON p.product_id = pa.product_id
-        WHERE c.category_name = %s
-        GROUP BY p.product_id
-        """
-        cursor.execute(query, (type,))
-        components = cursor.fetchall()
-        
-        if not components:
-            return jsonify({"message": "No components found for this type"}), 404
-            
-        return jsonify(components), 200
-        
-    except mysql.connector.Error as err:
-        return jsonify({"error": str(err)}), 500
+        order_id = int(f"{int(datetime.now().timestamp())}{user_id}")
+        for item in order_items:
+            cursor.execute("""
+                SELECT product_id 
+                FROM Product_Attributes 
+                WHERE attribute_name = 'model_number' AND attribute_value = %s
+            """, (item['model_number'],))
+            product = cursor.fetchone()
+
+            if not product:
+                raise ValueError(f"Product with model_number {item['model_number']} not found")
+
+            product_id = product[0]
+            quantity = item['quantity']
+            price_per_item = item['total_price'] / quantity
+
+            cursor.execute("""
+                INSERT INTO `Order` (order_id, user_id, product_id, quantity, price, status)
+                VALUES (%s, %s, %s, %s, %s, %s)
+            """, (order_id, user_id, product_id, quantity, price_per_item, 'pending'))
+
+        # 2. Tạo thanh toán
+        cursor.execute("""
+            INSERT INTO Payments (order_id, user_id, amount, payment_method, payment_status)
+            VALUES (%s, %s, %s, %s, %s)
+        """, (order_id, user_id, total_amount, payment_method, 'pending'))
+
+        # Commit giao dịch
+        connection.commit()
+        return {
+            'message': 'Order placed successfully',
+            'order_id': order_id
+        }
+
+    except Error as e:
+        connection.rollback()
+        raise Exception(f"Database error: {str(e)}")
+
+    except ValueError as e:
+        connection.rollback()
+        raise Exception(str(e))
+
     finally:
         cursor.close()
-        db.close()
-
-
-@app.route('/checkout', methods=['POST'])
-def api_checkout():
-    try:
-        # Lấy dữ liệu từ request body
-        order_data = request.json
-
-        # Kiểm tra dữ liệu đầu vào
-        required_fields = ['user_id', 'order_items', 'total_amount', 'payment_method', 'shipping_address']
-        for field in required_fields:
-            if field not in order_data:
-                return jsonify({"errCode": 1, "message": f"Missing required field: {field}"}), 400
-
-        # Gọi hàm checkout từ service_controller
-        result = checkout(order_data)
-        return jsonify({"errCode": 0, "message": result['message'], "order_id": result['order_id']}), 200
-
-    except Exception as e:
-        return jsonify({"errCode": 1, "message": str(e)}), 500    
-
-@app.route('/orders/<int:user_id>', methods=['GET'])
-def api_get_orders_by_user(user_id):
-    try:
-        orders = get_orders_by_user_id(user_id)
-        return jsonify({"errCode": 0, "orders": orders}), 200
-    except Exception as e:
-        return jsonify({"errCode": 1, "message": str(e)}), 500
-
-@app.route('/order/<order_id>', methods=['GET'])
-def api_get_order_by_id(order_id):
-    try:
-        order = get_order_by_id(order_id)
-        if order:
-            return jsonify({"errCode": 0, "data": order}), 200
-        else:
-            return jsonify({"errCode": 1, "message": "Order not found"}), 404
-    except Exception as e:
-        return jsonify({"errCode": 1, "message": str(e)}), 500
-
-@app.route('/payment/<order_id>', methods=['GET'])
-def api_get_payment_by_order_id(order_id):
-    try:
-        payment = get_payment_by_order_id(order_id)
-        if payment:
-            return jsonify({"errCode": 0, "data": payment}), 200
-        else:
-            return jsonify({"errCode": 1, "message": "Payment not found"}), 404
-    except Exception as e:
-        return jsonify({"errCode": 1, "message": str(e)}), 500
-
-
+        connection.close()
 if __name__ == "__main__":
     app.run(debug=True, port=5000)

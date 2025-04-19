@@ -1,0 +1,217 @@
+/* Modern Profile Page CSS with unique class names */
+.user-profile-container {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+.user-profile-card {
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    padding: 30px;
+    transition: transform 0.3s ease;
+}
+
+.user-profile-card:hover {
+    transform: translateY(-5px);
+}
+
+.user-profile-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.user-profile-avatar {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #4a90e2, #845ec2);
+    color: white;
+    font-size: 36px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    margin-right: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.user-profile-title-container {
+    flex: 1;
+}
+
+.user-profile-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #2d3748;
+    margin: 0 0 5px 0;
+}
+
+.user-profile-subtitle {
+    font-size: 14px;
+    color: #718096;
+    margin: 0;
+}
+
+.user-profile-form {
+    width: 100%;
+}
+
+.user-profile-form-content {
+    margin-bottom: 30px;
+}
+
+.user-profile-form-group {
+    margin-bottom: 24px;
+}
+
+.user-profile-label-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.user-profile-field-icon {
+    color: #4a90e2;
+    margin-right: 8px;
+    font-size: 16px;
+}
+
+.user-profile-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #4a5568;
+}
+
+.user-profile-input-wrapper {
+    position: relative;
+}
+
+.user-profile-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 15px;
+    color: #2d3748;
+    background-color: #fff;
+    transition: all 0.3s ease;
+}
+
+.user-profile-input:focus {
+    outline: none;
+    border-color: #4a90e2;
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+}
+
+.user-profile-input-readonly {
+    background-color: #f8fafc;
+    color: #4a5568;
+}
+
+.user-profile-input-disabled {
+    background-color: #f8fafc;
+    color: #718096;
+    cursor: not-allowed;
+    border: 1px solid #edf2f7;
+}
+
+.user-profile-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.user-profile-edit-button,
+.user-profile-password-button,
+.user-profile-save-button,
+.user-profile-cancel-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+}
+
+.user-profile-button-icon {
+    margin-right: 8px;
+}
+
+.user-profile-edit-button {
+    background-color: #4a90e2;
+    color: white;
+}
+
+.user-profile-edit-button:hover {
+    background-color: #3a7bc8;
+    box-shadow: 0 4px 12px rgba(74, 144, 226, 0.2);
+}
+
+.user-profile-password-button {
+    background-color: #718096;
+    color: white;
+}
+
+.user-profile-password-button:hover {
+    background-color: #5e6c84;
+    box-shadow: 0 4px 12px rgba(113, 128, 150, 0.2);
+}
+
+.user-profile-save-button {
+    background-color: #48bb78;
+    color: white;
+}
+
+.user-profile-save-button:hover {
+    background-color: #38a169;
+    box-shadow: 0 4px 12px rgba(72, 187, 120, 0.2);
+}
+
+.user-profile-cancel-button {
+    background-color: #e2e8f0;
+    color: #4a5568;
+}
+
+.user-profile-cancel-button:hover {
+    background-color: #cbd5e0;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .user-profile-header {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .user-profile-avatar {
+        margin-right: 0;
+        margin-bottom: 16px;
+    }
+    
+    .user-profile-title {
+        font-size: 24px;
+    }
+    
+    .user-profile-actions {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .user-profile-edit-button,
+    .user-profile-password-button,
+    .user-profile-save-button,
+    .user-profile-cancel-button {
+        width: 100%;
+        margin-bottom: 8px;
+    }
+}

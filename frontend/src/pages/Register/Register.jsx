@@ -1,9 +1,8 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { UserContext } from '../../context/UserProvider';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
-import 'bootstrap/dist/css/bootstrap.min.css';
 import './Register.css';
 import LoginImg from '../../assets/images/logintem.png';
 import { CreateNewUser } from '../../services/userService';
@@ -47,7 +46,7 @@ const Register = () => {
 
             if (response && response.errCode === 0) {
                 toast.success("Registration successful!");
-                setTimeout(() => window.location.href = '/login', 500);
+                setTimeout(() => navigate('/login'), 500);
             } else {
                 toast.error(response.error || "Registration failed!");
             }
@@ -58,38 +57,88 @@ const Register = () => {
     };
 
     return (
-        <div className="register-page">
-            <div className="container-fluid d-flex align-items-center justify-content-center my-5">
-                <div className="row w-75 shadow-lg rounded-3 overflow-hidden">
-                    <div className="col-md-6 d-none d-md-block p-0">
-                        <img src={LoginImg} alt="Background" className="img-fluid h-100 w-100 object-fit-cover" />
-                    </div>
-                    <div className="col-md-6 bg-white p-5 d-flex flex-column justify-content-center">
-                        <h2 className="text-primary fw-bold text-center mb-4">Register</h2>
-                        <form onSubmit={handleRegister}>
-                            <div className="mb-3">
-                                <label className="form-label">Full Name</label>
-                                <input type="text" name="fullName" className="form-control" placeholder="Enter your full name" value={formData.fullName} onChange={handleChange} required />
-                            </div>
-                            <div className="mb-3">
-                                <label className="form-label">Email</label>
-                                <input type="email" name="email" className="form-control" placeholder="Enter your email" value={formData.email} onChange={handleChange} required />
-                            </div>
-                            <div className="mb-3">
-                                <label className="form-label">Password</label>
-                                <input type="password" name="password" className="form-control" placeholder="Enter password" value={formData.password} onChange={handleChange} required />
-                            </div>
-                            <div className="mb-3">
-                                <label className="form-label">Confirm Password</label>
-                                <input type="password" name="confirmPassword" className="form-control" placeholder="Re-enter password" value={formData.confirmPassword} onChange={handleChange} required />
-                            </div>
-                            <div className="mb-3">
-                                <label className="form-label">Phone Number</label>
-                                <input type="text" name="phoneNumber" className="form-control" placeholder="Enter your phone number" value={formData.phoneNumber} onChange={handleChange} required />
-                            </div>
-                            <button type="submit" className="btn btn-primary w-100">Register</button>
-                        </form>
-                        <p className="mt-3 text-center">Already have an account? <a href="/login" className="text-decoration-none text-primary">Login here</a></p>
+        <div className="register__container">
+            <div className="register__wrapper">
+                <div className="register__image-section">
+                    <img src={LoginImg} alt="Register Background" className="register__image" />
+                </div>
+                <div className="register__form-section">
+                    <h2 className="register__title">Create an Account</h2>
+                    <form onSubmit={handleRegister} className="register__form">
+                        <div className="register__form-group">
+                            <label className="register__label">Full Name</label>
+                            <input 
+                                type="text" 
+                                name="fullName" 
+                                className="register__input" 
+                                placeholder="Enter your full name" 
+                                value={formData.fullName} 
+                                onChange={handleChange} 
+                                required 
+                            />
+                        </div>
+                        
+                        <div className="register__form-group">
+                            <label className="register__label">Email</label>
+                            <input 
+                                type="email" 
+                                name="email" 
+                                className="register__input" 
+                                placeholder="Enter your email" 
+                                value={formData.email} 
+                                onChange={handleChange} 
+                                required 
+                            />
+                        </div>
+                        
+                        <div className="register__form-group">
+                            <label className="register__label">Password</label>
+                            <input 
+                                type="password" 
+                                name="password" 
+                                className="register__input" 
+                                placeholder="Enter password" 
+                                value={formData.password} 
+                                onChange={handleChange} 
+                                required 
+                            />
+                        </div>
+                        
+                        <div className="register__form-group">
+                            <label className="register__label">Confirm Password</label>
+                            <input 
+                                type="password" 
+                                name="confirmPassword" 
+                                className="register__input" 
+                                placeholder="Re-enter password" 
+                                value={formData.confirmPassword} 
+                                onChange={handleChange} 
+                                required 
+                            />
+                        </div>
+                        
+                        <div className="register__form-group">
+                            <label className="register__label">Phone Number</label>
+                            <input 
+                                type="text" 
+                                name="phoneNumber" 
+                                className="register__input" 
+                                placeholder="Enter your phone number" 
+                                value={formData.phoneNumber} 
+                                onChange={handleChange} 
+                                required 
+                            />
+                        </div>
+                        
+                        <button type="submit" className="register__button">
+                            Register
+                        </button>
+                    </form>
+                    
+                    <div className="register__footer">
+                        <p className="register__footer-text">
+                            Already have an account? <Link to="/login" className="register__link">Login here</Link>
+                        </p>
                     </div>
                 </div>
             </div>

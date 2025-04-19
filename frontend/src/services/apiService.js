@@ -1,34 +1,36 @@
 import axios from "../setup/axios";
 
-const CreatePayment = (form) => {
-	return axios
-		.post("/payments", form, {
-			headers: {
-				"Content-Type": "application/x-www-form-urlencoded",
-			},
-		})
-		.then((response) => {
-			return response;
-		})
-		.catch((error) => {
-			console.error(error);
-		});
+const loadCart = async (userId) => {
+	try {
+		const response = await axios.get(`/cart/${userId}`);
+		return response;
+	} catch (error) {
+		console.error("Error loading cart:", error);
+		throw error.response.data;
+	}
 };
-const UpdatePayment = (booking_id) => {
-	return axios
-		.put(`/payments/${booking_id}`, {
-			headers: {
-				"Content-Type": "application/x-www-form-urlencoded",
-			},
-		})
-		.then((response) => {
-			return response;
-		})
-		.catch((error) => {
-			console.error(error);
+const addToCart = async (userId, product_id, quantity = 1) => {
+	try {
+		const response = await axios.post('/addToCart', {
+			user_id: userId,
+			product_id: product_id,
+			quantity: quantity,
 		});
+		return response;
+	} catch (error) {
+		console.error("Error adding to cart:", error);
+		throw error.response.data;
+	}
 };
-
+const removeFromCart = async (cart_id) => {
+	try {
+		const response = await axios.delete(`/delete_cart/${cart_id}`);
+		return response;
+	} catch (error) {
+		console.error("Error removing from cart:", error);
+		throw error.response.data;
+	}
+}
 const CheckPayment = async (apptransid) => {
 	return axios.post(
 		"/payment/CheckZaloPay",
@@ -47,25 +49,55 @@ const PaymentZaloPay = async (user) => {
 		},
 	});
 };
-const ChangeRoomAva = async (form) => {
-	return axios.put(`/rooms/${form.RoomID}`, form, {
+const CheckOut = async (orderData) => {
+	// try {
+	// 	const response = await fetch("/api/checkout", {
+	// 		method: "POST",
+	// 		headers: {
+	// 			"Content-Type": "application/json",
+	// 		},
+	// 		body: JSON.stringify(orderData),
+	// 	});
+	// 	return await response.json();
+	// } catch (error) {
+	// 	console.error("Error during checkout:", error);
+	// 	throw error;
+	// }
+	return axios.post("/checkout", orderData, {
 		headers: {
-			"Content-Type": "application/x-www-form-urlencoded",
+			"Content-Type": "application/json",
 		},
 	});
 };
-const DeleteRooms = async (id_rooms) => {
-	return axios.delete(`/rooms/${id_rooms}`, {
+const GetOrdersData = async (user_id) => {
+	return axios.get(`/orders/${user_id}`, {
 		headers: {
-			"Content-Type": "application/x-www-form-urlencoded",
+			"Content-Type": "application/json",
 		},
 	});
 };
+const GetOrderDetail = async (order_id) => {
+	return axios.get(`/order/${order_id}`, {
+		headers: {
+			"Content-Type": "application/json",
+		},
+	});
+};
+const GetOrderPayment = async (order_id) => {
+	return axios.get(`/payment/${order_id}`, {
+		headers: {
+			"Content-Type": "application/json",
+		},
+	});
+}
 export {
-	UpdatePayment,
-	CreatePayment,
+	loadCart,
+	addToCart,
+	removeFromCart,
 	CheckPayment,
 	PaymentZaloPay,
-	ChangeRoomAva,
-	DeleteRooms,
+	CheckOut,
+	GetOrdersData,
+	GetOrderDetail,
+	GetOrderPayment,
 };

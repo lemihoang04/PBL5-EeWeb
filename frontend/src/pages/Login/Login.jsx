@@ -1,10 +1,9 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { LoginUser } from '../../services/userService';
 import { UserContext } from '../../context/UserProvider';
-import 'bootstrap/dist/css/bootstrap.min.css';
 import './Login.css';
 import LoginImg from '../../assets/images/logintem.png';
 
@@ -19,10 +18,6 @@ const Login = () => {
 
     const [formValues, setFormValues] = useState({ email: '', password: '' });
     const [showPassword, setShowPassword] = useState(false);
-
-
-
-
     const handleChange = (e) => {
         setFormValues({ ...formValues, [e.target.name]: e.target.value });
     };
@@ -61,53 +56,65 @@ const Login = () => {
     };
 
     return (
-        <div className="login-page">
-            <div className="container-fluid vh-100 d-flex align-items-center justify-content-center">
-                <div className="row w-75 shadow-lg rounded-3 overflow-hidden">
-                    <div className="col-md-7 d-none d-md-block p-0">
-                        <img src={LoginImg} alt="Background" className="img-fluid h-100 w-100 object-fit-cover" />
+        <div className="l-container">
+            <div className="l-card">
+                <div className="l-image-section">
+                    <img src={LoginImg} alt="Login" className="l-image" />
+                    <div className="l-overlay">
+                        <h2 className="l-welcome">Welcome Back</h2>
+                        <p className="l-motto">Sign in to continue your journey</p>
                     </div>
-                    <div className="col-md-5 bg-white p-5 d-flex flex-column justify-content-center">
-                        <h2 className="text-primary fw-bold text-center mb-4">Login</h2>
-                        <form onSubmit={handleLogin}>
-                            <div className="mb-3">
-                                <label className="form-label">Email or Username</label>
+                </div>
+                <div className="l-form-section">
+                    <div className="l-form-container">
+                        <h1 className="l-title">Sign In</h1>
+                        <p className="l-subtitle">Please login to access your account</p>
+
+                        <form onSubmit={handleLogin} className="l-form">
+                            <div className="l-input-group">
+                                <label className="l-label">Email or Username</label>
                                 <input
                                     type="text"
                                     name="email"
-                                    className="form-control"
-                                    placeholder="Enter email or username"
+                                    className="l-input"
+                                    placeholder="Enter your email or username"
                                     value={formValues.email}
                                     onChange={handleChange}
                                 />
                             </div>
-                            <div className="mb-3">
-                                <label className="form-label">Password</label>
+
+                            <div className="l-input-group">
+                                <label className="l-label">Password</label>
                                 <input
                                     type={showPassword ? "text" : "password"}
                                     name="password"
-                                    className="form-control"
-                                    placeholder="Enter password"
+                                    className="l-input"
+                                    placeholder="Enter your password"
                                     value={formValues.password}
                                     onChange={handleChange}
                                 />
                             </div>
-                            <div className="d-flex justify-content-between align-items-center mb-3">
-                                <div className="form-check">
+
+                            <div className="l-options">
+                                <div className="l-checkbox-group">
                                     <input
                                         type="checkbox"
-                                        className="form-check-input"
                                         id="showPassword"
+                                        className="l-checkbox"
                                         checked={showPassword}
                                         onChange={() => setShowPassword(!showPassword)}
                                     />
-                                    <label className="form-check-label" htmlFor="showPassword">Show password</label>
+                                    <label className="l-checkbox-label" htmlFor="showPassword">Show password</label>
                                 </div>
-                                <a href="#" className="text-decoration-none text-primary">Forgot password?</a>
+                                <Link to="/forgot-password" className="l-forgot">Forgot password?</Link>
                             </div>
-                            <button type="submit" className="btn btn-primary w-100">Login</button>
+
+                            <button type="submit" className="l-button">Sign In</button>
+
+                            <div className="l-signup">
+                                <p>Don't have an account? <Link to="/Register" className="l-link">Sign up now</Link></p>
+                            </div>
                         </form>
-                        <p className="mt-3 text-center">Don't have an account? <a href="/Register" className="text-decoration-none text-primary">Sign up now</a></p>
                     </div>
                 </div>
             </div>

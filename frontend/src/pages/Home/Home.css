@@ -1,0 +1,643 @@
+/* TechShopHome.css - Using BEM methodology to avoid conflicts */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
+
+/* Base styles and variables */
+.techshop {
+    font-family: 'Poppins', sans-serif;
+    color: #2d3748;
+    --primary-color: #0070f3;
+    --primary-hover: #0062d3;
+    --secondary-color: #f97316;
+    --secondary-hover: #ea580c;
+    --light-bg: #f8fafc;
+    --border-color: #e2e8f0;
+    --dark-text: #1e293b;
+    --light-text: #64748b;
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+    --radius-sm: 6px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --transition: all 0.3s ease;
+}
+
+/* Section styling */
+.techshop section {
+    margin-bottom: 60px;
+}
+
+.techshop-section__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.techshop-section__title {
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--dark-text);
+}
+
+.techshop-section__view-all {
+    display: flex;
+    align-items: center;
+    background: none;
+    border: none;
+    color: var(--primary-color);
+    font-weight: 500;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.techshop-section__view-all i {
+    margin-left: 6px;
+    transition: var(--transition);
+}
+
+.techshop-section__view-all:hover i {
+    transform: translateX(4px);
+}
+
+/* Hero Slider */
+.techshop-hero {
+    position: relative;
+    height: 400px;
+    overflow: hidden;
+    margin-bottom: 40px;
+}
+
+.techshop-hero__container {
+    height: 100%;
+    position: relative;
+}
+
+.techshop-hero__slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    opacity: 0;
+    transition: opacity 0.8s ease;
+    display: flex;
+    align-items: center;
+}
+
+.techshop-hero__slide::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.4) 50%, rgba(0, 0, 0, 0.1) 100%);
+}
+
+.techshop-hero__slide--active {
+    opacity: 1;
+    z-index: 1;
+}
+
+.techshop-hero__content {
+    position: relative;
+    z-index: 2;
+    max-width: 600px;
+    padding: 0 60px;
+    color: white;
+}
+
+.techshop-hero__title {
+    font-size: 48px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    animation: techshop-slideIn 0.5s ease forwards;
+    opacity: 0;
+    transform: translateY(20px);
+    animation-delay: 0.2s;
+}
+
+.techshop-hero__subtitle {
+    font-size: 18px;
+    margin-bottom: 24px;
+    opacity: 0.9;
+    animation: techshop-slideIn 0.5s ease forwards;
+    opacity: 0;
+    transform: translateY(20px);
+    animation-delay: 0.4s;
+}
+
+@keyframes techshop-slideIn {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.techshop-hero__button {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: var(--transition);
+    animation: techshop-fadeIn 0.5s ease forwards;
+    opacity: 0;
+    animation-delay: 0.6s;
+}
+
+@keyframes techshop-fadeIn {
+    to {
+        opacity: 1;
+    }
+}
+
+.techshop-hero__button:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.techshop-hero__controls {
+    position: absolute;
+    bottom: 30px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    z-index: 5;
+}
+
+.techshop-hero__dots {
+    display: flex;
+    gap: 10px;
+}
+
+.techshop-hero__dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.4);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.techshop-hero__dot--active {
+    background-color: white;
+    transform: scale(1.2);
+}
+
+/* Special Deals Section */
+.techshop-deals {
+    padding: 20px 0;
+}
+
+.techshop-deals__container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.techshop-deals__card {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    background-color: white;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-color);
+    transition: var(--transition);
+    cursor: pointer;
+}
+
+.techshop-deals__card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary-color);
+}
+
+.techshop-deals__icon {
+    width: 50px;
+    height: 50px;
+    background-color: #e6f2ff;
+    color: var(--primary-color);
+    border-radius: var(--radius-sm);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 16px;
+    font-size: 20px;
+}
+
+.techshop-deals__title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.techshop-deals__description {
+    font-size: 13px;
+    color: var(--light-text);
+    line-height: 1.4;
+}
+
+/* Featured Products */
+.techshop-products {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.techshop-products__grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+}
+
+.techshop-product {
+    background-color: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+    transition: var(--transition);
+    position: relative;
+    cursor: pointer;
+}
+
+.techshop-product:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary-color);
+}
+
+.techshop-product__discount-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background-color: var(--secondary-color);
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
+    z-index: 2;
+}
+
+.techshop-product__image-container {
+    height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background-color: var(--light-bg);
+    transition: var(--transition);
+}
+
+.techshop-product__image {
+    max-width: 80%;
+    max-height: 80%;
+    object-fit: contain;
+    transition: var(--transition);
+}
+
+.techshop-product:hover .techshop-product__image {
+    transform: scale(1.05);
+}
+
+.techshop-product__info {
+    padding: 20px;
+}
+
+.techshop-product__category {
+    font-size: 12px;
+    color: var(--light-text);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.techshop-product__name {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 6px 0;
+    height: 48px;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+}
+
+.techshop-rating {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.techshop-rating i {
+    color: #cbd5e0;
+    font-size: 14px;
+    margin-right: 2px;
+}
+
+.techshop-rating__star--filled {
+    color: #f59e0b;
+}
+
+.techshop-rating__number {
+    margin-left: 5px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--light-text);
+}
+
+.techshop-product__price {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.techshop-product__price--current {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--dark-text);
+}
+
+.techshop-product__price--original {
+    font-size: 14px;
+    color: var(--light-text);
+    text-decoration: line-through;
+}
+
+.techshop-product__button {
+    width: 100%;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    margin-top: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.techshop-product__button i {
+    margin-right: 8px;
+}
+
+.techshop-product__button:hover {
+    background-color: var(--primary-hover);
+}
+
+/* PC Builder Banner */
+.techshop-builder-banner {
+    background-color: #1e293b;
+    padding: 60px 0;
+    margin: 60px 0;
+}
+
+.techshop-builder-banner__content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+}
+
+.techshop-builder-banner__text {
+    flex: 1;
+    color: white;
+    padding-right: 40px;
+}
+
+.techshop-builder-banner__title {
+    font-size: 36px;
+    font-weight: 700;
+    margin-bottom: 16px;
+}
+
+.techshop-builder-banner__description {
+    font-size: 16px;
+    opacity: 0.9;
+    margin-bottom: 30px;
+    line-height: 1.6;
+}
+
+.techshop-builder-banner__button {
+    background-color: var(--secondary-color);
+    color: white;
+    border: none;
+    padding: 14px 28px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    width: fit-content;
+}
+
+.techshop-builder-banner__button i {
+    margin-left: 8px;
+    transition: var(--transition);
+}
+
+.techshop-builder-banner__button:hover {
+    background-color: var(--secondary-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.techshop-builder-banner__button:hover i {
+    transform: translateX(4px);
+}
+
+.techshop-builder-banner__image-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+
+.techshop-builder-banner__image {
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--radius-lg);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Categories Section */
+.techshop-categories {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.techshop-categories__grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+
+.techshop-category {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px 20px;
+    background-color: white;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+    border: 1px solid var(--border-color);
+    cursor: pointer;
+    text-align: center;
+}
+
+.techshop-category:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary-color);
+}
+
+.techshop-category__icon {
+    width: 70px;
+    height: 70px;
+    background: linear-gradient(135deg, #e6f2ff, #cce4ff);
+    color: var(--primary-color);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 16px;
+    font-size: 24px;
+    transition: var(--transition);
+}
+
+.techshop-category:hover .techshop-category__icon {
+    background: linear-gradient(135deg, var(--primary-color), #4a9eff);
+    color: white;
+    transform: scale(1.1);
+}
+
+/* Testimonials Section */
+.techshop-testimonials {
+    background-color: var(--light-bg);
+    padding: 40px 20px;
+}
+
+.techshop-testimonials__container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.techshop-testimonial {
+    background-color: white;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    padding: 20px;
+    text-align: center;
+    border: 1px solid var(--border-color);
+    transition: var(--transition);
+}
+
+.techshop-testimonial:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary-color);
+}
+
+.techshop-testimonial__rating {
+    margin-bottom: 10px;
+}
+
+.techshop-testimonial__star--filled {
+    color: #f59e0b;
+}
+
+.techshop-testimonial__star--empty {
+    color: #cbd5e0;
+}
+
+.techshop-testimonial__comment {
+    font-size: 14px;
+    color: var(--light-text);
+    margin-bottom: 10px;
+    line-height: 1.6;
+}
+
+.techshop-testimonial__author {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--dark-text);
+}
+
+/* Newsletter Section */
+.techshop-newsletter {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 40px 20px;
+    text-align: center;
+}
+
+.techshop-newsletter__title {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.techshop-newsletter__description {
+    font-size: 16px;
+    margin-bottom: 20px;
+    opacity: 0.9;
+}
+
+.techshop-newsletter__form {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.techshop-newsletter__input {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+}
+
+.techshop-newsletter__button {
+    background-color: var(--secondary-color);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.techshop-newsletter__button:hover {
+    background-color: var(--secondary-hover);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}

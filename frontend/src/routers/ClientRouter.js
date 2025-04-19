@@ -1,18 +1,21 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import AppContextProvider from "../context/AppContext";
+import AppContextProvider from "../services/AppContext";
 import UserLayout from "../layouts/UserLayout";
-import Home from "../pages/Home";
-import ProductInfo from "../pages/ProductInfo";
+import Home from "../pages/Home/Home";
+import ProductInfo from "../pages/ProductInfo/ProductInfo";
 import Cart from "../pages/Cart/Cart";
 import Login from "../pages/Login/Login";
 import Register from "../pages/Register/Register";
 import Admin from "../pages/Admin/Admin";
 import NotFound from "../components/NotFound";
-import LaptopSearch from "../pages/laptop/LaptopSearch";
-
-import Checkout from "../pages/Checkout/Checkout";
-import ZaloPayButton from "../pages/Zalopaybutton";
 import Build from "../pages/Build/Build";
+import Checkout from "../pages/Checkout/Checkout";
+import Profile from "../pages/UserInfo/Profile";
+import ChangePassword from "../pages/ChangePass/ChangePass";
+import LaptopSearch from "../pages/laptop/LaptopSearch"
+import ComponentSearch from "../pages/Component/ComponentSearch"
+import Orders from "../pages/Order/Orders";
+
 
 const AppRoutes = () => {
     return (
@@ -27,10 +30,14 @@ const AppRoutes = () => {
                         <Route path="/product-info/:productId" element={<ProductInfo />} />
                         <Route path="/login" element={<Login />} />
                         <Route path="/register" element={<Register />} />
+                        <Route path="/profile" element={<Profile />} />
+                        <Route path="/change-password" element={<ChangePassword />} />
+                        <Route path="/orders" element={<Orders />} />
                         <Route path="/laptops" element={<LaptopSearch />} />
-                        <Route path="/checkout" element={<Checkout />} />
-                        <Route path="/zalopay" element={<ZaloPayButton />} />
                         <Route path="/build" element={<Build />} />
+                        <Route path="/checkout" element={<Checkout />} />
+                        <Route path="/components/:type" element={<ComponentSearch />} />
+
                     </Route>
 
                     {/* Route Admin */}

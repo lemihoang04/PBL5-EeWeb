@@ -17,7 +17,9 @@ db = mysql.connector.connect(
     user="root",
     port=3307,
     password="",
-    database="amazon_db",
+    # database="amazon_db",
+    database="computer_store",
+
 )
 
 @app.route("/products", methods=["GET"])
@@ -38,16 +40,16 @@ def get_filters():
         cursor = db.cursor(dictionary=True)
 
         # Lấy các giá trị distinct từ các cột
-        cursor.execute("SELECT DISTINCT screen_size FROM laptop ")
+        cursor.execute("SELECT DISTINCT screen_size FROM amazon_laptops ")
         screen_sizes = [row["screen_size"] for row in cursor.fetchall()]
 
-        cursor.execute("SELECT DISTINCT ram FROM laptop")
+        cursor.execute("SELECT DISTINCT ram FROM amazon_laptops")
         ram_sizes = [row["ram"] for row in cursor.fetchall()]
 
-        cursor.execute("SELECT DISTINCT brand FROM laptop")
+        cursor.execute("SELECT DISTINCT brand FROM amazon_laptops")
         brands = [row["brand"] for row in cursor.fetchall()]
 
-        cursor.execute("SELECT DISTINCT operating_system FROM laptop")
+        cursor.execute("SELECT DISTINCT operating_system FROM amazon_laptops")
         operating_systems = [row["operating_system"] for row in cursor.fetchall()]
 
         # Trả về dữ liệu dưới dạng JSON
@@ -64,6 +66,8 @@ def get_filters():
         print("Error fetching filters:", e)
         return jsonify({"error": "Internal Server Error"}), 500
     
+
+    
 @app.route("/product-images/<int:product_id>", methods=["GET"])
 def get_product_images(product_id):
     cursor = db.cursor(dictionary=True)
@@ -78,6 +82,17 @@ def get_product_images(product_id):
 
     return jsonify(image_urls)
 
+# @app.route("/product/<int:product_id>", methods=["GET"])
+# def get_product_details(product_id):
+#     cursor = db.cursor(dictionary=True)
+#     cursor.execute("SELECT * FROM amazon_laptops WHERE id = %s", (product_id,))
+#     product = cursor.fetchone()
+#     cursor.close()
+    
+#     if product:
+#         return jsonify(product)
+#     else:
+#         return jsonify({"error": "Product not found"}), 404
 
 
 
