@@ -17,8 +17,6 @@ import ComponentSearch from "../pages/Component/ComponentSearch"
 import Orders from "../pages/Order/Orders";
 import UserRouter from "./UserRouter";
 
-
-
 const AppRoutes = () => {
     return (
         <AppContextProvider>
@@ -74,7 +72,6 @@ const AppRoutes = () => {
                             }
                         />
                         <Route path="/components/:type" element={<ComponentSearch />} />
-
                     </Route>
                    
 

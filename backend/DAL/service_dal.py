@@ -35,7 +35,7 @@ def checkout(order_data):
                 cursor.execute("""
                     DELETE FROM Cart WHERE cart_id = %s
                 """, (item['cart_id'],))
-
+        payment_status = 'completed' if order_data['payment_method'] == 'online_payment' else 'pending'
         cursor.execute("""
             INSERT INTO Payments (order_id, user_id, amount, payment_method, payment_status)
             VALUES (%s, %s, %s, %s, %s)
@@ -44,7 +44,7 @@ def checkout(order_data):
             order_data['user_id'],
             order_data['total_amount'],
             order_data['payment_method'],
-            'pending'  
+            payment_status  
         ))
         connection.commit()
         return {
