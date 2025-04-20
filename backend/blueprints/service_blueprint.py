@@ -14,10 +14,10 @@ ZALOPAY_CONFIG = {
 @service_blueprint.route("/create_order", methods=["POST"])
 def create_order():
     # Lấy dữ liệu từ request.form
-    data = request.form
+    data = request.json
     amount = int(float(data.get("amount", 10000)))
     embed_data = {
-        "redirecturl": f"http://localhost:3000/laptops",
+        "redirecturl": f"http://localhost:3000/checkPayment",
     }
     # Tạo ID giao dịch duy nhất cho đơn hàng
     app_trans_id = time.strftime("%y%m%d") + "_" + str(int(time.time()))
@@ -48,7 +48,10 @@ def create_order():
             data=order,  # Changed to `data` for form-encoded content
             headers={"Content-Type": "application/x-www-form-urlencoded"},
         )
-        return jsonify(response.json()), response.status_code
+        resp_json = response.json()
+        # Trả về app_trans_id cho client sử dụng
+        resp_json["app_trans_id"] = app_trans_id
+        return jsonify(resp_json), response.status_code
     except requests.RequestException as e:
         return jsonify({"error": str(e)}), 500
 
@@ -63,6 +66,33 @@ def zalo_ipn():
 
     # Trả lời ZaloPay để xác nhận đã nhận được IPN
     return jsonify({"return_code": 1, "return_message": "OK"})
+
+@service_blueprint.route("/checkPayment", methods=["POST"])
+def query_order():
+    try:
+        data = request.json
+        app_trans_id = data.get("app_trans_id")
+        if not app_trans_id:
+            return jsonify({"errCode": 1, "message": "Missing app_trans_id"}), 400
+
+        # Tạo dữ liệu truy vấn
+        params = {
+            "app_id": ZALOPAY_CONFIG["app_id"],
+            "app_trans_id": app_trans_id,
+        }
+        # Tạo chữ ký (mac) cho truy vấn
+        data_mac = f"{params['app_id']}|{params['app_trans_id']}|{ZALOPAY_CONFIG['key1']}"
+        params["mac"] = hmac.new(ZALOPAY_CONFIG["key1"].encode(), data_mac.encode(), hashlib.sha256).hexdigest()
+
+        # Gửi yêu cầu truy vấn đến ZaloPay
+        response = requests.post(
+            ZALOPAY_CONFIG["query_order_endpoint"],
+            data=params,
+            headers={"Content-Type": "application/x-www-form-urlencoded"},
+        )
+        return jsonify(response.json()), response.status_code
+    except Exception as e:
+        return jsonify({"errCode": 1, "message": str(e)}), 500
 
 @service_blueprint.route('/checkout', methods=['POST'])
 def api_checkout():
@@ -107,4 +137,6 @@ def api_get_payment_by_order_id(order_id):
             return jsonify({"errCode": 1, "message": "Payment not found"}), 404
     except Exception as e:
         return jsonify({"errCode": 1, "message": str(e)}), 500
+
+
 

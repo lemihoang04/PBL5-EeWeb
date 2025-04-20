@@ -119,23 +119,22 @@ const Checkout = () => {
             toast.error("Please select a payment method.");
             return;
         }
-
+        const orderData = {
+            user_id: user.account.id,
+            order_items: formValue.items.map((item) => ({
+                cart_id: item.cart_id,
+                product_id: item.product_id,
+                quantity: item.quantity,
+                total_price: item.price * item.quantity,
+            })),
+            total_amount: totalAmount,
+            discount_amount: discount.amount,
+            discount_code: discount.code,
+            payment_method: formData.payment,
+            shipping_address: formData.address + ", " + formData.country,
+        };
         if (formData.payment === "pay_later") {
             setIsLoading(true);
-            const orderData = {
-                user_id: user.account.id,
-                order_items: formValue.items.map((item) => ({
-                    cart_id: item.cart_id,
-                    product_id: item.product_id,
-                    quantity: item.quantity,
-                    total_price: item.price * item.quantity,
-                })),
-                total_amount: totalAmount,
-                discount_amount: discount.amount,
-                discount_code: discount.code,
-                payment_method: formData.payment,
-                shipping_address: formData.address + ", " + formData.country,
-            };
             try {
                 const response = await CheckOut(orderData);
                 if (response && response.errCode === 0) {
@@ -151,6 +150,7 @@ const Checkout = () => {
                 setIsLoading(false);
             }
         } else if (formData.payment === "online_payment") {
+            localStorage.setItem("pendingOrderData", JSON.stringify(orderData));
             setIsLoading(true);
             try {
                 let payment = await PaymentZaloPay({
