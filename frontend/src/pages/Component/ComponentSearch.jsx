@@ -24,6 +24,10 @@ const ComponentSearch = () => {
   const normalizedType = normalizeType(type);
 
   useEffect(() => {
+    window.scrollTo(0, 0); // Scroll to the top of the page
+  }, []);
+
+  useEffect(() => {
     console.log('Type from useParams:', type, 'Normalized:', normalizedType);
     const loadComponents = async () => {
       const data = await fetchComponents(type);
