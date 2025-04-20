@@ -1,4 +1,3 @@
-from flask import jsonify
 from config import get_db_connection
 from mysql.connector import Error
 from datetime import datetime

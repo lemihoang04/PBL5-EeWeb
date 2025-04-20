@@ -1,32 +1,28 @@
 import { useNavigate, useLocation } from 'react-router-dom'; 
 import React, { useState, useEffect } from 'react';
 import './Build.css';
+import MotherboardUsage from './MotherboardUsage';
 
 const Build = () => {
   const navigate = useNavigate(); // Initialize navigate
   const location = useLocation();
   
-  const [components, setComponents] = useState([
-    {
-      // id: 'cpu',
-      // name: 'CPU',
-      // selected: {
-      //   name: 'AMD Ryzen 7 9800X3D 4.7 GHz 8-Core Processor',
-      //   price: 479.00,
-      //   image: 'https://m.media-amazon.com/images/I/51D3BmtA+GL._AC_UF1000,1000_QL80_.jpg'
-      // }
-      id : 'cpu', name : 'CPU', selected: null
-    },
-    { id: 'cpuCooler', name: 'CPU Cooler', selected: null },
-    { id: 'motherboard', name: 'Motherboard', selected: null },
-    { id: 'memory', name: 'Memory', selected: null },
-    { id: 'storage', name: 'Storage', selected: null },
-    { id: 'videoCard', name: 'Video Card', selected: null },
-    { id: 'case', name: 'Case', selected: null },
-    { id: 'powerSupply', name: 'Power Supply', selected: null },
-    { id: 'operatingSystem', name: 'Operating System', selected: null },
-    { id: 'monitor', name: 'Monitor', selected: null }
-  ]);
+  const [components, setComponents] = useState(() => {
+    // Khôi phục trạng thái từ sessionStorage nếu có
+    const savedComponents = sessionStorage.getItem('components');
+    return savedComponents
+      ? JSON.parse(savedComponents)
+      : [
+          { id: 'cpu', name: 'CPU', selected: null },
+          { id: 'cpu Cooler', name: 'CPU Cooler', selected: null },
+          { id: 'Mainboard', name: 'Mainboard', selected: null },
+          { id: 'ram', name: 'RAM', selected: null },
+          { id: 'storage', name: 'Storage', selected: null },
+          { id: 'gpu', name: 'GPU', selected: null },
+          { id: 'case', name: 'Case', selected: null },
+          { id: 'psu', name: 'PSU', selected: null },
+        ];
+  });
 
   const [expansionItems] = useState([
     'Sound Cards', 'Wired Network Adapters', 'Wireless Network Adapters'
@@ -47,9 +43,19 @@ const Build = () => {
 
   const handleCategoryClick = (componentId) => {
     // Điều hướng đến ComponentSearch với loại thành phần
+    if (componentId === 'cpu Cooler') {
+      navigate(`/components/cpu%20cooler`);
+    }
+    else{
+      navigate(`/components/${componentId}`);
+    }
     
-    navigate(`/components/${componentId}`);
   };
+
+  // Lưu trạng thái vào sessionStorage mỗi khi components thay đổi
+    useEffect(() => {
+      sessionStorage.setItem('components', JSON.stringify(components));
+    }, [components]);
 
    // Xử lý dữ liệu được gửi từ ComponentSearch.jsx
    useEffect(() => {
@@ -57,7 +63,7 @@ const Build = () => {
       const addedComponent = location.state.addedComponent;
       setComponents((prevComponents) =>
         prevComponents.map((component) =>
-          component.id === addedComponent.type
+          component.name === addedComponent.category_name
             ? { ...component, selected: addedComponent }
             : component
         )
@@ -83,9 +89,14 @@ const Build = () => {
       <table className="components-table">
         <thead>
           <tr>
-            <th className="component-col">Component</th>
+          <th className="component-col">Component</th>
             <th className="selection-col">Selection</th>
+            <th className="base-col">Base</th>
+            <th className="promo-col">Promo</th>
+            <th className="shipping-col">Shipping</th>
+            <th className="tax-col">Tax</th>
             <th className="price-col">Price</th>
+            <th className="where-col">Where</th>
             <th className="action-col"></th>
           </tr>
         </thead>
@@ -185,6 +196,8 @@ const Build = () => {
       <div className="checkout-section">
         <button className="amazon-buy-btn">Buy From Amazon</button>
       </div>
+
+      <MotherboardUsage/>
     </div>
   );
 };
