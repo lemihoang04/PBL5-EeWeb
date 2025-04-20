@@ -31,38 +31,27 @@ const removeFromCart = async (cart_id) => {
 		throw error.response.data;
 	}
 }
-const CheckPayment = async (apptransid) => {
+const CheckPaymentZalopay = async (apptransid) => {
 	return axios.post(
-		"/payment/CheckZaloPay",
+		"/checkPayment",
 		{ app_trans_id: apptransid },
 		{
 			headers: {
-				"Content-Type": "application/x-www-form-urlencoded",
+				"Content-Type": "application/json",
 			},
 		}
 	);
 };
+
 const PaymentZaloPay = async (user) => {
 	return axios.post("/create_order", user, {
 		headers: {
-			"Content-Type": "application/x-www-form-urlencoded",
+			"Content-Type": "application/json",
 		},
 	});
 };
+
 const CheckOut = async (orderData) => {
-	// try {
-	// 	const response = await fetch("/api/checkout", {
-	// 		method: "POST",
-	// 		headers: {
-	// 			"Content-Type": "application/json",
-	// 		},
-	// 		body: JSON.stringify(orderData),
-	// 	});
-	// 	return await response.json();
-	// } catch (error) {
-	// 	console.error("Error during checkout:", error);
-	// 	throw error;
-	// }
 	return axios.post("/checkout", orderData, {
 		headers: {
 			"Content-Type": "application/json",
@@ -94,7 +83,7 @@ export {
 	loadCart,
 	addToCart,
 	removeFromCart,
-	CheckPayment,
+	CheckPaymentZalopay,
 	PaymentZaloPay,
 	CheckOut,
 	GetOrdersData,

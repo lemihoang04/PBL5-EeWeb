@@ -1,0 +1,19 @@
+from flask import Flask
+from flask_cors import CORS
+from blueprints.user_blueprint import user_blueprint
+from blueprints.service_blueprint import service_blueprint
+from blueprints.cart_blueprint import cart_blueprint
+from blueprints.product_blueprint import product_blueprint
+ 
+app = Flask(__name__)
+app.secret_key = "phuocnopro123" 
+CORS(app, origins="http://localhost:3000", supports_credentials=True)
+
+
+app.register_blueprint(user_blueprint)
+app.register_blueprint(service_blueprint)
+app.register_blueprint(cart_blueprint)
+app.register_blueprint(product_blueprint)
+
+if __name__ == "__main__":
+    app.run(debug=True, port=5000)

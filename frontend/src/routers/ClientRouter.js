@@ -15,6 +15,9 @@ import ChangePassword from "../pages/ChangePass/ChangePass";
 import LaptopSearch from "../pages/laptop/LaptopSearch"
 import ComponentSearch from "../pages/Component/ComponentSearch"
 import Orders from "../pages/Order/Orders";
+import UserRouter from "./UserRouter";
+import CheckPayment from "../pages/Private/CheckPayment/CheckPayment";
+import FailPayment from "../pages/Private/failPayment/failPayment";
 
 const AppRoutes = () => {
     return (
@@ -25,17 +28,54 @@ const AppRoutes = () => {
                     <Route element={<UserLayout />}>
                         <Route path="/home" element={<Home />} />
                         <Route path="/" element={<Home />} />
-                        <Route path="/cart" element={<Cart />} />
+                        <Route
+                            path="/cart"
+                            element={
+                                <UserRouter>
+                                    <Cart />
+                                </UserRouter>
+                            }
+                        />
                         <Route path="/product-info/:productId" element={<ProductInfo />} />
                         <Route path="/login" element={<Login />} />
                         <Route path="/register" element={<Register />} />
-                        <Route path="/profile" element={<Profile />} />
-                        <Route path="/change-password" element={<ChangePassword />} />
-                        <Route path="/orders" element={<Orders />} />
+                        <Route
+                            path="/profile"
+                            element={
+                                <UserRouter>
+                                    <Profile />
+                                </UserRouter>
+                            }
+                        />
+                        <Route
+                            path="/change-password"
+                            element={
+                                <UserRouter>
+                                    <ChangePassword />
+                                </UserRouter>
+                            }
+                        />
+                        <Route
+                            path="/orders"
+                            element={
+                                <UserRouter>
+                                    <Orders />
+                                </UserRouter>
+                            }
+                        />
                         <Route path="/laptops" element={<LaptopSearch />} />
                         <Route path="/build" element={<Build />} />
-                        <Route path="/checkout" element={<Checkout />} />
+                        <Route
+                            path="/checkout"
+                            element={
+                                <UserRouter>
+                                    <Checkout />
+                                </UserRouter>
+                            }
+                        />
                         <Route path="/components/:type" element={<ComponentSearch />} />
+                        <Route path="/checkPayment" element={<CheckPayment />} />
+                        <Route path="/failPayment" element={<FailPayment />} />
                     </Route>
 
                     {/* Route Admin */}

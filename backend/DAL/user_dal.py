@@ -1,4 +1,5 @@
 from config import get_db_connection
+from mysql.connector import Error
 from datetime import datetime
 
 def user_to_json(user_data):
@@ -119,3 +120,20 @@ def delete_user(user_id):
     connection.commit()
     cursor.close()
     connection.close()
+    
+def get_number_of_cart_items(user_id):
+    connection = get_db_connection()
+    if not connection:
+        raise Exception("Database connection failed")
+    cursor = connection.cursor(dictionary=True)
+    try:
+        cursor.execute("""
+            SELECT COUNT(*) AS cart_count FROM Cart WHERE user_id = %s
+        """, (user_id,))
+        result = cursor.fetchone()
+        return result['cart_count'] if result else 0
+    except Error as e:
+        raise Exception(f"Database error: {str(e)}")
+    finally:
+        cursor.close()
+        connection.close()
