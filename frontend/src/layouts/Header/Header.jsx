@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { UserContext } from "../../context/UserProvider";
 import { LogOutUser } from "../../services/userService";
 import { toast } from "react-toastify";
-import './HeaderNew.css';
+import './Header.css';
 
 const Header = () => {
   const { user, logoutUser } = useContext(UserContext);

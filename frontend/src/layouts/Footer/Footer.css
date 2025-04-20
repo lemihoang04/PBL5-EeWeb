@@ -1,0 +1,179 @@
+/* Modern Footer Design for TechShop */
+
+.tech-footer {
+  background: linear-gradient(to right, #1a2035, #1e293b);
+  color: #f8fafc;
+  padding: 0;
+  font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
+  margin-top: 3rem;
+}
+
+.tech-footer__container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem 1.5rem;
+}
+
+.tech-footer__main {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2.5rem;
+}
+
+.tech-footer__company {
+  margin-bottom: 1rem;
+}
+
+.tech-footer__title {
+  color: #60a5fa;
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+  letter-spacing: -0.5px;
+}
+
+.tech-footer__text {
+  font-size: 1rem;
+  opacity: 0.8;
+  margin: 0.5rem 0;
+  line-height: 1.5;
+}
+
+.tech-footer__links {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 2rem;
+}
+
+.tech-footer__heading {
+  color: #f8fafc;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 1.2rem 0;
+  position: relative;
+  padding-bottom: 0.75rem;
+}
+
+.tech-footer__heading::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 2.5rem;
+  height: 2px;
+  background-color: #60a5fa;
+}
+
+.tech-footer__list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.tech-footer__item {
+  margin-bottom: 0.75rem;
+}
+
+.tech-footer__link {
+  color: #cbd5e1;
+  text-decoration: none;
+  font-size: 0.95rem;
+  transition: color 0.2s, transform 0.2s;
+  display: inline-block;
+}
+
+.tech-footer__link:hover {
+  color: #60a5fa;
+  transform: translateX(3px);
+}
+
+.tech-footer__contact {
+  margin-top: 1rem;
+}
+
+.tech-footer__contact-item {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+  font-size: 0.95rem;
+  color: #cbd5e1;
+}
+
+.tech-footer__contact-icon {
+  margin-right: 0.75rem;
+  font-size: 1rem;
+}
+
+.tech-footer__social {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.tech-footer__social-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: rgba(203, 213, 225, 0.1);
+  color: #f8fafc;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.tech-footer__social-link:hover {
+  background-color: #60a5fa;
+  transform: translateY(-3px);
+}
+
+.tech-footer__bottom {
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(203, 213, 225, 0.2);
+  text-align: center;
+}
+
+.tech-footer__copyright {
+  font-size: 0.9rem;
+  color: #94a3b8;
+  margin: 0;
+}
+
+/* Responsive styles */
+@media (min-width: 768px) {
+  .tech-footer__main {
+    grid-template-columns: 1.5fr 2fr 1.5fr;
+  }
+  
+  .tech-footer__links {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 767px) {
+  .tech-footer__container {
+    padding: 2rem 1rem 1rem;
+  }
+  
+  .tech-footer__title {
+    font-size: 1.5rem;
+  }
+  
+  .tech-footer__heading {
+    font-size: 1rem;
+  }
+  
+  .tech-footer__social {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 480px) {
+  .tech-footer__links {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}
