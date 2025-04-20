@@ -1,0 +1,141 @@
+.motherboard-usage {
+  margin-top: 40px;
+  padding: 20px;
+  border: 1px solid #e0e0e0;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+}
+
+.motherboard-usage h2 {
+  margin-top: 0;
+  color: #333;
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.motherboard-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.mb-image-container {
+  width: 80px;
+  height: 80px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  margin-right: 15px;
+}
+
+.mb-image {
+  max-width: 70px;
+  max-height: 70px;
+  object-fit: contain;
+}
+
+.mb-title {
+  font-weight: bold;
+  font-size: 18px;
+  color: #333;
+}
+
+.mb-layout {
+  display: flex;
+  gap: 30px;
+  margin-bottom: 20px;
+}
+
+.mb-section {
+  flex: 1;
+}
+
+.section-header {
+  background-color: #f0f0f0;
+  padding: 10px;
+  font-weight: bold;
+  border: 1px solid #ddd;
+  border-radius: 5px 5px 0 0;
+}
+
+.section-content {
+  border: 1px solid #ddd;
+  border-top: none;
+  border-radius: 0 0 5px 5px;
+  padding: 15px;
+  background-color: #fff;
+}
+
+.socket-item, .memory-item, .slot-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #eee;
+}
+
+.socket-item:last-child, .memory-item:last-child, .slot-item:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.socket-label, .memory-label, .slot-label {
+  font-weight: bold;
+  width: 150px;
+  padding: 5px 10px;
+  background-color: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  text-align: center;
+  font-size: 14px;
+}
+
+.socket-connection, .memory-connection, .slot-connection {
+  width: 50px;
+  height: 2px;
+  background-color: #aaa;
+  margin: 0 10px;
+}
+
+.component-item {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  background-color: #e6f2ff;
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #bbd9ff;
+}
+
+.component-image {
+  width: 30px;
+  height: 30px;
+  margin-right: 10px;
+  object-fit: contain;
+}
+
+.component-name {
+  font-size: 14px;
+  color: #333;
+}
+
+.mb-note {
+  color: #666;
+  font-style: italic;
+  margin: 15px 0;
+  font-size: 14px;
+}
+
+.covered {
+  opacity: 0.6;
+}
+
+.covered .slot-label {
+  background-color: #eee;
+  color: #888;
+  border-style: dashed;
+}

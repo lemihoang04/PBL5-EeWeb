@@ -1,28 +1,28 @@
-import React, { useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom'; 
+import React, { useState, useEffect } from 'react';
 import './Build.css';
+import MotherboardUsage from './MotherboardUsage';
 
 const Build = () => {
-  const [components, setComponents] = useState([
-    {
-      // id: 'cpu',
-      // name: 'CPU',
-      // selected: {
-      //   name: 'AMD Ryzen 7 9800X3D 4.7 GHz 8-Core Processor',
-      //   price: 479.00,
-      //   image: 'https://m.media-amazon.com/images/I/51D3BmtA+GL._AC_UF1000,1000_QL80_.jpg'
-      // }
-      id : 'cpu', name : 'CPU', selected: null
-    },
-    { id: 'cpuCooler', name: 'CPU Cooler', selected: null },
-    { id: 'motherboard', name: 'Motherboard', selected: null },
-    { id: 'memory', name: 'Memory', selected: null },
-    { id: 'storage', name: 'Storage', selected: null },
-    { id: 'videoCard', name: 'Video Card', selected: null },
-    { id: 'case', name: 'Case', selected: null },
-    { id: 'powerSupply', name: 'Power Supply', selected: null },
-    { id: 'operatingSystem', name: 'Operating System', selected: null },
-    { id: 'monitor', name: 'Monitor', selected: null }
-  ]);
+  const navigate = useNavigate(); // Initialize navigate
+  const location = useLocation();
+  
+  const [components, setComponents] = useState(() => {
+    // Khôi phục trạng thái từ sessionStorage nếu có
+    const savedComponents = sessionStorage.getItem('components');
+    return savedComponents
+      ? JSON.parse(savedComponents)
+      : [
+          { id: 'cpu', name: 'CPU', selected: null },
+          { id: 'cpu Cooler', name: 'CPU Cooler', selected: null },
+          { id: 'Mainboard', name: 'Mainboard', selected: null },
+          { id: 'ram', name: 'RAM', selected: null },
+          { id: 'storage', name: 'Storage', selected: null },
+          { id: 'gpu', name: 'GPU', selected: null },
+          { id: 'case', name: 'Case', selected: null },
+          { id: 'psu', name: 'PSU', selected: null },
+        ];
+  });
 
   const [expansionItems] = useState([
     'Sound Cards', 'Wired Network Adapters', 'Wireless Network Adapters'
@@ -42,10 +42,35 @@ const Build = () => {
   }, 0);
 
   const handleCategoryClick = (componentId) => {
-    // This would navigate to the component category page in a real application
-    console.log(`Navigating to ${componentId} category`);
-    alert(`Navigating to ${componentId} category...`);
+    // Điều hướng đến ComponentSearch với loại thành phần
+    if (componentId === 'cpu Cooler') {
+      navigate(`/components/cpu%20cooler`);
+    }
+    else{
+      navigate(`/components/${componentId}`);
+    }
+    
   };
+
+  // Lưu trạng thái vào sessionStorage mỗi khi components thay đổi
+    useEffect(() => {
+      sessionStorage.setItem('components', JSON.stringify(components));
+    }, [components]);
+
+   // Xử lý dữ liệu được gửi từ ComponentSearch.jsx
+   useEffect(() => {
+    if (location.state?.addedComponent) {
+      const addedComponent = location.state.addedComponent;
+      setComponents((prevComponents) =>
+        prevComponents.map((component) =>
+          component.name === addedComponent.category_name
+            ? { ...component, selected: addedComponent }
+            : component
+        )
+      );
+      console.log('Added component:', addedComponent);
+    }
+  }, [location.state]);
 
   return (
     <div className="build-container">
@@ -64,7 +89,7 @@ const Build = () => {
       <table className="components-table">
         <thead>
           <tr>
-            <th className="component-col">Component</th>
+          <th className="component-col">Component</th>
             <th className="selection-col">Selection</th>
             <th className="base-col">Base</th>
             <th className="promo-col">Promo</th>
@@ -96,21 +121,24 @@ const Build = () => {
                   </button>
                 )}
               </td>
-              <td className="base">{component.selected ? `$${component.selected.price.toFixed(2)}` : '—'}</td>
-              <td className="promo">—</td>
-              <td className="shipping">
-                {component.selected && <img src="https://m.media-amazon.com/images/G/01/prime/detail/images/prime_check_badge._CB659998231_.png" alt="Prime" className="prime-icon" />}
-              </td>
-              <td className="tax">—</td>
-              <td className="price">{component.selected ? `$${component.selected.price.toFixed(2)}` : ''}</td>
-              <td className="where">
-                {component.selected && <span className="amazon-label">amazon.com</span>}
-              </td>
+              <td className="price">{component.selected ? `$${component.selected.price.toFixed(2)}` : '—'}</td>
               <td className="actions">
                 {component.selected && (
                   <div className="action-buttons">
-                    <button className="buy-btn">Buy</button>
-                    <button className="remove-btn">✕</button>
+                    <button 
+                      className="remove-btn" 
+                      onClick={() => {
+                        setComponents((prevComponents) =>
+                          prevComponents.map((comp) =>
+                            comp.id === component.id
+                              ? { ...comp, selected: null }
+                              : comp
+                          )
+                        );
+                      }}
+                    >
+                      ✕
+                    </button>
                   </div>
                 )}
               </td>
@@ -168,6 +196,8 @@ const Build = () => {
       <div className="checkout-section">
         <button className="amazon-buy-btn">Buy From Amazon</button>
       </div>
+
+      <MotherboardUsage/>
     </div>
   );
 };

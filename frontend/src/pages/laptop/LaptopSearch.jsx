@@ -266,9 +266,9 @@ const LaptopSearch = () => {
                     )}
                   </div>
                 </div> */}
-
-                <button className="add-to-cart">Add to cart</button>
-
+                
+                
+                
                 {/* <div className="more-buying-choices">
                   <div className="buying-choices-header">More Buying Choices</div>
                   {laptop.id === 1 && <div className="buying-choices-price">$141.15 (111+ used & new offers)</div>}

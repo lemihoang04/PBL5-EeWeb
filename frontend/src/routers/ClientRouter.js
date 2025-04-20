@@ -16,8 +16,6 @@ import LaptopSearch from "../pages/laptop/LaptopSearch"
 import ComponentSearch from "../pages/Component/ComponentSearch"
 import Orders from "../pages/Order/Orders";
 import UserRouter from "./UserRouter";
-import CheckPayment from "../pages/Private/CheckPayment/CheckPayment";
-import FailPayment from "../pages/Private/failPayment/failPayment";
 
 const AppRoutes = () => {
     return (
@@ -74,9 +72,8 @@ const AppRoutes = () => {
                             }
                         />
                         <Route path="/components/:type" element={<ComponentSearch />} />
-                        <Route path="/checkPayment" element={<CheckPayment />} />
-                        <Route path="/failPayment" element={<FailPayment />} />
                     </Route>
+                   
 
                     {/* Route Admin */}
                     <Route path="/admin" element={<Admin />} />
