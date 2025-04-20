@@ -29,12 +29,14 @@ def checkout(order_data):
                 'pending',  
                 order_data['shipping_address']
             ))
-
-        for item in order_data['order_items']:
-            if 'cart_id' in item and item['cart_id']:
-                cursor.execute("""
-                    DELETE FROM Cart WHERE cart_id = %s
-                """, (item['cart_id'],))
+        isBuyNow = order_data.get('isBuyNow', False)
+        if not isBuyNow:
+            for item in order_data['order_items']:
+                if 'cart_id' in item and item['cart_id']:
+                    cursor.execute("""
+                        DELETE FROM Cart WHERE cart_id = %s
+                    """, (item['cart_id'],))
+                
         payment_status = 'completed' if order_data['payment_method'] == 'online_payment' else 'pending'
         cursor.execute("""
             INSERT INTO Payments (order_id, user_id, amount, payment_method, payment_status)

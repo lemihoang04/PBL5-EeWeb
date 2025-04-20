@@ -23,16 +23,13 @@ const CheckPayment = () => {
 
             try {
                 const response = await CheckPaymentZalopay(app_trans_id);
-                // Kiểm tra trạng thái thanh toán thành công
                 if (response?.return_code === 1 && response?.sub_return_code === 1) {
-                    // Lấy orderData từ localStorage
                     const orderDataStr = localStorage.getItem("pendingOrderData");
                     if (!orderDataStr) {
                         navigate("/failPayment");
                         return;
                     }
                     const orderData = JSON.parse(orderDataStr);
-                    // Xóa orderData sau khi sử dụng
                     localStorage.removeItem("pendingOrderData");
                     const responseCheckout = await CheckOut(orderData);
                     if (responseCheckout && responseCheckout.errCode === 0) {

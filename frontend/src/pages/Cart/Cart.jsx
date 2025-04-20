@@ -145,11 +145,11 @@ const CartPage = () => {
                                     <div className="crt__item-image">
                                         <img
                                             src={item.image ? item.image.split("; ")[0] : "default-image.jpg"}
-                                            alt={item.name}
+                                            alt={item.title}
                                         />
                                     </div>
                                     <div className="crt__item-details">
-                                        <h3 className="crt__item-name">{item.name}</h3>
+                                        <h3 className="crt__item-name">{item.title}</h3>
                                         <div className="crt__item-actions">
                                             <div className="crt__quantity-control">
                                                 <button
