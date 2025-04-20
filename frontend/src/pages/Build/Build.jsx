@@ -1,7 +1,11 @@
-import React, { useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom'; 
+import React, { useState, useEffect } from 'react';
 import './Build.css';
 
 const Build = () => {
+  const navigate = useNavigate(); // Initialize navigate
+  const location = useLocation();
+  
   const [components, setComponents] = useState([
     {
       // id: 'cpu',
@@ -42,10 +46,25 @@ const Build = () => {
   }, 0);
 
   const handleCategoryClick = (componentId) => {
-    // This would navigate to the component category page in a real application
-    console.log(`Navigating to ${componentId} category`);
-    alert(`Navigating to ${componentId} category...`);
+    // Điều hướng đến ComponentSearch với loại thành phần
+    
+    navigate(`/components/${componentId}`);
   };
+
+   // Xử lý dữ liệu được gửi từ ComponentSearch.jsx
+   useEffect(() => {
+    if (location.state?.addedComponent) {
+      const addedComponent = location.state.addedComponent;
+      setComponents((prevComponents) =>
+        prevComponents.map((component) =>
+          component.id === addedComponent.type
+            ? { ...component, selected: addedComponent }
+            : component
+        )
+      );
+      console.log('Added component:', addedComponent);
+    }
+  }, [location.state]);
 
   return (
     <div className="build-container">
@@ -55,10 +74,10 @@ const Build = () => {
           <span className="label">Compatibility:</span>
           <span className="notes">See <a href="#notes">notes</a> below.</span>
         </div>
-        {/* <div className="wattage">
+        <div className="wattage">
           <span className="icon">⚡</span>
           <span>Estimated Wattage: 120W</span>
-        </div> */}
+        </div>
       </div>
 
       <table className="components-table">
@@ -66,12 +85,7 @@ const Build = () => {
           <tr>
             <th className="component-col">Component</th>
             <th className="selection-col">Selection</th>
-            <th className="base-col">Base</th>
-            <th className="promo-col">Promo</th>
-            <th className="shipping-col">Shipping</th>
-            <th className="tax-col">Tax</th>
             <th className="price-col">Price</th>
-            <th className="where-col">Where</th>
             <th className="action-col"></th>
           </tr>
         </thead>
@@ -96,21 +110,24 @@ const Build = () => {
                   </button>
                 )}
               </td>
-              <td className="base">{component.selected ? `$${component.selected.price.toFixed(2)}` : '—'}</td>
-              <td className="promo">—</td>
-              <td className="shipping">
-                {component.selected && <img src="https://m.media-amazon.com/images/G/01/prime/detail/images/prime_check_badge._CB659998231_.png" alt="Prime" className="prime-icon" />}
-              </td>
-              <td className="tax">—</td>
-              <td className="price">{component.selected ? `$${component.selected.price.toFixed(2)}` : ''}</td>
-              <td className="where">
-                {component.selected && <span className="amazon-label">amazon.com</span>}
-              </td>
+              <td className="price">{component.selected ? `$${component.selected.price.toFixed(2)}` : '—'}</td>
               <td className="actions">
                 {component.selected && (
                   <div className="action-buttons">
-                    <button className="buy-btn">Buy</button>
-                    <button className="remove-btn">✕</button>
+                    <button 
+                      className="remove-btn" 
+                      onClick={() => {
+                        setComponents((prevComponents) =>
+                          prevComponents.map((comp) =>
+                            comp.id === component.id
+                              ? { ...comp, selected: null }
+                              : comp
+                          )
+                        );
+                      }}
+                    >
+                      ✕
+                    </button>
                   </div>
                 )}
               </td>

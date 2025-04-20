@@ -267,7 +267,7 @@ const LaptopSearch = () => {
                   </div>
                 </div> */}
                 
-                <button className="add-to-cart">Add to cart</button>
+                
                 
                 {/* <div className="more-buying-choices">
                   <div className="buying-choices-header">More Buying Choices</div>

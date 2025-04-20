@@ -263,7 +263,7 @@ def get_laptops():
                 p.rating,
                 pa.attribute_name,
                 pa.attribute_value
-            FROM Products p
+            FROM products p
             LEFT JOIN Product_Attributes pa ON p.product_id = pa.product_id
             WHERE p.category_id = 4
         """)

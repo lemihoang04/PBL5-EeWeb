@@ -18,7 +18,7 @@ CORS(app, origins="http://localhost:3000", supports_credentials=True)
 db = mysql.connector.connect(
     host="localhost",
     user="root",
-    port=3306,
+    port=3307,
     password="",
     database="techshop_db",
 )
@@ -72,7 +72,7 @@ def create_order():
     except requests.RequestException as e:
         return jsonify({"error": str(e)}), 500
 
-@app.route("/zalo-ipn", methods=["POST"])
+@app.route("/zalo-ipn", methods=["POST"])   
 def zalo_ipn():
     # Lắng nghe IPN (Instant Payment Notification) từ ZaloPay
     ipn_data = request.json
@@ -193,18 +193,7 @@ def api_logout():
     session.clear()
     return jsonify({"errCode": 0, "message": "Logged out successfully"}), 200
 
-@app.route("/products", methods=["GET"])
-def get_products():
-    try:
-        cursor = db.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM laptop")
-        products = cursor.fetchall()
-        cursor.close()
-        return jsonify(products)
-    except Exception as e:
-        print("Error fetching products:", e)
-        return jsonify({"error": "Internal Server Error"}), 500
-
+#laptop
 @app.route("/filters", methods=["GET"])
 def get_filters():
     try:

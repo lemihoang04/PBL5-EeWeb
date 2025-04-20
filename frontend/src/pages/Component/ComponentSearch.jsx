@@ -418,7 +418,18 @@ const ComponentSearch = () => {
                     ? `$${component.price.toFixed(2)}`
                     : 'N/A'}
                 </p>
-                <button>Add to cart</button>
+                <button
+                  onClick={() => {
+                    console.log('Adding component:', component);
+                    navigate('/build', {
+                      state: {
+                        addedComponent: component,
+                      },
+                    });
+                  }}
+                >
+                  Add
+              </button>
               </div>
             ))}
           </div>
