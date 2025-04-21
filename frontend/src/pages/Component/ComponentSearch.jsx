@@ -147,6 +147,7 @@ const ComponentSearch = () => {
         'Integrated Graphics',
         'Rating',
         'Price',
+        'Action'
       ],
       RAM: [
         'Name',
@@ -157,6 +158,7 @@ const ComponentSearch = () => {
         'Timing',
         'ECC / Registered',
         'Price',
+        'Action'
       ],
       'CPU Cooler': [
         'Name',
@@ -167,6 +169,7 @@ const ComponentSearch = () => {
         'Water Cooled',
         'Fanless',
         'Price',
+        'Action'
       ],
       Case: [
         'Name',
@@ -177,6 +180,7 @@ const ComponentSearch = () => {
         'Maximum Video Card Length',
         'Drive Bays',
         'Price',
+        'Action'
       ],
       GPU: [
         'Name',
@@ -187,6 +191,7 @@ const ComponentSearch = () => {
         'TDP',
         'Cooling',
         'Price',
+        'Action'
       ],
       Mainboard: [
         'Name',
@@ -197,6 +202,7 @@ const ComponentSearch = () => {
         'Memory Slots',
         'PCIe x16 Slots',
         'Price',
+        'Action'
       ],
       PSU: [
         'Name',
@@ -207,6 +213,7 @@ const ComponentSearch = () => {
         'PCIe 8-Pin Connectors',
         'SATA Connectors',
         'Price',
+        'Action'
       ],
       Storage: [
         'Name',
@@ -217,6 +224,7 @@ const ComponentSearch = () => {
         'NVME',
         'Cache',
         'Price',
+        'Action'
       ],
     };
 
@@ -457,7 +465,7 @@ const ComponentSearch = () => {
                       </td>
                     ))}
                     <td style={{ padding: '10px' }}>
-                    <button className="add-button"
+                      <button className="add-button"
                         onClick={() => {
                           console.log('Adding component:', component);
                           navigate('/build', {
@@ -468,7 +476,7 @@ const ComponentSearch = () => {
                         }}
                       >
                         Add
-                    </button>
+                      </button>
                     </td>
                   </tr>
                 ))}

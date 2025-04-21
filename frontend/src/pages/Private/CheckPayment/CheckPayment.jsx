@@ -30,6 +30,7 @@ const CheckPayment = () => {
                         return;
                     }
                     const orderData = JSON.parse(orderDataStr);
+                    orderData.app_trans_id = app_trans_id;
                     localStorage.removeItem("pendingOrderData");
                     const responseCheckout = await CheckOut(orderData);
                     if (responseCheckout && responseCheckout.errCode === 0) {

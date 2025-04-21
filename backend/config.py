@@ -4,7 +4,11 @@ DATABASE_CONFIG = {
     'user': 'root',
     'password': '',
     'host': 'localhost',  
+<<<<<<< HEAD
     'port': 3306, #3307        
+=======
+    'port': 3306,        
+>>>>>>> 89321cb4be26e1d64cd49bb0abcd972927e9712f
     'database': 'techshop_db',
 }
 ZALOPAY_CONFIG = {
