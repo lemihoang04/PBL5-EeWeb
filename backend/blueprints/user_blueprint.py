@@ -1,5 +1,7 @@
 from flask import Blueprint, request, jsonify, session
 from DAL.user_dal import *
+from datetime import datetime, timedelta
+from context.email_utils import send_otp_email
 
 user_blueprint = Blueprint('user', __name__)
 
@@ -110,3 +112,72 @@ def api_change_password():
 def api_logout():
     session.clear()
     return jsonify({"errCode": 0, "message": "Logged out successfully"}), 200
+
+@user_blueprint.route('/forgotPassword', methods=['POST'])
+def api_forgot_password():
+    data = request.json
+    email = data.get('email')
+    
+    if not email:
+        return jsonify({"errCode": 1, "message": "Email is required"}), 400
+    
+    # Check if user with this email exists
+    user = get_user_by_email(email)
+    if not user:
+        return jsonify({"errCode": 1, "message": "Email not found"}), 404
+    otp_code = generate_otp()
+    expiry_time = datetime.utcnow() + timedelta(minutes=5)
+    create_otp(email, otp_code, expiry_time)
+    email_sent = send_otp_email(email, otp_code)
+    
+    if not email_sent:
+        return jsonify({"errCode": 1, "message": "Failed to send OTP email. Please try again."}), 500
+    
+    return jsonify({
+        "errCode": 0, 
+        "message": "OTP sent successfully to your email"
+    }), 200
+
+@user_blueprint.route('/verifyOTP', methods=['POST'])
+def api_verify_otp():
+    data = request.json
+    email = data.get('email')
+    otp = data.get('otp')
+    
+    if not email or not otp:
+        return jsonify({"errCode": 1, "message": "Email and OTP are required"}), 400
+    
+    # Verify OTP
+    is_valid = verify_otp(email, otp)
+    
+    if not is_valid:
+        return jsonify({"errCode": 1, "message": "Invalid or expired OTP"}), 400
+    
+    return jsonify({"errCode": 0, "message": "OTP verified successfully"}), 200
+
+@user_blueprint.route('/resetPassword', methods=['POST'])
+def api_reset_password():
+    data = request.json
+    email = data.get('email')
+    otp = data.get('otp')
+    new_password = data.get('newPassword')
+    
+    if not email or not otp or not new_password:
+        return jsonify({"errCode": 1, "message": "Email, OTP, and new password are required"}), 400
+    
+    # Verify OTP again as an extra security measure
+    is_valid = verify_otp(email, otp)
+    
+    if not is_valid:
+        return jsonify({"errCode": 1, "message": "Invalid or expired OTP"}), 400
+    
+    # Reset the password
+    success = reset_password(email, new_password)
+    
+    if not success:
+        return jsonify({"errCode": 1, "message": "Failed to reset password"}), 500
+    
+    # Delete the used OTP
+    delete_otp(email)
+    
+    return jsonify({"errCode": 0, "message": "Password reset successfully"}), 200
