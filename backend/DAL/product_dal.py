@@ -124,3 +124,4 @@ def dal_get_components_by_type(type):
     finally:
         cursor.close()
         db.close()
+

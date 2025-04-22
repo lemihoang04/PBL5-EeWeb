@@ -236,3 +236,105 @@
   .base, .promo, .shipping, .tax, .price {
     text-align: center;
   }
+
+/* CSS cho nút Add */
+.add-another-row {
+  background-color: #f9f9f9;
+}
+
+.add-another-cell, .add-first-cell {
+  padding: 8px 16px;
+  text-align: left;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.add-first-cell {
+  /* Kiểu cho nút "Add" đầu tiên (khi chưa có thành phần nào) */
+  padding-left: 50px; /* Thêm padding để căn chỉnh với các thành phần khác */
+}
+
+.add-another-btn {
+  background-color: #f0f0f0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 6px 12px;
+  color: #333;
+  font-size: 0.85em;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.add-another-btn:hover {
+  background-color: #e0e0e0;
+}
+
+/* Compatibility Issues Section */
+.compatibility-issues {
+  margin-top: 30px;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 5px;
+}
+
+.compatibility-issues h2 {
+  margin-top: 0;
+  color: #333;
+}
+
+.issues-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.issue-item {
+  display: flex;
+  align-items: flex-start;
+  padding: 12px;
+  border-radius: 4px;
+}
+
+.issue-item.problem {
+  background-color: #ffecec;
+}
+
+.issue-item.disclaimer {
+  background-color: #e8f4ff;
+}
+
+.issue-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  font-weight: bold;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+.issue-item.problem .issue-badge {
+  background-color: #e53935;
+  color: white;
+}
+
+.issue-item.disclaimer .issue-badge {
+  background-color: #2196F3;
+  color: white;
+}
+
+.issue-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.issue-type {
+  font-weight: bold;
+  color: #e53935;
+  margin-bottom: 4px;
+}
+
+.issue-item.disclaimer .issue-type {
+  color: #2196F3;
+}
