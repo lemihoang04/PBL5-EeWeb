@@ -4,10 +4,10 @@ import { UserContext } from '../../context/UserProvider';
 import { toast } from 'react-toastify';
 import { GetOrdersData } from '../../services/apiService';
 import OrderDetailModal from './OrderDetailModal';
+import { CancelOrder } from '../../services/apiService';
 
 import './Orders.css';
 
-// Hàm định dạng ngày giờ
 const formatDate = (dateString) => {
     const options = {
         year: 'numeric',
@@ -28,36 +28,37 @@ const Orders = () => {
     const [selectedOrderId, setSelectedOrderId] = useState(null);
     const [showModal, setShowModal] = useState(false);
 
-    useEffect(() => {
-        const fetchOrders = async () => {
-            try {
-                setLoading(true);
-                setOrders([]);
-                const response = await GetOrdersData(user.account.id);
-                if (response && response.errCode === 0) {
-                    const orders = (response.orders || []).map(item => ({
-                        id: item.id,
-                        order_id: item.order_id, // Sử dụng order_id nếu có, nếu không thì dùng id
-                        orderNumber: `ORD-${item.order_id}`,
-                        date: item.created_at || new Date().toISOString(),
-                        status: (item.status || '').trim().toLowerCase(),
-                        productId: item.product_id,
-                        productName: item.title,
-                        productImage: item.image,
-                        price: item.price,
-                        quantity: item.quantity,
-                        total: item.price * item.quantity
-                    }));
-                    setOrders(orders);
-                }
-            } catch (error) {
-                console.error('Error loading orders:', error);
-                toast.error("Failed to load orders.");
-            } finally {
-                setLoading(false);
+    // Đưa fetchOrders ra ngoài để có thể gọi lại sau khi cancel
+    const fetchOrders = async () => {
+        try {
+            setLoading(true);
+            setOrders([]);
+            const response = await GetOrdersData(user.account.id);
+            if (response && response.errCode === 0) {
+                const orders = (response.orders || []).map(item => ({
+                    id: item.id,
+                    order_id: item.order_id,
+                    orderNumber: `ORD-${item.order_id}`,
+                    date: item.created_at || new Date().toISOString(),
+                    status: (item.status || '').trim().toLowerCase(),
+                    productId: item.product_id,
+                    title: item.title,
+                    productImage: item.image,
+                    price: item.price,
+                    quantity: item.quantity,
+                    total: item.price * item.quantity
+                }));
+                setOrders(orders);
             }
-        };
+        } catch (error) {
+            console.error('Error loading orders:', error);
+            toast.error("Failed to load orders.");
+        } finally {
+            setLoading(false);
+        }
+    };
 
+    useEffect(() => {
         fetchOrders();
 
         // Cleanup function to clear orders when component unmounts or dependencies change
@@ -99,7 +100,7 @@ const Orders = () => {
     };
 
     // Lấy tên sản phẩm
-    const getProductName = (order) => order.productName || 'Product';
+    const getProductName = (order) => order.title || 'Product';
 
     // Mở modal chi tiết đơn hàng
     const openOrderDetails = (order) => {
@@ -111,6 +112,23 @@ const Orders = () => {
     const closeOrderDetails = () => {
         setShowModal(false);
         setSelectedOrderId(null);
+    };
+
+    // Xử lý hủy đơn hàng
+    const handleCancel = async (order) => {
+        if (window.confirm("Are you sure you want to cancel this order?")) {
+            try {
+                const response = await CancelOrder(order.id);
+                if (response && response.errCode === 0) {
+                    toast.success(`Order ${order.orderNumber} has been cancelled.`);
+                    await fetchOrders(); // Fetch lại danh sách đơn hàng sau khi hủy thành công
+                } else {
+                    toast.error(`Failed to cancel order ${order.orderNumber}.`);
+                }
+            } catch (error) {
+                toast.error(`Error cancelling order: ${error.message}`);
+            }
+        }
     };
 
     // Hiển thị trạng thái đang tải
@@ -256,12 +274,14 @@ const Orders = () => {
                                 >
                                     View Details
                                 </button>
-                                <button className="odrs__button odrs__secondary-button">
+                                {/* <button className="odrs__button odrs__secondary-button">
                                     Track Order
-                                </button>
-                                {/* Also check for pending status */}
+                                </button> */}
                                 {(order.status === 'pending' || order.status === 'processing' || order.status === 'shipped') && (
-                                    <button className="odrs__button odrs__outline-button">
+                                    <button
+                                        className="odrs__button odrs__outline-button"
+                                        onClick={() => handleCancel(order)}
+                                    >
                                         Cancel Order
                                     </button>
                                 )}
@@ -274,9 +294,7 @@ const Orders = () => {
             {/* Order Detail Modal */}
             {showModal && selectedOrderId && (
                 <OrderDetailModal
-                    id={selectedOrderId.id}
-                    order_id={selectedOrderId.order_id}
-                    image={getProductImage(orders.find(order => order.id === selectedOrderId.id))}
+                    order={orders.find(order => order.id === selectedOrderId.id)}
                     onClose={closeOrderDetails}
                 />
             )}

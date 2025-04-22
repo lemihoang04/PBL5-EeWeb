@@ -127,6 +127,7 @@ const Checkout = () => {
                 quantity: item.quantity,
                 total_price: item.price * item.quantity,
             })),
+            isBuyNow: formValue.isBuyNow,
             total_amount: totalAmount,
             discount_amount: discount.amount,
             discount_code: discount.code,
@@ -262,7 +263,7 @@ const Checkout = () => {
                                     {formValue?.items.map((item) => (
                                         <div className="checkout-product-item" key={item.id}>
                                             <div className="checkout-product-info">
-                                                <span className="checkout-product-name">{item.name}</span>
+                                                <span className="checkout-product-name">{item.title}</span>
                                                 <span className="checkout-product-quantity">x{item.quantity}</span>
                                             </div>
                                             <span className="checkout-product-price">${(item.price * item.quantity).toFixed(2)}</span>

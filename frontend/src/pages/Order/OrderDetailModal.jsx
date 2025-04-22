@@ -3,7 +3,7 @@ import { toast } from 'react-toastify';
 import './OrderDetailModal.css';
 import { GetOrderDetail, GetOrderPayment } from '../../services/apiService';
 
-const OrderDetailModal = ({ id, order_id, onClose }) => {
+const OrderDetailModal = ({ order, onClose }) => {
     const [orderDetails, setOrderDetails] = useState(null);
     const [paymentDetails, setPaymentDetails] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -54,25 +54,25 @@ const OrderDetailModal = ({ id, order_id, onClose }) => {
         return statusMap[status.toLowerCase()] || 'odtm__payment-default';
     };
 
-    // Fetch order and payment details
+    // Fetch payment details only, order is from props
     useEffect(() => {
-        const fetchOrderDetails = async () => {
+        const fetchPaymentDetails = async () => {
             try {
                 setLoading(true);
-                // Lấy order bằng id
-                const orderResponse = await GetOrderDetail(id);
-                if (orderResponse.errCode !== 0) throw new Error('Failed to fetch order details');
-                const orderData = orderResponse.data;
+                if (!order || !order.order_id) {
+                    setError('Order information is missing.');
+                    setLoading(false);
+                    return;
+                }
+                setOrderDetails(order); // set order from props
 
-
-                const paymentResponse = await GetOrderPayment(order_id);
+                const paymentResponse = await GetOrderPayment(order.order_id);
                 if (paymentResponse.errCode !== 0) throw new Error('Failed to fetch payment details');
                 const paymentData = paymentResponse.data;
 
-                setOrderDetails(orderData);
                 setPaymentDetails(paymentData);
             } catch (err) {
-                console.error('Error fetching order details:', err);
+                console.error('Error fetching payment details:', err);
                 setError('Failed to load order details. Please try again later.');
                 toast.error('Failed to load order details');
             } finally {
@@ -80,10 +80,10 @@ const OrderDetailModal = ({ id, order_id, onClose }) => {
             }
         };
 
-        if (id && order_id) {
-            fetchOrderDetails();
+        if (order && order.order_id) {
+            fetchPaymentDetails();
         }
-    }, [id, order_id]);
+    }, [order]);
 
     // Handle click outside to close
     const handleClickOutside = (e) => {
@@ -149,7 +149,7 @@ const OrderDetailModal = ({ id, order_id, onClose }) => {
                         <div className="odtm__order-header">
                             <div>
                                 <h3>Order #{orderDetails.order_id}</h3>
-                                <p className="odtm__order-date">Placed on: {formatDate(orderDetails.created_at)}</p>
+                                <p className="odtm__order-date">Placed on: {formatDate(orderDetails.date)}</p>
                             </div>
                             <div className={`odtm__status ${getStatusClass(orderDetails.status)}`}>
                                 {orderDetails.status ? (orderDetails.status.charAt(0).toUpperCase() + orderDetails.status.slice(1)) : 'Unknown'}
@@ -162,7 +162,7 @@ const OrderDetailModal = ({ id, order_id, onClose }) => {
                             <h4>Product</h4>
                             <div className="odtm__product-details">
                                 <div className="odtm__product-image">
-                                    <img src={orderDetails.image?.split("; ")[0] || 'https://via.placeholder.com/80'}
+                                    <img src={orderDetails.productImage?.split("; ")[0] || 'https://via.placeholder.com/80'}
                                         alt={orderDetails.title} />
                                 </div>
                                 <div className="odtm__product-info">
@@ -184,7 +184,7 @@ const OrderDetailModal = ({ id, order_id, onClose }) => {
                                 </div>
                                 <div className="odtm__price-row">
                                     <span>Shipping</span>
-                                    <span>{formatCurrency(10.00)}</span>
+                                    <span>Free</span>
                                 </div>
                                 <div className="odtm__price-row">
                                     <span>Tax</span>
@@ -194,7 +194,6 @@ const OrderDetailModal = ({ id, order_id, onClose }) => {
                                     <span>Total</span>
                                     <span>{formatCurrency(
                                         orderDetails.price * orderDetails.quantity +
-                                        10.00 +
                                         (orderDetails.price * orderDetails.quantity * 0.08)
                                     )}</span>
                                 </div>
@@ -203,7 +202,7 @@ const OrderDetailModal = ({ id, order_id, onClose }) => {
 
                         <div className="odtm__divider"></div>
 
-                        <div className="odtm__shipping-section">
+                        {/* <div className="odtm__shipping-section">
                             <h4>Shipping Details</h4>
                             <p className="odtm__shipping-address">{orderDetails.shipping_address}</p>
                             <div className="odtm__shipping-timeline">
@@ -236,9 +235,9 @@ const OrderDetailModal = ({ id, order_id, onClose }) => {
                                     </div>
                                 </div>
                             </div>
-                        </div>
-
-                        <div className="odtm__divider"></div>
+                        </div> */}
+                        {/* 
+                        <div className="odtm__divider"></div> */}
 
                         <div className="odtm__payment-section">
                             <h4>Payment Information</h4>

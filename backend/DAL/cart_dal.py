@@ -56,7 +56,7 @@ def dal_get_cart(user_id):
             cart_items.append({
                 'cart_id': row['cart_id'],
                 'product_id': row['product_id'],
-                'name': row['title'],
+                'title': row['title'],
                 'price': row['price'],
                 'quantity': row['quantity'],
                 'image': row['image'],

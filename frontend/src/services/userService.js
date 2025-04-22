@@ -106,6 +106,53 @@ const changePassword = async (userId, oldPassword, newPassword) => {
 		throw error.response.data;
 	}
 };
+
+const forgotPassword = async (email) => {
+	try {
+		const response = await axios.post('/forgotPassword', { email }, {
+			headers: {
+				"Content-Type": "application/json",
+			},
+		});
+		return response;
+	} catch (error) {
+		console.error("Error in forgot password request:", error);
+		throw error.response ? error.response.data : error;
+	}
+};
+
+const verifyOTP = async (email, otp) => {
+	try {
+		const response = await axios.post('/verifyOTP', { email, otp }, {
+			headers: {
+				"Content-Type": "application/json",
+			},
+		});
+		return response;
+	} catch (error) {
+		console.error("Error verifying OTP:", error);
+		throw error.response ? error.response.data : error;
+	}
+};
+
+const resetPassword = async (email, otp, newPassword) => {
+	try {
+		const response = await axios.post('/resetPassword', {
+			email,
+			otp,
+			newPassword
+		}, {
+			headers: {
+				"Content-Type": "application/json",
+			},
+		});
+		return response;
+	} catch (error) {
+		console.error("Error resetting password:", error);
+		throw error.response ? error.response.data : error;
+	}
+};
+
 export {
 	LoginUser,
 	LoginAdmin,
@@ -118,4 +165,7 @@ export {
 	DeleteUser,
 	GetUserID,
 	changePassword,
+	forgotPassword,
+	verifyOTP,
+	resetPassword,
 };

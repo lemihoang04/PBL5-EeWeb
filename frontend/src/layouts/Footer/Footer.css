@@ -5,7 +5,6 @@
   color: #f8fafc;
   padding: 0;
   font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
-  margin-top: 3rem;
 }
 
 .tech-footer__container {
@@ -147,7 +146,7 @@
   .tech-footer__main {
     grid-template-columns: 1.5fr 2fr 1.5fr;
   }
-  
+
   .tech-footer__links {
     grid-template-columns: repeat(3, 1fr);
   }
@@ -157,15 +156,15 @@
   .tech-footer__container {
     padding: 2rem 1rem 1rem;
   }
-  
+
   .tech-footer__title {
     font-size: 1.5rem;
   }
-  
+
   .tech-footer__heading {
     font-size: 1rem;
   }
-  
+
   .tech-footer__social {
     justify-content: flex-start;
   }

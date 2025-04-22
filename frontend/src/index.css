@@ -61,7 +61,9 @@ span,
 input,
 textarea,
 select,
-button {
+button,
+th,
+td {
   font-family: "Inter", serif !important;
 
 }

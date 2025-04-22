@@ -142,8 +142,21 @@ const ProductInfo = () => {
 
   // Handle the buy now action
   const handleBuyNow = () => {
-    handleAddToCart();
-    navigate('/checkout');
+    if (!productInfo) return;
+    const item = {
+      product_id: productInfo.id,
+      price: productInfo.price,
+      title: productInfo.title,
+      quantity,
+    };
+    console.log("Item to buy now:", item);
+    const amount = productInfo.price ? productInfo.price * quantity : 0;
+    const isBuyNow = true;
+    const items = [item];
+    const formValue = { items, amount, isBuyNow };
+    navigate("/checkout", {
+      state: { formValue }
+    });
   };
 
   if (!productInfo && products) {
