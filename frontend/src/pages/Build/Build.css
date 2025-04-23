@@ -1,326 +1,465 @@
 .build-container {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', sans-serif;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-    color: #333;
-  }
-  
-  .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px;
-    margin-bottom: 20px;
-    border-radius: 5px;
-    background-color: #19a463;
-    color: white;
-  }
-  
-  .compatibility {
-    display: flex;
-    align-items: center;
-  }
-  
-  .compatibility .icon {
-    margin-right: 8px;
-    font-size: 20px;
-  }
-  
-  .compatibility .label {
-    font-weight: bold;
-    margin-right: 5px;
-  }
-  
-  .compatibility .notes a {
-    color: white;
-    text-decoration: underline;
-  }
-  
-  .wattage {
-    display: flex;
-    align-items: center;
-    padding: 5px 10px;
-    background-color: #4da3ff;
-    border-radius: 5px;
-  }
-  
-  .wattage .icon {
-    margin-right: 8px;
-  }
-  
-  .components-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 30px;
-  }
-  
-  .components-table th, 
-  .components-table td {
-    padding: 12px 10px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
-  }
-  
-  .components-table thead {
-    background-color: #f5f5f5;
-  }
-  
-  .component-name a {
-    color: #1a73e8;
-    text-decoration: none;
-    font-weight: bold;
-  }
-  
-  .component-name a:hover {
-    text-decoration: underline;
-  }
-  
-  .selected-component {
-    display: flex;
-    align-items: center;
-  }
-  
-  .selected-component img {
-    width: 40px;
-    height: 40px;
-    object-fit: contain;
-    margin-right: 10px;
-  }
-  
-  .choose-btn {
-    background-color: #2196f3;
-    color: white;
-    border: none;
-    padding: 8px 15px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 14px;
-  }
-  
-  .choose-btn:hover {
-    background-color: #0b7dda;
-  }
-  
-  .prime-icon {
-    height: 20px;
-  }
-  
-  .action-buttons {
-    display: flex;
-    align-items: center;
-  }
-  
-  .buy-btn {
-    background-color: #19a463;
-    color: white;
-    border: none;
-    padding: 6px 15px;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-right: 8px;
-  }
-  
-  .remove-btn {
-    background-color: transparent;
-    border: none;
-    color: #888;
-    cursor: pointer;
-    font-size: 16px;
-  }
-  
-  .buy-btn:hover {
-    background-color: #148553;
-  }
-  
-  .remove-btn:hover {
-    color: #555;
-  }
-  
-  .amazon-label {
-    font-size: 14px;
-    color: #666;
-  }
-  
-  .additional-components {
-    margin-bottom: 30px;
-  }
-  
-  .component-group {
-    display: flex;
-    border-bottom: 1px solid #ddd;
-    padding: 12px 0;
-  }
-  
-  .group-title {
-    width: 180px;
-    font-weight: bold;
-    padding-right: 15px;
-  }
-  
-  .group-items {
-    flex: 1;
-  }
-  
-  .group-item {
-    margin-right: 15px;
-  }
-  
-  .group-item a {
-    color: #1a73e8;
-    text-decoration: none;
-  }
-  
-  .group-item a:hover {
-    text-decoration: underline;
-  }
-  
-  .total-section {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    padding: 15px 0;
-    font-size: 18px;
-  }
-  
-  .total-label {
-    font-weight: bold;
-    margin-right: 30px;
-  }
-  
-  .total-price {
-    font-weight: bold;
-    font-size: 22px;
-  }
-  
-  .checkout-section {
-    display: flex;
-    justify-content: flex-end;
-    margin-top: 20px;
-  }
-  
-  .amazon-buy-btn {
-    background-color: #19a463;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-  }
-  
-  .amazon-buy-btn:hover {
-    background-color: #148553;
-  }
-  
-  .base-col, .promo-col, .shipping-col, .tax-col, .price-col {
-    text-align: center;
-  }
-  
-  .selection-col {
-    width: 30%;
-  }
-  
-  .where-col {
-    width: 10%;
-  }
-  
-  .component-col {
-    width: 12%;
-  }
-  
-  .base-col, .promo-col, .shipping-col, .tax-col, .price-col {
-    width: 8%;
-  }
-  
-  .base, .promo, .shipping, .tax, .price {
-    text-align: center;
-  }
+  font-family: 'Segoe UI', Roboto, -apple-system, BlinkMacSystemFont, Oxygen, Ubuntu, Cantarell, 'Open Sans', sans-serif;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  color: #333;
+  background-color: #ffffff;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+  border-radius: 10px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  margin-bottom: 30px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #19a463 0%, #0f7b48 100%);
+  color: white;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.compatibility {
+  display: flex;
+  align-items: center;
+}
+
+.compatibility .icon {
+  margin-right: 12px;
+  font-size: 24px;
+}
+
+.compatibility .label {
+  font-weight: 600;
+  margin-right: 8px;
+  letter-spacing: 0.5px;
+}
+
+.compatibility .notes a {
+  color: white;
+  text-decoration: none;
+  padding-bottom: 2px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+  transition: border-color 0.2s ease;
+}
+
+.compatibility .notes a:hover {
+  border-color: white;
+}
+
+.wattage {
+  display: flex;
+  align-items: center;
+  padding: 8px 15px;
+  background: linear-gradient(135deg, #4da3ff 0%, #2180e6 100%);
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+}
+
+.wattage:hover {
+  transform: translateY(-2px);
+}
+
+.wattage .icon {
+  margin-right: 10px;
+  font-size: 18px;
+}
+
+/* Components Table Styling */
+.components-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin-bottom: 40px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.components-table th, 
+.components-table td {
+  padding: 15px;
+  text-align: left;
+  border-bottom: 1px solid #eaeaea;
+}
+
+.components-table thead {
+  background: linear-gradient(to right, #f5f5f5, #fafafa);
+}
+
+.components-table th {
+  font-weight: 600;
+  color: #444;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  letter-spacing: 1px;
+}
+
+.components-table tbody tr {
+  transition: background-color 0.2s;
+}
+
+.components-table tbody tr:hover {
+  background-color: rgba(25, 164, 99, 0.05);
+}
+
+.component-name a {
+  color: #1a73e8;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s;
+}
+
+.component-name a:hover {
+  color: #0d47a1;
+}
+
+.selected-component {
+  display: flex;
+  align-items: center;
+  background-color: #f9f9f9;
+  padding: 8px;
+  border-radius: 6px;
+  transition: all 0.2s;
+  border-left: 3px solid #19a463;
+}
+
+.selected-component:hover {
+  background-color: #f0f0f0;
+  transform: translateX(5px);
+}
+
+.selected-component img {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+  margin-right: 15px;
+  background-color: white;
+  padding: 5px;
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.choose-btn {
+  background: linear-gradient(to bottom, #2196f3, #1e88e5);
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s;
+  box-shadow: 0 2px 4px rgba(33, 150, 243, 0.3);
+}
+
+.choose-btn:hover {
+  background: linear-gradient(to bottom, #1e88e5, #1976d2);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(33, 150, 243, 0.4);
+}
+
+.prime-icon {
+  height: 20px;
+}
+
+.action-buttons {
+  display: flex;
+  align-items: center;
+}
+
+.buy-btn {
+  background: linear-gradient(to bottom, #19a463, #148553);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  margin-right: 10px;
+  transition: all 0.2s;
+  box-shadow: 0 2px 4px rgba(25, 164, 99, 0.3);
+}
+
+.remove-btn {
+  background-color: transparent;
+  border: 1px solid #ddd;
+  color: #666;
+  cursor: pointer;
+  font-size: 14px;
+  height: 30px;
+  width: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.buy-btn:hover {
+  background: linear-gradient(to bottom, #148553, #0f7243);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(25, 164, 99, 0.4);
+}
+
+.remove-btn:hover {
+  color: #e53935;
+  border-color: #e53935;
+  background-color: rgba(229, 57, 53, 0.08);
+}
+
+.amazon-label {
+  font-size: 14px;
+  color: #666;
+}
+
+/* Additional Components Styling */
+.additional-components {
+  margin-bottom: 40px;
+  background-color: white;
+  border-radius: 8px;
+  padding: 15px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.component-group {
+  display: flex;
+  border-bottom: 1px solid #eaeaea;
+  padding: 15px 0;
+}
+
+.component-group:last-child {
+  border-bottom: none;
+}
+
+.group-title {
+  width: 180px;
+  font-weight: 600;
+  padding-right: 15px;
+  color: #444;
+}
+
+.group-items {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.group-item {
+  margin-right: 15px;
+  margin-bottom: 8px;
+  background-color: #f5f5f5;
+  padding: 6px 12px;
+  border-radius: 20px;
+  transition: all 0.2s;
+}
+
+.group-item:hover {
+  background-color: #e0e0e0;
+}
+
+.group-item a {
+  color: #1a73e8;
+  text-decoration: none;
+  font-size: 14px;
+  transition: color 0.2s;
+}
+
+.group-item a:hover {
+  color: #0d47a1;
+}
+
+/* Total & Checkout Styling */
+.total-section {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 20px;
+  margin: 30px 0;
+  background: linear-gradient(to right, #f9f9f9, #f0f0f0);
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.total-label {
+  font-weight: 600;
+  margin-right: 30px;
+  font-size: 20px;
+  color: #444;
+}
+
+.total-price {
+  font-weight: 700;
+  font-size: 26px;
+  color: #19a463;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+}
+
+.checkout-section {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.amazon-buy-btn {
+  background: linear-gradient(to bottom, #19a463, #148553);
+  color: white;
+  border: none;
+  padding: 12px 30px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  transition: all 0.3s;
+  box-shadow: 0 4px 6px rgba(21, 101, 192, 0.2);
+  display: flex;
+  align-items: center;
+}
+
+.amazon-buy-btn:hover {
+  background: linear-gradient(to bottom, #148553, #0f7243);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(21, 101, 192, 0.3);
+}
+
+.amazon-buy-btn:active {
+  transform: translateY(-1px);
+}
+
+/* Table column widths */
+.selection-col {
+  width: 30%;
+}
+
+.where-col {
+  width: 10%;
+}
+
+.component-col {
+  width: 12%;
+}
+
+.base-col, .promo-col, .shipping-col, .tax-col, .price-col {
+  width: 8%;
+  text-align: center;
+}
+
+.base, .promo, .shipping, .tax, .price {
+  text-align: center;
+}
 
 /* CSS cho nút Add */
 .add-another-row {
-  background-color: #f9f9f9;
+  background-color: #f8f9fa;
 }
 
 .add-another-cell, .add-first-cell {
-  padding: 8px 16px;
+  padding: 10px 16px;
   text-align: left;
   border-bottom: 1px solid #e0e0e0;
 }
 
 .add-first-cell {
-  /* Kiểu cho nút "Add" đầu tiên (khi chưa có thành phần nào) */
-  padding-left: 50px; /* Thêm padding để căn chỉnh với các thành phần khác */
+  padding-left: 50px;
 }
 
 .add-another-btn {
-  background-color: #f0f0f0;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  padding: 6px 12px;
-  color: #333;
-  font-size: 0.85em;
+  background-color: #f8f8f8;
+  border: 1px dashed #bbb;
+  border-radius: 6px;
+  padding: 8px 16px;
+  color: #555;
+  font-size: 0.9em;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .add-another-btn:hover {
-  background-color: #e0e0e0;
+  background-color: #f0f0f0;
+  border-color: #888;
+  color: #333;
+}
+
+.add-another-btn:before {
+  content: "+";
+  margin-right: 5px;
+  font-weight: bold;
+  font-size: 16px;
 }
 
 /* Compatibility Issues Section */
 .compatibility-issues {
-  margin-top: 30px;
-  padding: 20px;
-  background-color: #f9f9f9;
-  border-radius: 5px;
+  margin-top: 40px;
+  padding: 25px;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
 }
 
 .compatibility-issues h2 {
   margin-top: 0;
   color: #333;
+  font-size: 22px;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #f0f0f0;
 }
 
 .issues-container {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 15px;
 }
 
 .issue-item {
   display: flex;
   align-items: flex-start;
-  padding: 12px;
-  border-radius: 4px;
+  padding: 15px;
+  border-radius: 8px;
+  transition: transform 0.2s;
+}
+
+.issue-item:hover {
+  transform: translateX(5px);
 }
 
 .issue-item.problem {
-  background-color: #ffecec;
+  background-color: #fff8f8;
+  border-left: 4px solid #e53935;
 }
 
 .issue-item.disclaimer {
-  background-color: #e8f4ff;
+  background-color: #f0f7ff;
+  border-left: 4px solid #2196F3;
 }
 
 .issue-badge {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   font-weight: bold;
-  margin-right: 12px;
+  margin-right: 15px;
   flex-shrink: 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .issue-item.problem .issue-badge {
-  background-color: #e53935;
+  background: linear-gradient(135deg, #ff5252, #e53935);
   color: white;
 }
 
 .issue-item.disclaimer .issue-badge {
-  background-color: #2196F3;
+  background: linear-gradient(135deg, #42a5f5, #2196F3);
   color: white;
 }
 
@@ -330,11 +469,68 @@
 }
 
 .issue-type {
-  font-weight: bold;
+  font-weight: 600;
+  margin-bottom: 5px;
+  font-size: 16px;
+}
+
+.issue-item.problem .issue-type {
   color: #e53935;
-  margin-bottom: 4px;
 }
 
 .issue-item.disclaimer .issue-type {
   color: #2196F3;
+}
+
+.issue-message {
+  font-size: 15px;
+  line-height: 1.5;
+  color: #555;
+}
+
+/* Motherboard Usage Component styling */
+.motherboard-empty {
+  text-align: center;
+  padding: 40px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  margin-top: 30px;
+}
+
+.empty-state {
+  font-size: 16px;
+  color: #777;
+  font-style: italic;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .build-container {
+    padding: 15px;
+  }
+  
+  .components-table {
+    font-size: 14px;
+  }
+  
+  .selected-component img {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .component-group {
+    flex-direction: column;
+  }
+  
+  .group-title {
+    width: 100%;
+    margin-bottom: 10px;
+  }
 }

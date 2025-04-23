@@ -1,4 +1,4 @@
-import { useNavigate, useLocation } from 'react-router-dom'; 
+import { useNavigate, useLocation } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import './Build.css';
 import MotherboardUsage from './MotherboardUsage';
@@ -6,22 +6,22 @@ import MotherboardUsage from './MotherboardUsage';
 const Build = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  
+
   const [components, setComponents] = useState(() => {
-    // Khôi phục trạng thái từ sessionStorage nếu có
+    // Restore state from sessionStorage if available
     const savedComponents = sessionStorage.getItem('components');
     return savedComponents
       ? JSON.parse(savedComponents)
       : [
-          { id: 'cpu', name: 'CPU', selected: null, multiple: false },
-          { id: 'cpu Cooler', name: 'CPU Cooler', selected: null, multiple: false },
-          { id: 'Mainboard', name: 'Mainboard', selected: null, multiple: false },
-          { id: 'ram', name: 'RAM', selected: [], multiple: true },
-          { id: 'storage', name: 'Storage', selected: [], multiple: true },
-          { id: 'gpu', name: 'GPU', selected: [], multiple: true },
-          { id: 'case', name: 'Case', selected: null, multiple: false },
-          { id: 'psu', name: 'PSU', selected: null, multiple: false },
-        ];
+        { id: 'cpu', name: 'CPU', selected: null, multiple: false, icon: '🧠' },
+        { id: 'cpu Cooler', name: 'CPU Cooler', selected: null, multiple: false, icon: '❄️' },
+        { id: 'Mainboard', name: 'Mainboard', selected: null, multiple: false, icon: '🔄' },
+        { id: 'ram', name: 'RAM', selected: [], multiple: true, icon: '🧮' },
+        { id: 'storage', name: 'Storage', selected: [], multiple: true, icon: '💾' },
+        { id: 'gpu', name: 'GPU', selected: [], multiple: true, icon: '🎮' },
+        { id: 'case', name: 'Case', selected: null, multiple: false, icon: '🏠' },
+        { id: 'psu', name: 'PSU', selected: null, multiple: false, icon: '⚡' },
+      ];
   });
 
   const [expansionItems] = useState([
@@ -33,7 +33,7 @@ const Build = () => {
   ]);
 
   const [accessories] = useState([
-    'Case Accessories', 'Case Fans', 'Fan Controllers', 'Thermal Compound', 
+    'Case Accessories', 'Case Fans', 'Fan Controllers', 'Thermal Compound',
     'External Storage', 'Optical Drives', 'UPS Systems'
   ]);
 
@@ -46,12 +46,12 @@ const Build = () => {
   const calculateTotalPrice = () => {
     return components.reduce((sum, component) => {
       if (!component.selected) return sum;
-      
+
       if (component.multiple) {
-        // Nếu là dạng multiple (mảng các sản phẩm)
+        // If multiple type (array of products)
         return sum + component.selected.reduce((itemSum, item) => itemSum + (item ? item.price : 0), 0);
       } else {
-        // Nếu là dạng single (một sản phẩm)
+        // If single type (one product)
         return sum + (component.selected ? component.selected.price : 0);
       }
     }, 0);
@@ -59,13 +59,13 @@ const Build = () => {
 
   const totalPrice = calculateTotalPrice();
 
-  // Lấy mainboard được chọn (nếu có)
+  // Get selected mainboard (if any)
   const selectedMainboard = components.find(component => component.id === 'Mainboard')?.selected || null;
-  
-  // Lấy danh sách RAM được chọn
+
+  // Get list of selected RAMs
   const selectedRams = components.find(component => component.id === 'ram')?.selected || [];
 
-  // Lấy các thành phần khác nếu cần
+  // Get other components if needed
   const selectedCpu = components.find(component => component.id === 'cpu')?.selected || null;
   const selectedStorages = components.find(component => component.id === 'storage')?.selected || [];
   const selectedGpus = components.find(component => component.id === 'gpu')?.selected || [];
@@ -73,39 +73,39 @@ const Build = () => {
   // Update compatibility issues whenever components change
   useEffect(() => {
     const issues = [];
-    
+
     // Check RAM compatibility
     const motherboard = components.find(c => c.id === 'Mainboard')?.selected;
     const rams = components.find(c => c.id === 'ram')?.selected || [];
-    
+
     if (motherboard && rams.length > 0) {
       const ramSlots = motherboard.specs?.memorySlots || 4;
       if (rams.length > ramSlots) {
-        issues.push({ 
-          type: 'problem', 
+        issues.push({
+          type: 'problem',
           message: `Your motherboard only supports ${ramSlots} RAM modules, but you've selected ${rams.length}.`
         });
       }
-      
+
       // Add the standard disclaimer
-      issues.push({ 
-        type: 'disclaimer', 
+      issues.push({
+        type: 'disclaimer',
         message: 'Some physical constraints are not checked, such as RAM clearance with CPU Coolers.'
       });
     } else {
       // Default issues when components aren't selected
       issues.push({ type: 'problem', message: 'Two additional RAM slots are needed.' });
-      issues.push({ 
-        type: 'disclaimer', 
+      issues.push({
+        type: 'disclaimer',
         message: 'Some physical constraints are not checked, such as RAM clearance with CPU Coolers.'
       });
     }
-    
+
     setCompatibilityIssues(issues);
   }, [components]);
 
   const handleCategoryClick = (componentId) => {
-    // Điều hướng đến ComponentSearch với loại thành phần
+    // Navigate to ComponentSearch with component type
     if (componentId === 'cpu Cooler') {
       navigate(`/components/cpu%20cooler`);
     } else {
@@ -113,37 +113,12 @@ const Build = () => {
     }
   };
 
-  // Lưu trạng thái vào sessionStorage mỗi khi components thay đổi
+  // Save state to sessionStorage each time components change
   useEffect(() => {
     sessionStorage.setItem('components', JSON.stringify(components));
   }, [components]);
 
-  // Xử lý dữ liệu được gửi từ ComponentSearch.jsx
-  // useEffect(() => {
-  //   if (location.state?.addedComponent) {
-  //     const addedComponent = location.state.addedComponent;
-  //     setComponents((prevComponents) =>
-  //       prevComponents.map((component) => {
-  //         if (component.name === addedComponent.category_name) {
-  //           if (component.multiple) {
-  //             // Nếu component hỗ trợ nhiều lựa chọn
-  //             return { 
-  //               ...component, 
-  //               selected: [...(component.selected || []), addedComponent] 
-  //             };
-  //           } else {
-  //             // Nếu component chỉ hỗ trợ một lựa chọn
-  //             return { ...component, selected: addedComponent };
-  //           }
-  //         }
-  //         return component;
-  //       })
-  //     );
-  //     console.log('Added component:', addedComponent);
-  //   }
-  // }, [location.state]);
-
-
+  // Handle data sent from ComponentSearch.jsx
   useEffect(() => {
     if (location.state?.addedComponent) {
       const addedComponent = location.state.addedComponent;
@@ -151,28 +126,28 @@ const Build = () => {
         prevComponents.map((component) => {
           if (component.name === addedComponent.category_name) {
             if (component.id === 'Mainboard') {
-              // Xử lý riêng cho Mainboard để lấy giá trị M2.slot
+              // Special handling for Mainboard to get M2.slot values
               const m2Slots = addedComponent.attributes?.['m2Slots'] || [];
               console.log('M2:', m2Slots);
               return {
                 ...component,
-                selected: { ...addedComponent, m2Slots }, // Lưu cả sản phẩm và M2.slot
+                selected: { ...addedComponent, m2Slots }, // Save both product and M2.slot
               };
             } else if (component.multiple) {
-              // Nếu component hỗ trợ nhiều lựa chọn
+              // If component supports multiple selections
               return {
                 ...component,
                 selected: [...(component.selected || []), addedComponent],
               };
             } else {
-              // Nếu component chỉ hỗ trợ một lựa chọn
+              // If component only supports one selection
               return { ...component, selected: addedComponent };
             }
           }
           return component;
         })
       );
-      
+
       console.log('Added component:', addedComponent);
     }
   }, [location.state]);
@@ -182,12 +157,12 @@ const Build = () => {
       prevComponents.map((comp) => {
         if (comp.id === componentId) {
           if (comp.multiple && index !== null) {
-            // Xóa một mục cụ thể từ mảng selected
+            // Remove a specific item from the selected array
             const newSelected = [...comp.selected];
             newSelected.splice(index, 1);
             return { ...comp, selected: newSelected };
           } else {
-            // Xóa toàn bộ selected nếu không phải multiple hoặc không có index
+            // Remove all selected if not multiple or no index
             return { ...comp, selected: comp.multiple ? [] : null };
           }
         }
@@ -206,7 +181,7 @@ const Build = () => {
         </div>
         <div className="wattage">
           <span className="icon">⚡</span>
-          <span>Estimated Wattage: 120W</span>
+          <span>Estimated Wattage: {calculateWattage()}W</span>
         </div>
       </div>
 
@@ -215,12 +190,7 @@ const Build = () => {
           <tr>
             <th className="component-col">Component</th>
             <th className="selection-col">Selection</th>
-            <th className="base-col">Base</th>
-            <th className="promo-col">Promo</th>
-            <th className="shipping-col">Shipping</th>
-            <th className="tax-col">Tax</th>
             <th className="price-col">Price</th>
-            <th className="where-col">Where</th>
             <th className="action-col"></th>
           </tr>
         </thead>
@@ -228,16 +198,19 @@ const Build = () => {
           {components.map((component) => (
             <React.Fragment key={component.id}>
               {component.multiple ? (
-                // Xử lý cho các thành phần có thể chọn nhiều (RAM, Storage, GPU)
+                // Handling for components that can be selected multiple times (RAM, Storage, GPU)
                 <>
-                  {/* Hiển thị tên thành phần nếu chưa có lựa chọn nào */}
+                  {/* Display component name if no selection yet */}
                   {component.selected.length === 0 && (
                     <tr className="component-row">
                       <td className="component-name">
-                        <a href={`#${component.id}`}>{component.name}</a>
+                        <a href={`#${component.id}`}>
+                          <span className="component-icon">{component.icon}</span>
+                          {component.name}
+                        </a>
                       </td>
                       <td className="selection">
-                        <button 
+                        <button
                           className="choose-btn"
                           onClick={() => handleCategoryClick(component.id)}
                         >
@@ -248,14 +221,17 @@ const Build = () => {
                       <td className="actions"></td>
                     </tr>
                   )}
-                  
-                  {/* Hiển thị các mục đã chọn */}
+
+                  {/* Display selected items */}
                   {component.selected.map((item, index) => (
                     <tr key={`${component.id}-${index}`} className="component-row">
-                      {/* Chỉ hiển thị tên thành phần ở dòng đầu tiên */}
+                      {/* Only show component name in first row */}
                       {index === 0 && (
                         <td className="component-name" rowSpan={component.selected.length}>
-                          <a href={`#${component.id}`}>{component.name}</a>
+                          <a href={`#${component.id}`}>
+                            <span className="component-icon">{component.icon}</span>
+                            {component.name}
+                          </a>
                         </td>
                       )}
                       <td className="selection">
@@ -264,12 +240,13 @@ const Build = () => {
                           <span>{item.title}</span>
                         </div>
                       </td>
-                      <td className="price">${item.price.toFixed(2)}</td>
+                      <td className="price">{renderPrice(item.price)}</td>
                       <td className="actions">
                         <div className="action-buttons">
-                          <button 
-                            className="remove-btn" 
+                          <button
+                            className="remove-btn"
                             onClick={() => handleRemoveComponent(component.id, index)}
+                            title="Remove"
                           >
                             ✕
                           </button>
@@ -277,26 +254,29 @@ const Build = () => {
                       </td>
                     </tr>
                   ))}
-                  
-                  {/* Chỉ hiển thị nút "Add Another" khi đã có ít nhất một thành phần được chọn */}
+
+                  {/* Only show "Add Another" button when at least one component is selected */}
                   {component.selected.length > 0 && (
                     <tr className="add-another-row">
-                      <td colSpan="9" className="add-another-cell">
-                        <button 
+                      <td colSpan="4" className="add-another-cell">
+                        <button
                           className="add-another-btn"
                           onClick={() => handleCategoryClick(component.id)}
                         >
-                          + Add Another {component.name}
+                          Add another {component.name}
                         </button>
                       </td>
                     </tr>
                   )}
                 </>
               ) : (
-                // Xử lý cho các thành phần chỉ chọn một (CPU, Mainboard, v.v.)
+                // Handling for components that can only be selected once (CPU, Mainboard, etc.)
                 <tr className="component-row">
                   <td className="component-name">
-                    <a href={`#${component.id}`}>{component.name}</a>
+                    <a href={`#${component.id}`}>
+                      <span className="component-icon">{component.icon}</span>
+                      {component.name}
+                    </a>
                   </td>
                   <td className="selection">
                     {component.selected ? (
@@ -305,23 +285,24 @@ const Build = () => {
                         <span>{component.selected.title}</span>
                       </div>
                     ) : (
-                      <button 
+                      <button
                         className="choose-btn"
                         onClick={() => handleCategoryClick(component.id)}
                       >
-                        Choose {component.id === 'operatingSystem' ? 'An' : 'A'} {component.name}
+                        Choose {component.name}
                       </button>
                     )}
                   </td>
                   <td className="price">
-                    {component.selected ? `$${component.selected.price.toFixed(2)}` : '—'}
+                    {component.selected ? renderPrice(component.selected.price) : '—'}
                   </td>
                   <td className="actions">
                     {component.selected && (
                       <div className="action-buttons">
-                        <button 
-                          className="remove-btn" 
+                        <button
+                          className="remove-btn"
                           onClick={() => handleRemoveComponent(component.id)}
+                          title="Remove"
                         >
                           ✕
                         </button>
@@ -338,7 +319,8 @@ const Build = () => {
       <div className="additional-components">
         <div className="component-group">
           <div className="group-title">
-            Expansion Cards / Networking
+            <span className="group-icon">🔌</span>
+            Expansion / Networking
           </div>
           <div className="group-items">
             {expansionItems.map(item => (
@@ -351,6 +333,7 @@ const Build = () => {
 
         <div className="component-group">
           <div className="group-title">
+            <span className="group-icon">🖱️</span>
             Peripherals
           </div>
           <div className="group-items">
@@ -364,6 +347,7 @@ const Build = () => {
 
         <div className="component-group">
           <div className="group-title">
+            <span className="group-icon">🔧</span>
             Accessories / Other
           </div>
           <div className="group-items">
@@ -378,24 +362,27 @@ const Build = () => {
 
       <div className="total-section">
         <div className="total-label">Total:</div>
-        <div className="total-price">${totalPrice.toFixed(2)}</div>
+        <div className="total-price">{renderPrice(totalPrice)}</div>
       </div>
 
       <div className="checkout-section">
-        <button className="amazon-buy-btn">Buy From Amazon</button>
+        <button className="amazon-buy-btn">
+          <span className="checkout-icon">🛒</span>
+          Buy from Amazon
+        </button>
       </div>
 
-      {/* New Compatibility Issues Section */}
+      {/* Compatibility issues section */}
       <div className="compatibility-issues" id="notes">
         <h2>Potential Issues / Incompatibilities</h2>
-        
+
         <div className="issues-container">
           {compatibilityIssues.map((issue, index) => (
             <div key={index} className={`issue-item ${issue.type}`}>
-              <div className="issue-badge">{issue.type === 'problem' ? 'A' : 'B'}</div>
+              <div className="issue-badge">{issue.type === 'problem' ? 'P' : 'I'}</div>
               <div className="issue-content">
                 <div className="issue-type">
-                  {issue.type === 'problem' ? 'Problem:' : 'Disclaimer:'}
+                  {issue.type === 'problem' ? 'Problem:' : 'Note:'}
                 </div>
                 <div className="issue-message">
                   {issue.message}
@@ -403,11 +390,18 @@ const Build = () => {
               </div>
             </div>
           ))}
+
+          {compatibilityIssues.length === 0 && (
+            <div className="no-issues">
+              <div className="success-icon">✓</div>
+              <p>No compatibility issues detected!</p>
+            </div>
+          )}
         </div>
       </div>
-      
+
       {/* Motherboard Usage Component */}
-      <MotherboardUsage 
+      <MotherboardUsage
         motherboard={selectedMainboard}
         rams={selectedRams}
         cpu={selectedCpu}
@@ -415,10 +409,41 @@ const Build = () => {
         gpus={selectedGpus}
         components={components}
       />
-      
-      
+
+
     </div>
   );
+
+  // Helper function to format price
+  function renderPrice(price) {
+    if (!price) return '—';
+    return `$${price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  }
+
+  // Function to calculate estimated wattage
+  function calculateWattage() {
+    let totalWattage = 0;
+
+    // CPU wattage (typically 65-125W)
+    const cpu = components.find(c => c.id === 'cpu')?.selected;
+    if (cpu) {
+      totalWattage += cpu.specs?.tdp || 95;
+    }
+
+    // GPU wattage (typically 75-350W)
+    const gpus = components.find(c => c.id === 'gpu')?.selected || [];
+    gpus.forEach(gpu => {
+      totalWattage += gpu.specs?.tdp || 150;
+    });
+
+    // Other components
+    totalWattage += 40; // Motherboard
+    totalWattage += 10; // Each RAM ~2-5W
+    totalWattage += 15; // Each SSD/HDD ~5-10W
+    totalWattage += 20; // Fans and other components
+
+    return totalWattage;
+  }
 };
 
 export default Build;
