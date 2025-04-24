@@ -38,3 +38,4 @@ def get_components_by_type(type):
             return jsonify(components), status
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    

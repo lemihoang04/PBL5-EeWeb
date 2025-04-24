@@ -342,14 +342,14 @@ const ComponentSearch = () => {
   }
 
   return (
-    <div className="component-search-container" style={{ display: 'flex' }}>
-      <div className="sidebar" style={{ width: '250px', padding: '20px', borderRight: '1px solid #ddd' }}>
-        <div className="filter-section">
+    <div className="comp-search-container" style={{ display: 'flex' }}>
+      <div className="comp-search-sidebar" style={{ width: '250px', padding: '20px', borderRight: '1px solid #ddd' }}>
+        <div className="comp-search-filter-section">
           <h3 style={{ fontSize: '16px', fontWeight: 'bold' }}>Price</h3>
-          <div className="price-label" style={{ marginBottom: '10px' }}>
+          <div className="comp-search-price-label" style={{ marginBottom: '10px' }}>
             ${priceRange[0]} - ${priceRange[1].toLocaleString()}
           </div>
-          <div className="price-slider">
+          <div className="comp-search-price-slider">
             <input
               type="range"
               min="0"
@@ -376,9 +376,9 @@ const ComponentSearch = () => {
             />
           </div>
         </div>
-        <div className="filter-section">
+        <div className="comp-search-filter-section">
           <h3 style={{ fontSize: '16px', fontWeight: 'bold' }}>Manufacturer</h3>
-          <div className="checkbox-group">
+          <div className="comp-search-checkbox-group">
             <label style={{ display: 'block', marginBottom: '5px' }}>
               <input
                 type="checkbox"
@@ -399,8 +399,8 @@ const ComponentSearch = () => {
         </div>
       </div>
 
-      <div className="results-container" style={{ flex: 1, padding: '20px' }}>
-        <div className="search-bar" style={{ marginBottom: '20px' }}>
+      <div className="comp-search-results-container" style={{ flex: 1, padding: '20px' }}>
+        <div className="comp-search-search-bar" style={{ marginBottom: '20px' }}>
           <input
             type="text"
             placeholder={`Search for ${normalizedType}...`}
@@ -412,7 +412,7 @@ const ComponentSearch = () => {
         {filteredComponents.length === 0 ? (
           <div>No components found for {normalizedType}</div>
         ) : (
-          <div className="component-table">
+          <div className="comp-search-component-table">
             <h2 style={{ fontSize: '24px', marginBottom: '10px' }}>
               {/* {filteredComponents.length} Compatible Products */}
             </h2>
@@ -465,7 +465,7 @@ const ComponentSearch = () => {
                       </td>
                     ))}
                     <td style={{ padding: '10px' }}>
-                      <button className="add-button"
+                      <button className="comp-search-add-button"
                         onClick={() => {
                           console.log('Adding component:', component);
                           navigate('/build', {
@@ -483,7 +483,7 @@ const ComponentSearch = () => {
               </tbody>
             </table>
             {filteredComponents.length > itemsPerPage && (
-              <div className="pagination" style={{ marginTop: '20px', textAlign: 'center' }}>
+              <div className="comp-search-pagination" style={{ marginTop: '20px', textAlign: 'center' }}>
                 <button
                   onClick={handlePreviousPage}
                   disabled={currentPage === 1}
@@ -497,7 +497,6 @@ const ComponentSearch = () => {
                     cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
                   }}
                 >
-
                   Previous
                 </button>
                 <span>Page {currentPage} of {totalPages}</span>
@@ -516,7 +515,6 @@ const ComponentSearch = () => {
                 >
                   Next
                 </button>
-
               </div>
             )}
           </div>
