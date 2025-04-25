@@ -4,8 +4,11 @@ import { UserContext } from "../context/UserProvider";
 
 const UserRouter = ({ children }) => {
     const { user } = useContext(UserContext);
-
-    if (!user || !user.isAuthenticated) {
+    if (user.isLoading) {
+        // Có thể hiển thị loading spinner ở đây nếu muốn
+        return <div>Loading...</div>;
+    }
+    if (!user.isAuthenticated) {
         return <Navigate to="/login" replace />;
     }
 

@@ -11,9 +11,18 @@ const ComponentSearch = () => {
   const [manufacturerFilter, setManufacturerFilter] = useState({
     AMD: true,
     Intel: false,
+    Nvidia: false,
+    'Western Digital': false,
+    Samsung: false,
+    Corsair: false,
+    ASUS: false,
+    MSI: false,
+    Gigabyte: false,
   });
   const [currentPage, setCurrentPage] = useState(1);
   const [error, setError] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [isFilterVisible, setIsFilterVisible] = useState(false);
   const navigate = useNavigate();
 
   const validTypes = ['Storage', 'PSU', 'Mainboard', 'GPU', 'CPU', 'RAM', 'CPU Cooler', 'Case'];
@@ -334,193 +343,278 @@ const ComponentSearch = () => {
   };
 
   if (!normalizedType) {
-    return <div>Invalid component type</div>;
+    return (
+      <div className="comp-search-error">
+        <div className="comp-search-error-content">
+          <h2>Invalid Component Type</h2>
+          <p>Please select a valid component category from the menu.</p>
+          <button onClick={() => navigate('/')}>Return to Home</button>
+        </div>
+      </div>
+    );
   }
 
   if (error) {
-    return <div>Error: {error}</div>;
+    return (
+      <div className="comp-search-error">
+        <div className="comp-search-error-content">
+          <h2>Error Loading Components</h2>
+          <p>{error}</p>
+          <button onClick={() => navigate('/')}>Return to Home</button>
+        </div>
+      </div>
+    );
   }
 
+  // Get manufacturers relevant to the current component type
+  const getRelevantManufacturers = () => {
+    const manufacturerMap = {
+      CPU: ['AMD', 'Intel'],
+      GPU: ['AMD', 'Nvidia', 'ASUS', 'MSI', 'Gigabyte'],
+      RAM: ['Corsair', 'G.Skill', 'Kingston', 'Crucial'],
+      Storage: ['Western Digital', 'Samsung', 'Seagate', 'Crucial'],
+      Mainboard: ['ASUS', 'MSI', 'Gigabyte', 'ASRock'],
+      PSU: ['Corsair', 'EVGA', 'Seasonic', 'be quiet!'],
+      'CPU Cooler': ['Noctua', 'Cooler Master', 'NZXT', 'be quiet!'],
+      Case: ['Corsair', 'NZXT', 'Fractal Design', 'Lian Li']
+    };
+
+    return manufacturerMap[normalizedType] || [];
+  };
+
   return (
-    <div className="component-search-container" style={{ display: 'flex' }}>
-      <div className="sidebar" style={{ width: '250px', padding: '20px', borderRight: '1px solid #ddd' }}>
-        <div className="filter-section">
-          <h3 style={{ fontSize: '16px', fontWeight: 'bold' }}>Price</h3>
-          <div className="price-label" style={{ marginBottom: '10px' }}>
-            ${priceRange[0]} - ${priceRange[1].toLocaleString()}
-          </div>
-          <div className="price-slider">
+    <div className="comp-search-container">
+      <div className="comp-search-header">
+        <h1>{normalizedType} Components</h1>
+        <div className="comp-search-header-actions">
+          <div className="comp-search-search-bar">
+            <i className="fas fa-search"></i>
             <input
-              type="range"
-              min="0"
-              max="5000"
-              value={priceRange[0]}
+              type="text"
+              placeholder={`Search for ${normalizedType}...`}
+              value={searchTerm}
               onChange={(e) => {
-                const newRange = [parseInt(e.target.value), priceRange[1]];
-                setPriceRange(newRange);
-                handlePriceFilter();
+                setSearchTerm(e.target.value);
+                handleSearch(e);
               }}
-              style={{ width: '100%' }}
             />
-            <input
-              type="range"
-              min="0"
-              max="5000"
-              value={priceRange[1]}
-              onChange={(e) => {
-                const newRange = [priceRange[0], parseInt(e.target.value)];
-                setPriceRange(newRange);
-                handlePriceFilter();
-              }}
-              style={{ width: '100%' }}
-            />
+            {searchTerm && (
+              <button
+                className="comp-search-clear-search"
+                onClick={() => {
+                  setSearchTerm('');
+                  setFilteredComponents(components);
+                }}
+              >
+                ×
+              </button>
+            )}
           </div>
-        </div>
-        <div className="filter-section">
-          <h3 style={{ fontSize: '16px', fontWeight: 'bold' }}>Manufacturer</h3>
-          <div className="checkbox-group">
-            <label style={{ display: 'block', marginBottom: '5px' }}>
-              <input
-                type="checkbox"
-                name="AMD"
-                checked={manufacturerFilter.AMD}
-                onChange={handleManufacturerFilter}
-              /> AMD
-            </label>
-            <label style={{ display: 'block', marginBottom: '5px' }}>
-              <input
-                type="checkbox"
-                name="Intel"
-                checked={manufacturerFilter.Intel}
-                onChange={handleManufacturerFilter}
-              /> Intel
-            </label>
-          </div>
+          <button
+            className="comp-search-toggle-filters"
+            onClick={() => setIsFilterVisible(!isFilterVisible)}
+          >
+            {isFilterVisible ? 'Hide Filters' : 'Show Filters'} <i className={`fas fa-filter ${isFilterVisible ? 'active' : ''}`}></i>
+          </button>
         </div>
       </div>
 
-      <div className="results-container" style={{ flex: 1, padding: '20px' }}>
-        <div className="search-bar" style={{ marginBottom: '20px' }}>
-          <input
-            type="text"
-            placeholder={`Search for ${normalizedType}...`}
-            onChange={handleSearch}
-            style={{ width: '200px', padding: '5px' }}
-          />
-        </div>
-
-        {filteredComponents.length === 0 ? (
-          <div>No components found for {normalizedType}</div>
-        ) : (
-          <div className="component-table">
-            <h2 style={{ fontSize: '24px', marginBottom: '10px' }}>
-              {/* {filteredComponents.length} Compatible Products */}
-            </h2>
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-              <thead>
-                <tr>
-                  {getComponentHeaders().map((header, index) => (
-                    <th
-                      key={index}
-                      style={{
-                        padding: '10px',
-                        borderBottom: '1px solid #ddd',
-                        textAlign: 'left',
-                        fontWeight: 'bold',
-                      }}
-                    >
-                      {header} {header !== 'Name' && <span>▼</span>}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {currentComponents.map((component) => (
-                  <tr key={component.product_id} style={{ borderBottom: '1px solid #ddd' }}>
-                    {getComponentRowData(component).map((data, index) => (
-                      <td
-                        key={index}
-                        style={{
-                          padding: '10px',
-                          verticalAlign: 'middle',
-                        }}
-                      >
-                        {index === 0 ? (
-                          <div style={{ display: 'flex', alignItems: 'center' }}>
-                            <img
-                              src={component.image || 'default-component.jpg'}
-                              alt={component.title}
-                              style={{ width: '50px', marginRight: '10px' }}
-                            />
-                            <span
-                              onClick={() => navigate(`/product-info/${component.product_id}`)}
-                              style={{ cursor: 'pointer', color: '#007bff' }}
-                            >
-                              {data}
-                            </span>
-                          </div>
-                        ) : (
-                          data
-                        )}
-                      </td>
-                    ))}
-                    <td style={{ padding: '10px' }}>
-                      <button className="add-button"
-                        onClick={() => {
-                          console.log('Adding component:', component);
-                          navigate('/build', {
-                            state: {
-                              addedComponent: component,
-                            },
-                          });
-                        }}
-                      >
-                        Add
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            {filteredComponents.length > itemsPerPage && (
-              <div className="pagination" style={{ marginTop: '20px', textAlign: 'center' }}>
-                <button
-                  onClick={handlePreviousPage}
-                  disabled={currentPage === 1}
-                  style={{
-                    padding: '5px 10px',
-                    marginRight: '10px',
-                    backgroundColor: currentPage === 1 ? '#ddd' : '#007bff',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '5px',
-                    cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
-                  }}
-                >
-
-                  Previous
-                </button>
-                <span>Page {currentPage} of {totalPages}</span>
-                <button
-                  onClick={handleNextPage}
-                  disabled={currentPage === totalPages}
-                  style={{
-                    padding: '5px 10px',
-                    marginLeft: '10px',
-                    backgroundColor: currentPage === totalPages ? '#ddd' : '#007bff',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '5px',
-                    cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
-                  }}
-                >
-                  Next
-                </button>
-
+      <div className="comp-search-content">
+        {isFilterVisible && (
+          <div className="comp-search-sidebar">
+            <div className="comp-search-filter-section">
+              <h3>Price Range</h3>
+              <div className="comp-search-price-label">
+                ${priceRange[0]} - ${priceRange[1].toLocaleString()}
               </div>
-            )}
+              <div className="comp-search-price-slider">
+                <input
+                  type="range"
+                  min="0"
+                  max="5000"
+                  value={priceRange[0]}
+                  onChange={(e) => {
+                    const newRange = [parseInt(e.target.value), priceRange[1]];
+                    setPriceRange(newRange);
+                    handlePriceFilter();
+                  }}
+                />
+                <input
+                  type="range"
+                  min="0"
+                  max="5000"
+                  value={priceRange[1]}
+                  onChange={(e) => {
+                    const newRange = [priceRange[0], parseInt(e.target.value)];
+                    setPriceRange(newRange);
+                    handlePriceFilter();
+                  }}
+                />
+              </div>
+            </div>
+
+            <div className="comp-search-filter-section">
+              <h3>Manufacturer</h3>
+              <div className="comp-search-checkbox-group">
+                {getRelevantManufacturers().map(manufacturer => (
+                  <label key={manufacturer}>
+                    <input
+                      type="checkbox"
+                      name={manufacturer}
+                      checked={manufacturerFilter[manufacturer] || false}
+                      onChange={handleManufacturerFilter}
+                    />
+                    {manufacturer}
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <button
+              className="comp-search-reset-filters"
+              onClick={() => {
+                setPriceRange([0, 5000]);
+                setManufacturerFilter({
+                  AMD: false,
+                  Intel: false,
+                  Nvidia: false,
+                  'Western Digital': false,
+                  Samsung: false,
+                  Corsair: false,
+                  ASUS: false,
+                  MSI: false,
+                  Gigabyte: false,
+                });
+                setFilteredComponents(components);
+              }}
+            >
+              Reset Filters
+            </button>
           </div>
         )}
+
+        <div className="comp-search-results-container">
+          {filteredComponents.length === 0 ? (
+            <div className="comp-search-no-results">
+              <i className="fas fa-search"></i>
+              <h3>No {normalizedType} components found</h3>
+              <p>Try adjusting your search criteria or filters</p>
+            </div>
+          ) : (
+            <>
+              <div className="comp-search-results-header">
+                <h2>{filteredComponents.length} Compatible {normalizedType} Products</h2>
+                <div className="comp-search-sort">
+                  <label>Sort by:</label>
+                  <select>
+                    <option>Price: Low to High</option>
+                    <option>Price: High to Low</option>
+                    <option>Name: A to Z</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="comp-search-component-table">
+                <table>
+                  <thead>
+                    <tr>
+                      {getComponentHeaders().map((header, index) => (
+                        <th key={index}>
+                          {header} {header !== 'Name' && header !== 'Action' && <i className="fas fa-sort"></i>}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {currentComponents.map((component) => (
+                      <tr key={component.product_id}>
+                        {getComponentRowData(component).map((data, index) => (
+                          <td key={index}>
+                            {index === 0 ? (
+                              <div className="comp-search-product-name">
+                                <img
+                                  src={component.image || 'https://via.placeholder.com/50x50?text=No+Image'}
+                                  alt={component.title}
+                                  onError={(e) => {
+                                    e.target.onerror = null;
+                                    e.target.src = 'https://via.placeholder.com/50x50?text=Error';
+                                  }}
+                                />
+                                <span
+                                  onClick={() => navigate(`/product-info/${component.product_id}`)}
+                                >
+                                  {data}
+                                </span>
+                              </div>
+                            ) : (
+                              data
+                            )}
+                          </td>
+                        ))}
+                        <td>
+                          <button
+                            className="comp-search-add-button"
+                            onClick={() => {
+                              console.log('Adding component:', component);
+                              navigate('/build', {
+                                state: {
+                                  addedComponent: component,
+                                },
+                              });
+                            }}
+                          >
+                            <i className="fas fa-plus"></i> Add
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {filteredComponents.length > itemsPerPage && (
+                <div className="comp-search-pagination">
+                  <button
+                    onClick={handlePreviousPage}
+                    disabled={currentPage === 1}
+                    className={currentPage === 1 ? 'disabled' : ''}
+                  >
+                    <i className="fas fa-chevron-left"></i> Previous
+                  </button>
+                  <div className="comp-search-page-numbers">
+                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                      const pageNumber = currentPage <= 3
+                        ? i + 1
+                        : currentPage >= totalPages - 2
+                          ? totalPages - 4 + i
+                          : currentPage - 2 + i;
+
+                      if (pageNumber <= totalPages) {
+                        return (
+                          <button
+                            key={pageNumber}
+                            className={currentPage === pageNumber ? 'active' : ''}
+                            onClick={() => setCurrentPage(pageNumber)}
+                          >
+                            {pageNumber}
+                          </button>
+                        );
+                      }
+                      return null;
+                    })}
+                  </div>
+                  <button
+                    onClick={handleNextPage}
+                    disabled={currentPage === totalPages}
+                    className={currentPage === totalPages ? 'disabled' : ''}
+                  >
+                    Next <i className="fas fa-chevron-right"></i>
+                  </button>
+                </div>
+              )}
+            </>
+          )}
+        </div>
       </div>
     </div>
   );

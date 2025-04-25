@@ -1,0 +1,217 @@
+/* OTPVerifyModal.css - Modern and elegant styling for OTP verification modal */
+
+.otp-modal__overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.otp-modal__container {
+    width: 100%;
+    max-width: 450px;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    padding: 2rem;
+    position: relative;
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.otp-modal__close-button {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    line-height: 1;
+    color: #718096;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.otp-modal__close-button:hover {
+    color: #2d3748;
+}
+
+.otp-modal__header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.otp-modal__title {
+    color: #2d3748;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.8rem;
+}
+
+.otp-modal__subtitle {
+    color: #718096;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.otp-modal__email {
+    color: #3182ce;
+    font-weight: 600;
+    margin-top: 0.2rem;
+}
+
+.otp-modal__content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.otp-modal__input-group {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.otp-modal__input {
+    width: 48px;
+    height: 56px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 1.5rem;
+    font-weight: 600;
+    text-align: center;
+    transition: all 0.3s ease;
+    background-color: #f8fafc;
+}
+
+.otp-modal__input:focus {
+    outline: none;
+    border-color: #3182ce;
+    box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.2);
+    background-color: white;
+}
+
+.otp-modal__error {
+    color: #e53e3e;
+    font-size: 0.85rem;
+    margin: 0;
+    text-align: center;
+}
+
+.otp-modal__action-row {
+    display: flex;
+    justify-content: center;
+}
+
+.otp-modal__resend-button {
+    background: none;
+    border: none;
+    color: #3182ce;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.otp-modal__resend-button:hover:not(:disabled) {
+    color: #2c5282;
+    text-decoration: underline;
+}
+
+.otp-modal__resend-button:disabled {
+    color: #a0aec0;
+    cursor: not-allowed;
+}
+
+.otp-modal__verify-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: 0.8rem 1.5rem;
+    background-color: #3182ce;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    height: 48px;
+}
+
+.otp-modal__verify-button:hover:not(:disabled) {
+    background-color: #2c5282;
+    transform: translateY(-2px);
+}
+
+.otp-modal__verify-button:disabled {
+    background-color: #cbd5e0;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.otp-modal__verify-button--loading {
+    opacity: 0.8;
+}
+
+.otp-modal__spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    margin-right: 0.5rem;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+    .otp-modal__container {
+        padding: 1.5rem;
+        width: 90%;
+    }
+
+    .otp-modal__input {
+        width: 40px;
+        height: 48px;
+        font-size: 1.2rem;
+    }
+}

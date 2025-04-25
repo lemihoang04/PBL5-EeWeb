@@ -19,11 +19,13 @@ import UserRouter from "./UserRouter";
 import CheckPayment from "../pages/Private/CheckPayment/CheckPayment";
 import FailPayment from "../pages/Private/failPayment/failPayment";
 import ForgetPassword from "../pages/ForgerPassword/ForgetPassword";
+import ScrollToTop from "../components/ScrollToTop";
 
 const AppRoutes = () => {
     return (
         <AppContextProvider>
             <Router>
+                <ScrollToTop />
                 <Routes>
                     {/* Các route của User */}
                     <Route element={<UserLayout />}>

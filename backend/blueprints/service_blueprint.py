@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify, session
 from DAL.service_dal import *
 import time, hmac, hashlib, json, requests, urllib.request, urllib.parse
+from context.email_utils import send_order_confirmation_email
 
 service_blueprint = Blueprint('service', __name__)
 ZALOPAY_CONFIG = {
@@ -81,13 +82,49 @@ def api_checkout():
         for field in required_fields:
             if field not in order_data:
                 return jsonify({"errCode": 1, "message": f"Missing required field: {field}"}), 400
+        
+        # Process checkout
         result = checkout(order_data)
+        
+        # Send order confirmation email if email is available
+        email_data = result.get('email_data', {})
+        user_email = email_data.get('user_email')
+        
+        if user_email:
+            # Prepare data for email
+            order_email_data = {
+                'order_id': email_data.get('order_id'),
+                'total_amount': email_data.get('total_amount'),
+                'payment_method': email_data.get('payment_method'),
+                'shipping_address': email_data.get('shipping_address'),
+                'order_items': email_data.get('order_items', [])
+            }
+            
+            # Send confirmation email
+            email_sent = send_order_confirmation_email(user_email, order_email_data)
+            
+            if email_sent:
+                return jsonify({
+                    "errCode": 0, 
+                    "message": result['message'], 
+                    "order_id": result['order_id'],
+                    "email_sent": True
+                }), 200
+            else:
+                # If email fails, still return success for order but indicate email failure
+                return jsonify({
+                    "errCode": 0, 
+                    "message": result['message'], 
+                    "order_id": result['order_id'],
+                    "email_sent": False,
+                    "email_message": "Order confirmation email could not be sent"
+                }), 200
+        
+        # If no email available, just return success for order
         return jsonify({"errCode": 0, "message": result['message'], "order_id": result['order_id']}), 200
 
     except Exception as e:
-        return jsonify({"errCode": 1, "message": str(e)}), 500    
-
-
+        return jsonify({"errCode": 1, "message": str(e)}), 500
 
 @service_blueprint.route('/payment/<order_id>', methods=['GET'])
 def api_get_payment_by_order_id(order_id):

@@ -1,6 +1,8 @@
 from config import get_db_connection
 from mysql.connector import Error
 from datetime import datetime
+import random
+import string
 
 def user_to_json(user_data):
     return {
@@ -137,3 +139,70 @@ def get_number_of_cart_items(user_id):
     finally:
         cursor.close()
         connection.close()
+
+def get_user_by_email(email):
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
+    user = cursor.fetchone()
+    cursor.close()
+    connection.close()
+    return user if user else None
+
+def create_otp(email, otp_code, expiry_time):
+    connection = get_db_connection()
+    cursor = connection.cursor()
+    
+    # First, delete any existing OTP for this email
+    cursor.execute("DELETE FROM otp_codes WHERE email = %s", (email,))
+    
+    # Insert new OTP
+    sql = "INSERT INTO otp_codes (email, otp_code, created_at, expires_at) VALUES (%s, %s, %s, %s)"
+    cursor.execute(sql, (email, otp_code, datetime.utcnow(), expiry_time))
+    connection.commit()
+    cursor.close()
+    connection.close()
+
+def verify_otp(email, otp_code):
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+    
+    # Get OTP and check if it's valid and not expired
+    cursor.execute("""
+        SELECT * FROM otp_codes 
+        WHERE email = %s AND otp_code = %s AND expires_at > %s
+    """, (email, otp_code, datetime.utcnow()))
+    
+    result = cursor.fetchone()
+    cursor.close()
+    connection.close()
+    
+    return result is not None
+
+def reset_password(email, new_password):
+    connection = get_db_connection()
+    cursor = connection.cursor()
+    
+    cursor.execute("UPDATE users SET password = %s WHERE email = %s", (new_password, email))
+    affected_rows = cursor.rowcount
+    
+    connection.commit()
+    cursor.close()
+    connection.close()
+    
+    return affected_rows > 0
+
+def generate_otp():
+    """Generate a 6-digit OTP code"""
+    return ''.join(random.choices(string.digits, k=6))
+
+def delete_otp(email):
+    """Delete OTP after it's been used or expired"""
+    connection = get_db_connection()
+    cursor = connection.cursor()
+    
+    cursor.execute("DELETE FROM otp_codes WHERE email = %s", (email,))
+    
+    connection.commit()
+    cursor.close()
+    connection.close()
