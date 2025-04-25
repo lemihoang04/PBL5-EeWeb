@@ -44,7 +44,7 @@ const LaptopSearch = () => {
   useEffect(() => {
     const loadLaptops = async () => {
       const data = await fetchLaptops();
-      console.log('Fetched laptops dat:', data); // Log the data to check its value
+      console.log('Fetched laptops dat:', data);
       setLaptops(data);
     };
     loadLaptops();
