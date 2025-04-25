@@ -245,16 +245,11 @@ const LaptopSearch = () => {
   useEffect(() => {
     const loadLaptops = async () => {
       const data = await fetchLaptops();
-<<<<<<< HEAD
-      console.log('Fetched laptops dat:', data);
-      setLaptops(data);
-=======
       console.log('Fetched laptops data:', data);
       if (data && Array.isArray(data)) {
         setLaptops(data);
         setFilteredLaptops(data);
       }
->>>>>>> 7e27a27f84f7f221860b01a48481e7fcdc0cb398
     };
     loadLaptops();
   }, []);

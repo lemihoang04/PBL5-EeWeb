@@ -49,6 +49,8 @@ const UserProvider = ({ children }) => {
 	};
 
 	const fetchUser = async () => {
+		console.log('🔍 fetchUser called');
+		console.trace();
 		try {
 			const response = await getUserAccount();
 			if (response && response.errCode === 0) {
