@@ -149,7 +149,9 @@ const CartPage = () => {
                                         />
                                     </div>
                                     <div className="crt__item-details">
-                                        <h3 className="crt__item-name">{item.title}</h3>
+                                        <h3
+                                            className="crt__item-name"
+                                            onClick={() => navigate(`/product-info/${item.product_id}`)}>{item.title}</h3>
                                         <div className="crt__item-actions">
                                             <div className="crt__quantity-control">
                                                 <button
