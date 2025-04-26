@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { fetchComponents } from '../../services/componentService';
 import './ComponentSearch.css';
+import { fetchComponentById } from '../../services/componentService';
 
 const ComponentSearch = () => {
   const { type } = useParams();
@@ -552,19 +553,42 @@ const ComponentSearch = () => {
                           </td>
                         ))}
                         <td>
-                          <button
+                        <button
                             className="comp-search-add-button"
-                            onClick={() => {
-                              console.log('Adding component:', component);
-                              navigate('/build', {
-                                state: {
-                                  addedComponent: component,
-                                },
-                              });
+                            onClick={async () => {
+            
+                              try {
+                                const productId = parseInt(component.product_id, 10); // Cơ số 10 để tránh các vấn đề với số bắt đầu bằng 0
+                                // Gọi API để lấy thông tin chi tiết của component
+                                const componentDetail = await fetchComponentById(productId);
+                                console.log('ProductID:', productId);
+                                console.log('Adding component:', typeof componentDetail);
+                                if (componentDetail.error) {
+                                  console.error('Error fetching component details:', componentDetail.error);
+                                  // Có thể thêm thông báo lỗi cho người dùng ở đây
+                                  return;
+                                }
+                                // Nếu lấy dữ liệu thành công, chuyển hướng với dữ liệu đầy đủ
+                                navigate('/build', {
+                                  state: {
+                                    addedComponent: componentDetail,
+                                  },
+                                  
+                                });
+                                console.log('Navigating to build with component:', componentDetail);
+                              } catch (error) {
+                                console.error('Failed to fetch component details:', error);
+                                // Fallback: Nếu API gặp lỗi, vẫn dùng dữ liệu hiện có
+                                // navigate('/build', {
+                                //   state: {
+                                //     addedComponent: component,
+                                //   },
+                                // });
+                              }
                             }}
                           >
                             <i className="fas fa-plus"></i> Add
-                          </button>
+                        </button>
                         </td>
                       </tr>
                     ))}

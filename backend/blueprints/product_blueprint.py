@@ -39,3 +39,14 @@ def get_components_by_type(type):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
+@product_blueprint.route("/components/<int:product_id>", methods=["GET"])
+def get_component_by_id(product_id):
+    try:
+        component, status = dal_get_component_by_id(product_id)
+        if status == 200:
+            return jsonify(component), 200
+        else:
+            return jsonify(component), status
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500  
+    
