@@ -91,6 +91,7 @@
     height: 20px;
     cursor: pointer;
     accent-color: #0066cc;
+
 }
 
 .crt__item-image {
@@ -118,6 +119,13 @@
     font-weight: 500;
     margin: 0;
     color: #202020;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.crt__item-name:hover {
+    color: #0066cc;
+    text-decoration: none;
 }
 
 .crt__item-actions {

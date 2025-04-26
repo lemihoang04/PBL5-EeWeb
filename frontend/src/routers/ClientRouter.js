@@ -21,7 +21,7 @@ import FailPayment from "../pages/Private/failPayment/failPayment";
 import ForgetPassword from "../pages/ForgerPassword/ForgetPassword";
 import ScrollToTop from "../components/ScrollToTop";
 import ComponentInfo from "../pages/ComponentInfo/ComponentInfo";
-
+import LoginAdmin from "../pages/Admin/Login/AdminLogin";
 const AppRoutes = () => {
     return (
         <AppContextProvider>
@@ -87,7 +87,7 @@ const AppRoutes = () => {
 
                     {/* Route Admin */}
                     <Route path="/admin" element={<Admin />} />
-
+                    <Route path="/admin/login" element={<LoginAdmin />} />
                     {/* Route 404 */}
                     <Route path="*" element={<NotFound />} />
                 </Routes>
