@@ -12,14 +12,17 @@ const LaptopSearch = () => {
   const [showFilters, setShowFilters] = useState(true);
   const [sortOption, setSortOption] = useState('None');
   const [expandedFilterSections, setExpandedFilterSections] = useState({
-    screenSize: true,
-    ramSize: true,
-    brand: true,
-    cpuManufacturer: true,
-    weight: true,
-    processorType: true,
-    operatingSystem: true,
-    graphicsCoprocessor: true
+    screenSize: false,
+    price: true,
+    ramSize: false,
+    brand: false,
+    cpuManufacturer: false,
+    weight: false,
+    processorType: false,
+    operatingSystem: false,
+    graphicsCoprocessor: false,
+    storageType: false,
+    storageCapacity: false
   });
 
   // Filter states
@@ -31,7 +34,9 @@ const LaptopSearch = () => {
     weight: [],
     processorType: [],
     operatingSystem: [],
-    graphicsCoprocessor: []
+    graphicsCoprocessor: [],
+    storageType: [],
+    storageCapacity: []
   });
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -84,6 +89,32 @@ const LaptopSearch = () => {
       );
     }
 
+    // Apply storage type filter
+    if (filters.storageType.length > 0) {
+      results = results.filter(laptop => {
+        if (!laptop.hard_drive) return false;
+        return filters.storageType.some(type =>
+          (type === "SSD" && laptop.hard_drive.includes("SSD")) ||
+          (type === "HDD" && laptop.hard_drive.includes("HDD")) ||
+          (type === "eMMC" && laptop.hard_drive.toLowerCase().includes("emmc"))
+        );
+      });
+    }
+
+    // Apply storage capacity filter
+    if (filters.storageCapacity.length > 0) {
+      results = results.filter(laptop => {
+        if (!laptop.hard_drive) return false;
+
+        // Extract the capacity part (e.g. "128 GB" from "128 GB SSD")
+        const capacityMatch = laptop.hard_drive.match(/(\d+)\s*(TB|GB|MB)/i);
+        if (!capacityMatch) return false;
+
+        const capacity = capacityMatch[0].trim();
+        return filters.storageCapacity.some(cap => capacity.includes(cap));
+      });
+    }
+
     // Apply brand filter
     if (filters.brand.length > 0) {
       results = results.filter(laptop =>
@@ -95,7 +126,7 @@ const LaptopSearch = () => {
     if (filters.cpuManufacturer.length > 0) {
       results = results.filter(laptop => {
         return filters.cpuManufacturer.some(manufacturer =>
-          laptop.processor_brand && laptop.processor_brand.includes(manufacturer)
+          laptop.chipset_brand && laptop.chipset_brand.includes(manufacturer)
         );
       });
     }
@@ -139,12 +170,15 @@ const LaptopSearch = () => {
       );
     }
 
-    setFilteredLaptops(results);
-  }, [laptops, filters, priceRange, searchTerm]);
+    // Apply sort after filtering
+    results = applySorting(results);
 
-  // Sort the filtered laptops based on selected sort option
-  useEffect(() => {
-    let sortedLaptops = [...filteredLaptops];
+    setFilteredLaptops(results);
+  }, [laptops, filters, priceRange, searchTerm, sortOption]);
+
+  // Extract the sorting logic into a separate function
+  const applySorting = (laptopList) => {
+    let sortedLaptops = [...laptopList];
 
     switch (sortOption) {
       case 'None':
@@ -166,8 +200,8 @@ const LaptopSearch = () => {
         break;
     }
 
-    setFilteredLaptops(sortedLaptops);
-  }, [sortOption]);
+    return sortedLaptops;
+  };
 
   // Handle checkbox change for filters
   const handleFilterChange = (category, value) => {
@@ -257,9 +291,9 @@ const LaptopSearch = () => {
   // Render filter section
   const renderFilterSection = (title, section, items, showAll = null, toggleShowAll = null) => {
     return (
-      <div className="filter-section">
+      <div className="ls-filter-section">
         <div
-          className="filter-header"
+          className="ls-filter-header"
           onClick={() => toggleFilterSection(section)}
         >
           <h3>{title}</h3>
@@ -267,10 +301,10 @@ const LaptopSearch = () => {
         </div>
 
         {expandedFilterSections[section] && (
-          <div className="checkbox-group">
+          <div className="ls-checkbox-group">
             {items}
             {showAll !== null && items.length > 6 && (
-              <div className="see-more" onClick={toggleShowAll}>
+              <div className="ls-see-more" onClick={toggleShowAll}>
                 <span>{showAll ? "See less" : "See more"}</span>
               </div>
             )}
@@ -281,12 +315,10 @@ const LaptopSearch = () => {
   };
 
   return (
-    <div className="laptop-search-container">
-
-
-      <div className="search-content">
+    <div className="ls-laptop-search-container">
+      <div className="ls-search-content">
         {showFilters && (
-          <div className="sidebar">
+          <div className="ls-sidebar">
             {renderFilterSection("Display Size", "screenSize", (
               <>
                 {[
@@ -305,7 +337,7 @@ const LaptopSearch = () => {
                       checked={filters.screenSize.includes(size)}
                       onChange={() => handleFilterChange("screenSize", size)}
                     />
-                    <span className="checkmark"></span>
+                    <span className="ls-checkmark"></span>
                     {size}
                   </label>
                 ))}
@@ -314,11 +346,11 @@ const LaptopSearch = () => {
 
             {renderFilterSection("Price", "price", (
               <>
-                <div className="price-label">${priceRange[0]} - ${priceRange[1].toLocaleString()}</div>
-                <div className="price-range-controls">
-                  <div className="price-track"></div>
+                <div className="ls-price-label">${priceRange[0]} - ${priceRange[1].toLocaleString()}</div>
+                <div className="ls-price-range-controls">
+                  <div className="ls-price-track"></div>
                   <div
-                    className="price-range-selected"
+                    className="ls-price-range-selected"
                     style={{
                       left: `${(priceRange[0] / 10000) * 100}%`,
                       right: `${100 - (priceRange[1] / 10000) * 100}%`
@@ -345,9 +377,9 @@ const LaptopSearch = () => {
                     }}
                   />
                 </div>
-                <div className="price-controls">
-                  <button className="go-button" onClick={applyPriceFilter}>Apply</button>
-                </div>
+                {/* <div className="ls-price-controls">
+                  <button className="ls-go-button" onClick={applyPriceFilter}>Apply</button>
+                </div> */}
               </>
             ))}
 
@@ -360,8 +392,40 @@ const LaptopSearch = () => {
                       checked={filters.ramSize.includes(size)}
                       onChange={() => handleFilterChange("ramSize", size)}
                     />
-                    <span className="checkmark"></span>
+                    <span className="ls-checkmark"></span>
                     {size}
+                  </label>
+                ))}
+              </>
+            ))}
+
+            {renderFilterSection("Storage Type", "storageType", (
+              <>
+                {["SSD", "HDD", "eMMC"].map(type => (
+                  <label key={type}>
+                    <input
+                      type="checkbox"
+                      checked={filters.storageType.includes(type)}
+                      onChange={() => handleFilterChange("storageType", type)}
+                    />
+                    <span className="ls-checkmark"></span>
+                    {type}
+                  </label>
+                ))}
+              </>
+            ))}
+
+            {renderFilterSection("Storage Capacity", "storageCapacity", (
+              <>
+                {["2 TB", "1 TB", "512 GB", "256 GB", "128 GB", "64 GB"].map(capacity => (
+                  <label key={capacity}>
+                    <input
+                      type="checkbox"
+                      checked={filters.storageCapacity.includes(capacity)}
+                      onChange={() => handleFilterChange("storageCapacity", capacity)}
+                    />
+                    <span className="ls-checkmark"></span>
+                    {capacity}
                   </label>
                 ))}
               </>
@@ -370,7 +434,7 @@ const LaptopSearch = () => {
             {renderFilterSection("Brands", "brand", (
               <>
                 {availableBrands
-                  .slice(0, showAllBrands ? availableBrands.length : 6)
+                  .slice(0, showAllBrands ? availableBrands.length : 7)
                   .map(brand => (
                     <label key={brand}>
                       <input
@@ -378,7 +442,7 @@ const LaptopSearch = () => {
                         checked={filters.brand.includes(brand)}
                         onChange={() => handleFilterChange("brand", brand)}
                       />
-                      <span className="checkmark"></span>
+                      <span className="ls-checkmark"></span>
                       {brand}
                     </label>
                   ))
@@ -388,14 +452,14 @@ const LaptopSearch = () => {
 
             {renderFilterSection("CPU Model Manufacturer", "cpuManufacturer", (
               <>
-                {["Intel", "AMD", "MediaTek", "Qualcomm"].map(manufacturer => (
+                {["Intel", "AMD", "Apple", "Qualcomm"].map(manufacturer => (
                   <label key={manufacturer}>
                     <input
                       type="checkbox"
                       checked={filters.cpuManufacturer.includes(manufacturer)}
                       onChange={() => handleFilterChange("cpuManufacturer", manufacturer)}
                     />
-                    <span className="checkmark"></span>
+                    <span className="ls-checkmark"></span>
                     {manufacturer}
                   </label>
                 ))}
@@ -406,6 +470,7 @@ const LaptopSearch = () => {
             {renderFilterSection("Weight", "weight", (
               <>
                 {[
+
                   "Up to 3 Pounds",
                   "3 to 3.9 Pounds",
                   "4 to 4.9 Pounds",
@@ -419,16 +484,18 @@ const LaptopSearch = () => {
                       checked={filters.weight.includes(weightRange)}
                       onChange={() => handleFilterChange("weight", weightRange)}
                     />
-                    <span className="checkmark"></span>
+                    <span className="ls-checkmark"></span>
                     {weightRange}
                   </label>
                 ))}
+
               </>
             ))}
 
             {renderFilterSection("Processor Type", "processorType", (
               <>
                 {[
+
                   "AMD A-Series",
                   "AMD A10",
                   "AMD A4",
@@ -447,16 +514,18 @@ const LaptopSearch = () => {
                       checked={filters.processorType.includes(processor)}
                       onChange={() => handleFilterChange("processorType", processor)}
                     />
-                    <span className="checkmark"></span>
+                    <span className="ls-checkmark"></span>
                     {processor}
                   </label>
                 ))}
+
               </>
             ))}
 
             {renderFilterSection("Operating System", "operatingSystem", (
               <>
                 {[
+
                   "Windows 11 Home",
                   "Windows 11 Pro",
                   "Windows 11 S mode",
@@ -472,16 +541,18 @@ const LaptopSearch = () => {
                       checked={filters.operatingSystem.includes(os)}
                       onChange={() => handleFilterChange("operatingSystem", os)}
                     />
-                    <span className="checkmark"></span>
+                    <span className="ls-checkmark"></span>
                     {os}
                   </label>
                 ))}
+
               </>
             ))}
 
             {renderFilterSection("Graphics Coprocessor", "graphicsCoprocessor", (
               <>
                 {[
+
                   "Intel Iris Xe Graphics",
                   "NVIDIA GeForce RTX 2060",
                   "NVIDIA GeForce RTX 2070",
@@ -499,20 +570,22 @@ const LaptopSearch = () => {
                       checked={filters.graphicsCoprocessor.includes(gpu)}
                       onChange={() => handleFilterChange("graphicsCoprocessor", gpu)}
                     />
-                    <span className="checkmark"></span>
+                    <span className="ls-checkmark"></span>
                     {gpu}
                   </label>
                 ))}
+
               </>
             ))}
+
           </div>
         )}
 
-        <div className="results-container">
-          <div className="search-header">
-            <div className="search-controls">
-              <div className="search-bar">
-                <FaSearch className="search-icon" />
+        <div className="ls-results-container">
+          <div className="ls-search-header">
+            <div className="ls-search-controls">
+              <div className="ls-search-bar">
+                <FaSearch className="ls-search-icon" />
                 <input
                   type="text"
                   placeholder="Search for laptops..."
@@ -520,19 +593,19 @@ const LaptopSearch = () => {
                   onChange={handleSearch}
                 />
               </div>
-              <div className="filters-control">
-                <button className="hide-filters-btn" onClick={toggleFilters}>
+              <div className="ls-filters-control">
+                <button className="ls-hide-filters-btn" onClick={toggleFilters}>
                   {showFilters ? 'Hide Filters' : 'Show Filters'}
-                  <FaFilter className="filter-icon" />
+                  <FaFilter className="ls-filter-icon" />
                 </button>
               </div>
             </div>
 
-            <div className="results-header">
-              <div className="results-count">
+            <div className="ls-results-header">
+              <div className="ls-results-count">
                 <h2>{displayLaptops.length} Laptops Found</h2>
               </div>
-              <div className="sort-controls">
+              <div className="ls-sort-controls">
                 <label>Sort by: </label>
                 <select value={sortOption} onChange={handleSortChange}>
                   <option value="None">None</option>
@@ -544,11 +617,11 @@ const LaptopSearch = () => {
               </div>
             </div>
           </div>
-          <div className="laptop-listings">
+          <div className="ls-laptop-listings">
             {currentLaptops.length > 0 ? (
               currentLaptops.map((laptop) => (
-                <div className="laptop-card" key={laptop.id}>
-                  <div className="laptop-image" onClick={() => navigate(`/product-info/${laptop.id}`)}>
+                <div className="ls-laptop-card" key={laptop.id}>
+                  <div className="ls-laptop-image" onClick={() => navigate(`/product-info/${laptop.id}`)}>
                     <img
                       src={laptop.image ? laptop.image.split("; ")[0] : "/images/default-laptop.jpg"}
                       alt={laptop.title}
@@ -559,32 +632,32 @@ const LaptopSearch = () => {
                     />
                   </div>
 
-                  <div className="laptop-details">
+                  <div className="ls-laptop-details">
                     <h3
-                      className="laptop-title"
+                      className="ls-laptop-title"
                       title={laptop.title}
                       onClick={() => navigate(`/product-info/${laptop.id}`)}
                     >
                       {laptop.title}
                     </h3>
 
-                    <div className="laptop-meta">
-                      <div className="rating">
-                        <div className="stars">
+                    <div className="ls-laptop-meta">
+                      <div className="ls-rating">
+                        <div className="ls-stars">
                           {[1, 2, 3, 4, 5].map((star) => (
                             <FaStar
                               key={star}
-                              className={star <= Math.round(laptop.rating) ? "star filled" : "star"}
+                              className={star <= Math.round(laptop.rating) ? "ls-star ls-filled" : "ls-star"}
                             />
                           ))}
                         </div>
-                        <span className="rating-count">{laptop.rating}</span>
+                        <span className="ls-rating-count">{laptop.rating}</span>
                       </div>
 
-                      <div className="laptop-price">
-                        <div className="current-price">
-                          <span className="currency">$</span>
-                          <span className="amount">
+                      <div className="ls-laptop-price">
+                        <div className="ls-current-price">
+                          <span className="ls-currency">$</span>
+                          <span className="ls-amount">
                             {typeof laptop.price === 'number'
                               ? laptop.price.toFixed(2)
                               : laptop.price || 'N/A'}
@@ -593,39 +666,39 @@ const LaptopSearch = () => {
                       </div>
                     </div>
 
-                    <div className="laptop-specs">
+                    <div className="ls-laptop-specs">
                       {laptop.screen_size && (
-                        <div className="spec">
-                          <div className="spec-label">Display</div>
-                          <div className="spec-value">{laptop.screen_size}</div>
+                        <div className="ls-spec">
+                          <div className="ls-spec-label">Display</div>
+                          <div className="ls-spec-value">{laptop.screen_size}</div>
                         </div>
                       )}
 
                       {laptop.item_weight && (
-                        <div className="spec">
-                          <div className="spec-label">Weight</div>
-                          <div className="spec-value">{laptop.item_weight}</div>
+                        <div className="ls-spec">
+                          <div className="ls-spec-label">Weight</div>
+                          <div className="ls-spec-value">{laptop.item_weight}</div>
                         </div>
                       )}
 
                       {laptop.ram && (
-                        <div className="spec">
-                          <div className="spec-label">RAM</div>
-                          <div className="spec-value">{laptop.ram}</div>
+                        <div className="ls-spec">
+                          <div className="ls-spec-label">RAM</div>
+                          <div className="ls-spec-value">{laptop.ram}</div>
                         </div>
                       )}
 
-                      {laptop.operating_system && (
-                        <div className="spec">
-                          <div className="spec-label">OS</div>
-                          <div className="spec-value">{laptop.operating_system}</div>
+                      {laptop.hard_drive && (
+                        <div className="ls-spec">
+                          <div className="ls-spec-label">Storage</div>
+                          <div className="ls-spec-value">{laptop.hard_drive}</div>
                         </div>
                       )}
                     </div>
 
-                    <div className="laptop-actions">
+                    <div className="ls-laptop-actions">
                       <button
-                        className="view-details-btn"
+                        className="ls-view-details-btn"
                         onClick={() => navigate(`/product-info/${laptop.id}`)}
                       >
                         View Details
@@ -635,28 +708,28 @@ const LaptopSearch = () => {
                 </div>
               ))
             ) : (
-              <div className="no-results">
+              <div className="ls-no-results">
                 <p>No laptops found matching your criteria. Try adjusting your filters.</p>
               </div>
             )}
           </div>
 
           {totalPages > 1 && (
-            <div className="pagination">
+            <div className="ls-pagination">
               <button
-                className="page-btn prev-btn"
+                className="ls-page-btn ls-prev-btn"
                 onClick={handlePreviousPage}
                 disabled={currentPage === 1}
               >
                 Previous
               </button>
 
-              <div className="page-info">
+              <div className="ls-page-info">
                 <span>Page {currentPage} of {totalPages}</span>
               </div>
 
               <button
-                className="page-btn next-btn"
+                className="ls-page-btn ls-next-btn"
                 onClick={handleNextPage}
                 disabled={currentPage === totalPages || totalPages === 0}
               >

@@ -12,14 +12,14 @@ body {
   line-height: 1.6;
 }
 
-.laptop-search-container {
+.ls-laptop-search-container {
   max-width: 1400px;
   margin: 0 auto;
   padding: 20px;
 }
 
 /* Search Header Styles */
-.search-header {
+.ls-search-header {
   /* position: sticky; */
   top: 0;
   z-index: 100;
@@ -30,20 +30,20 @@ body {
   margin-bottom: 25px;
 }
 
-.search-controls {
+.ls-search-controls {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
 }
 
-.search-bar {
+.ls-search-bar {
   flex: 1;
   position: relative;
   max-width: 600px;
 }
 
-.search-icon {
+.ls-search-icon {
   position: absolute;
   left: 15px;
   top: 50%;
@@ -51,7 +51,7 @@ body {
   color: #6c757d;
 }
 
-.search-bar input {
+.ls-search-bar input {
   width: 100%;
   padding: 12px 15px 12px 40px;
   font-size: 16px;
@@ -61,14 +61,14 @@ body {
   transition: all 0.3s ease;
 }
 
-.search-bar input:focus {
+.ls-search-bar input:focus {
   outline: none;
   border-color: #4a90e2;
   box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
   background-color: #fff;
 }
 
-.hide-filters-btn {
+.ls-hide-filters-btn {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -83,16 +83,16 @@ body {
   transition: all 0.2s ease;
 }
 
-.hide-filters-btn:hover {
+.ls-hide-filters-btn:hover {
   background-color: #4a90e2;
   color: #fff;
 }
 
-.filter-icon {
+.ls-filter-icon {
   font-size: 14px;
 }
 
-.results-header {
+.ls-results-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -100,24 +100,24 @@ body {
   border-top: 1px solid #eee;
 }
 
-.results-count h2 {
+.ls-results-count h2 {
   font-size: 18px;
   font-weight: 600;
   color: #333;
 }
 
-.sort-controls {
+.ls-sort-controls {
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
-.sort-controls label {
+.ls-sort-controls label {
   font-size: 14px;
   color: #6c757d;
 }
 
-.sort-controls select {
+.ls-sort-controls select {
   padding: 8px 30px 8px 15px;
   border: 1px solid #ddd;
   border-radius: 6px;
@@ -130,20 +130,20 @@ body {
   background-position: right 10px center;
 }
 
-.sort-controls select:focus {
+.ls-sort-controls select:focus {
   outline: none;
   border-color: #4a90e2;
   box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
 }
 
 /* Search Content (Main Area) */
-.search-content {
+.ls-search-content {
   display: flex;
   gap: 15px;
 }
 
 /* Sidebar Styles */
-.sidebar {
+.ls-sidebar {
   width: 250px;
   flex-shrink: 0;
   background-color: #fff;
@@ -155,19 +155,19 @@ body {
   top: 100px;
 }
 
-.filter-section {
+.ls-filter-section {
   margin-bottom: 20px;
   border-bottom: 1px solid #eee;
   padding-bottom: 15px;
 }
 
-.filter-section:last-child {
+.ls-filter-section:last-child {
   border-bottom: none;
   margin-bottom: 0;
   padding-bottom: 0;
 }
 
-.filter-header {
+.ls-filter-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -176,23 +176,23 @@ body {
   transition: color 0.2s;
 }
 
-.filter-header:hover {
+.ls-filter-header:hover {
   color: #4a90e2;
 }
 
-.filter-header h3 {
+.ls-filter-header h3 {
   font-size: 15px;
   font-weight: 600;
 }
 
-.checkbox-group {
+.ls-checkbox-group {
   display: flex;
   flex-direction: column;
   margin-top: 12px;
   gap: 8px;
 }
 
-.checkbox-group label {
+.ls-checkbox-group label {
   display: flex;
   align-items: center;
   font-size: 14px;
@@ -201,7 +201,7 @@ body {
   padding-left: 28px;
 }
 
-.checkbox-group input[type="checkbox"] {
+.ls-checkbox-group input[type="checkbox"] {
   position: absolute;
   opacity: 0;
   cursor: pointer;
@@ -209,7 +209,7 @@ body {
   width: 0;
 }
 
-.checkmark {
+.ls-checkmark {
   position: absolute;
   top: 0;
   left: 0;
@@ -221,26 +221,26 @@ body {
   transition: all 0.2s ease;
 }
 
-.checkbox-group label:hover input~.checkmark {
+.ls-checkbox-group label:hover input~.ls-checkmark {
   border-color: #4a90e2;
 }
 
-.checkbox-group input:checked~.checkmark {
+.ls-checkbox-group input:checked~.ls-checkmark {
   background-color: #4a90e2;
   border-color: #4a90e2;
 }
 
-.checkmark:after {
+.ls-checkmark:after {
   content: "";
   position: absolute;
   display: none;
 }
 
-.checkbox-group input:checked~.checkmark:after {
+.ls-checkbox-group input:checked~.ls-checkmark:after {
   display: block;
 }
 
-.checkbox-group .checkmark:after {
+.ls-checkbox-group .ls-checkmark:after {
   left: 6px;
   top: 2px;
   width: 5px;
@@ -250,7 +250,7 @@ body {
   transform: rotate(45deg);
 }
 
-.see-more {
+.ls-see-more {
   font-size: 13px;
   color: #4a90e2;
   cursor: pointer;
@@ -259,18 +259,18 @@ body {
   text-align: center;
 }
 
-.see-more:hover {
+.ls-see-more:hover {
   text-decoration: underline;
 }
 
-.price-label {
+.ls-price-label {
   font-size: 14px;
   margin-bottom: 15px;
   color: #333;
   font-weight: 500;
 }
 
-.price-range-controls {
+.ls-price-range-controls {
   position: relative;
   width: 100%;
   padding-top: 10px;
@@ -278,25 +278,25 @@ body {
   margin-bottom: 15px;
 }
 
-.price-track {
+.ls-price-track {
   position: absolute;
-  top: 15px;
+  top: 10px;
   left: 0;
   right: 0;
-  height: 4px;
+  height: 5px;
   background: #ddd;
   border-radius: 2px;
 }
 
-.price-range-selected {
+.ls-price-range-selected {
   position: absolute;
-  top: 15px;
-  height: 4px;
+  top: 10px;
+  height: 5px;
   background: #4a90e2;
   border-radius: 2px;
 }
 
-.price-range-controls input[type="range"] {
+.ls-price-range-controls input[type="range"] {
   position: absolute;
   width: 100%;
   -webkit-appearance: none;
@@ -306,7 +306,7 @@ body {
   z-index: 3;
 }
 
-.price-range-controls input[type="range"]::-webkit-slider-thumb {
+.ls-price-range-controls input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   width: 20px;
   height: 20px;
@@ -320,7 +320,7 @@ body {
   transition: all 0.2s ease;
 }
 
-.price-range-controls input[type="range"]::-moz-range-thumb {
+.ls-price-range-controls input[type="range"]::-moz-range-thumb {
   width: 20px;
   height: 20px;
   border-radius: 50%;
@@ -332,24 +332,24 @@ body {
   transition: all 0.2s ease;
 }
 
-.price-range-controls input[type="range"]:hover::-webkit-slider-thumb,
-.price-range-controls input[type="range"]:focus::-webkit-slider-thumb {
+.ls-price-range-controls input[type="range"]:hover::-webkit-slider-thumb,
+.ls-price-range-controls input[type="range"]:focus::-webkit-slider-thumb {
   transform: scale(1.15);
   box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
 }
 
-.price-range-controls input[type="range"]:hover::-moz-range-thumb,
-.price-range-controls input[type="range"]:focus::-moz-range-thumb {
+.ls-price-range-controls input[type="range"]:hover::-moz-range-thumb,
+.ls-price-range-controls input[type="range"]:focus::-moz-range-thumb {
   transform: scale(1.15);
   box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
 }
 
-.price-controls {
+.ls-price-controls {
   display: flex;
   justify-content: flex-end;
 }
 
-.go-button {
+.ls-go-button {
   background-color: #4a90e2;
   color: white;
   border: none;
@@ -361,22 +361,22 @@ body {
   transition: background-color 0.2s;
 }
 
-.go-button:hover {
+.ls-go-button:hover {
   background-color: #3a7bc8;
 }
 
 /* Results Container Styles */
-.results-container {
+.ls-results-container {
   flex: 1;
 }
 
-.laptop-listings {
+.ls-laptop-listings {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 25px;
 }
 
-.laptop-card {
+.ls-laptop-card {
   background-color: #fff;
   border-radius: 10px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
@@ -387,19 +387,19 @@ body {
   flex-direction: column;
 }
 
-.laptop-card:hover {
+.ls-laptop-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
 }
 
-.laptop-image {
+.ls-laptop-image {
   height: 200px;
   overflow: hidden;
   position: relative;
   cursor: pointer;
 }
 
-.laptop-image img {
+.ls-laptop-image img {
   width: 100%;
   height: 100%;
   object-fit: contain;
@@ -407,18 +407,18 @@ body {
   padding: 20px;
 }
 
-.laptop-image:hover img {
+.ls-laptop-image:hover img {
   transform: scale(1.05);
 }
 
-.laptop-details {
+.ls-laptop-details {
   padding: 20px;
   display: flex;
   flex-direction: column;
   flex: 1;
 }
 
-.laptop-title {
+.ls-laptop-title {
   font-size: 16px;
   font-weight: 600;
   margin-bottom: 12px;
@@ -431,58 +431,58 @@ body {
   transition: color 0.2s;
 }
 
-.laptop-title:hover {
+.ls-laptop-title:hover {
   color: #4a90e2;
 }
 
-.laptop-meta {
+.ls-laptop-meta {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 15px;
 }
 
-.rating {
+.ls-rating {
   display: flex;
   align-items: center;
   gap: 6px;
 }
 
-.stars {
+.ls-stars {
   display: flex;
   gap: 2px;
 }
 
-.star {
+.ls-star {
   color: #e0e0e0;
   font-size: 16px;
 }
 
-.star.filled {
+.ls-star.ls-filled {
   color: #ffc107;
 }
 
-.rating-count {
+.ls-rating-count {
   font-size: 14px;
   color: #6c757d;
 }
 
-.laptop-price {
+.ls-laptop-price {
   text-align: right;
 }
 
-.current-price {
+.ls-current-price {
   font-size: 18px;
   font-weight: 600;
   color: #e53935;
 }
 
-.currency {
+.ls-currency {
   font-size: 14px;
   vertical-align: top;
 }
 
-.laptop-specs {
+.ls-laptop-specs {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 10px;
@@ -490,28 +490,28 @@ body {
   flex: 1;
 }
 
-.spec {
+.ls-spec {
   display: flex;
   flex-direction: column;
 }
 
-.spec-label {
+.ls-spec-label {
   font-size: 12px;
   color: #6c757d;
   margin-bottom: 3px;
 }
 
-.spec-value {
+.ls-spec-value {
   font-size: 14px;
   font-weight: 500;
   color: #333;
 }
 
-.laptop-actions {
+.ls-laptop-actions {
   margin-top: auto;
 }
 
-.view-details-btn {
+.ls-view-details-btn {
   width: 100%;
   padding: 10px;
   background-color: #4a90e2;
@@ -524,11 +524,11 @@ body {
   transition: background-color 0.2s;
 }
 
-.view-details-btn:hover {
+.ls-view-details-btn:hover {
   background-color: #3a7bc8;
 }
 
-.no-results {
+.ls-no-results {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -540,14 +540,14 @@ body {
   padding: 30px;
 }
 
-.no-results p {
+.ls-no-results p {
   font-size: 16px;
   color: #6c757d;
   max-width: 500px;
 }
 
 /* Pagination Styles */
-.pagination {
+.ls-pagination {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -555,7 +555,7 @@ body {
   gap: 15px;
 }
 
-.page-btn {
+.ls-page-btn {
   padding: 10px 20px;
   background-color: #fff;
   color: #4a90e2;
@@ -567,104 +567,104 @@ body {
   transition: all 0.2s ease;
 }
 
-.page-btn:hover:not(:disabled) {
+.ls-page-btn:hover:not(:disabled) {
   background-color: #4a90e2;
   color: #fff;
 }
 
-.page-btn:disabled {
+.ls-page-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
   border-color: #ddd;
   color: #999;
 }
 
-.page-info {
+.ls-page-info {
   font-size: 14px;
   color: #6c757d;
 }
 
 /* Responsive Design */
 @media (max-width: 1200px) {
-  .search-content {
+  .ls-search-content {
     flex-direction: column;
   }
 
-  .sidebar {
+  .ls-sidebar {
     width: 100%;
     position: relative;
     top: 0;
     margin-bottom: 25px;
   }
 
-  .checkbox-group {
+  .ls-checkbox-group {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (max-width: 768px) {
-  .laptop-listings {
+  .ls-laptop-listings {
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   }
 
-  .search-header {
+  .ls-search-header {
     padding: 15px;
   }
 
-  .search-controls {
+  .ls-search-controls {
     flex-direction: column;
     gap: 15px;
   }
 
-  .search-bar {
+  .ls-search-bar {
     max-width: none;
     width: 100%;
   }
 
-  .filters-control {
+  .ls-filters-control {
     width: 100%;
   }
 
-  .hide-filters-btn {
+  .ls-hide-filters-btn {
     width: 100%;
     justify-content: center;
   }
 
-  .results-header {
+  .ls-results-header {
     flex-direction: column;
     gap: 10px;
     align-items: flex-start;
   }
 
-  .sort-controls {
+  .ls-sort-controls {
     width: 100%;
   }
 
-  .sort-controls select {
+  .ls-sort-controls select {
     width: 100%;
   }
 
-  .checkbox-group {
+  .ls-checkbox-group {
     grid-template-columns: 1fr;
   }
 }
 
 @media (max-width: 480px) {
-  .laptop-listings {
+  .ls-laptop-listings {
     grid-template-columns: 1fr;
   }
 
-  .laptop-specs {
+  .ls-laptop-specs {
     grid-template-columns: 1fr;
   }
 
-  .laptop-meta {
+  .ls-laptop-meta {
     flex-direction: column;
     gap: 10px;
   }
 
-  .laptop-price {
+  .ls-laptop-price {
     text-align: left;
   }
 }
