@@ -75,10 +75,20 @@ const ComponentInfo = () => {
   const [quantity, setQuantity] = useState(1);
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
 
+  const validTypes = ['Storage', 'PSU', 'Mainboard', 'GPU', 'CPU', 'RAM', 'CPU Cooler', 'Case'];
+
+  const normalizeType = (inputType) => {
+    if (!inputType) return null;
+    const lowerType = inputType.toLowerCase();
+    return validTypes.find((validType) => validType.toLowerCase() === lowerType) || null;
+  };
+
+  const normalizedType = normalizeType(type);
+
   // Fetch components by type
   useEffect(() => {
     const loadComponents = async () => {
-      const result = await fetchComponents(type);
+      const result = await fetchComponents(normalizedType);
       if (result.error) {
         toast.error(result.error);
         setComponents([]);
@@ -87,7 +97,7 @@ const ComponentInfo = () => {
       }
     };
     loadComponents();
-  }, [type]);
+  }, [normalizedType]);
 
   // Update componentInfo when components or componentId changes
   useEffect(() => {
@@ -297,7 +307,7 @@ const ComponentInfo = () => {
               <div
                 key={component.product_id}
                 className="similar-product-card"
-                onClick={() => navigate(`/component-info/${type}/${component.product_id}`)}
+                onClick={() => navigate(`/component-info/${normalizeType}/${component.product_id}`)}
               >
                 <div className="similar-product-img-container">
                   <img

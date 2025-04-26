@@ -541,7 +541,7 @@ const ComponentSearch = () => {
                                   }}
                                 />
                                 <span
-                                  onClick={() => navigate(`/product-info/${component.product_id}`)}
+                                  onClick={() => navigate(`/component-info/${type}/${component.product_id}`)}
                                 >
                                   {data}
                                 </span>
