@@ -200,6 +200,81 @@ def dal_get_component_by_id(product_id):
     finally:
         cursor.close()
         db.close()
+        
+def get_products(limit=None):
+    """
+    Get a list of products with optional limit
+    
+    Args:
+        limit (int, optional): Maximum number of products to return
+        
+    Returns:
+        list: List of product dictionaries
+    """
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+    try:
+        query = """
+            SELECT 
+                product_id as id,
+                title,
+                price,
+                image,
+                rating
+            FROM Products
+        """
+        
+        if limit:
+            query += " LIMIT %s"
+            cursor.execute(query, (limit,))
+        else:
+            cursor.execute(query)
+            
+        products = cursor.fetchall()
+        return products
+    except Exception as e:
+        print(f"Error fetching products: {str(e)}")
+        return []
+    finally:
+        cursor.close()
+        connection.close()
+
+def get_product_by_id(product_id):
+    """
+    Get a product by its ID
+    
+    Args:
+        product_id (int): The ID of the product to retrieve
+        
+    Returns:
+        dict: Product information or None if not found
+    """
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+    try:
+        cursor.execute("""
+            SELECT 
+                product_id as id,
+                title,
+                price,
+                stock,
+                rating,
+                description,
+                image,
+                created_at,
+                updated_at,
+                category_id
+            FROM Products
+            WHERE product_id = %s
+        """, (product_id,))
+        product = cursor.fetchone()
+        return product
+    except Exception as e:
+        print(f"Error fetching product: {str(e)}")
+        return None
+    finally:
+        cursor.close()
+        connection.close()
 
 
 
