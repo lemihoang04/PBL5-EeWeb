@@ -6,7 +6,6 @@ from DAL.product_dal import get_products_from_db_by_query
 def create_product_agent():
     products = get_products_from_db_by_query()
     df = pd.DataFrame(products)
-    # Sử dụng Groq LLM thay vì HuggingFaceHub
     llm = ChatGroq(
         groq_api_key="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",  # Thay bằng API key của bạn hoặc lấy từ biến môi trường
         model_name="meta-llama/llama-4-scout-17b-16e-instruct",   # Hoặc model Groq khác bạn muốn dùng

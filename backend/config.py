@@ -1,5 +1,4 @@
 import mysql.connector
-from context.chatbot.trainbot import ElectronicsStoreBot
 
 DATABASE_CONFIG = {
     'user': 'root',
@@ -18,7 +17,3 @@ ZALOPAY_CONFIG = {
 def get_db_connection():
     connection = mysql.connector.connect(**DATABASE_CONFIG)
     return connection
-
-def get_chatbot():
-    bot = ElectronicsStoreBot(DATABASE_CONFIG)
-    return bot
