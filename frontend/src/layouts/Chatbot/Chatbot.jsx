@@ -35,7 +35,7 @@ const Chatbot = () => {
             // Add bot response with a slight delay to simulate typing
             setTimeout(() => {
                 if (response && !response.error) {
-                    setMessages(prev => [...prev, { text: response.response, sender: 'bot' }]);
+                    setMessages(prev => [...prev, { text: response.response.output, sender: 'bot' }]);
                 } else {
                     setMessages(prev => [...prev, { text: "Sorry, I'm having trouble connecting right now. Please try again later.", sender: 'bot' }]);
                 }

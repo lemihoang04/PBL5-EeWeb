@@ -129,17 +129,6 @@ def dal_get_components_by_type(type):
        
         
 def dal_get_component_by_id(product_id):
-    """
-    Get a component by its product_id with attributes formatted as JSON string.
-    
-    Args:
-        product_id (int): The ID of the product to retrieve
-        
-    Returns:
-        tuple: (component_data, status_code)
-            component_data: Dictionary containing product information or error message
-            status_code: HTTP status code
-    """
     db = get_db_connection()
     if not db:
         return {'error': 'Database connection failed'}, 500
@@ -202,15 +191,6 @@ def dal_get_component_by_id(product_id):
         db.close()
         
 def get_products(limit=None):
-    """
-    Get a list of products with optional limit
-    
-    Args:
-        limit (int, optional): Maximum number of products to return
-        
-    Returns:
-        list: List of product dictionaries
-    """
     connection = get_db_connection()
     cursor = connection.cursor(dictionary=True)
     try:
@@ -240,15 +220,6 @@ def get_products(limit=None):
         connection.close()
 
 def get_product_by_id(product_id):
-    """
-    Get a product by its ID
-    
-    Args:
-        product_id (int): The ID of the product to retrieve
-        
-    Returns:
-        dict: Product information or None if not found
-    """
     connection = get_db_connection()
     cursor = connection.cursor(dictionary=True)
     try:
@@ -584,3 +555,20 @@ def dal_get_components_by_attributes(type, attributes=None):
     finally:
         cursor.close()
         db.close()
+def get_products_from_db_by_query(query=None):
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+    sql = """
+        SELECT p.product_id, p.title AS product_name, c.category_name AS type, p.price, p.rating 
+        FROM products p
+        JOIN categories c ON p.category_id = c.category_id
+    """
+    if query:
+        sql += " WHERE p.title LIKE %s"
+        cursor.execute(sql, (f"%{query}%",))
+    else:
+        cursor.execute(sql)
+    products = cursor.fetchall()
+    cursor.close()
+    connection.close()
+    return products

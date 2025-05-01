@@ -12,5 +12,4 @@ const sendChatbotQuery = async (query, userId = null) => {
         return { error: true, message: 'Failed to get response from chatbot' };
     }
 };
-
 export { sendChatbotQuery };
