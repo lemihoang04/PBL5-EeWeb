@@ -119,7 +119,22 @@ const Build = () => {
         // Điều hướng đến CPU Cooler thông thường
         navigate(`/components/cpu%20cooler`);
       }
-    } else {
+    }
+    // else if (componentId === 'Mainboard') {
+    //   // Kiểm tra nếu CPU đã được chọn
+    //   const selectedCpu = components.find((component) => component.id === 'cpu')?.selected;
+      
+    //   // Nếu CPU đã được chọn, điều hướng đến Mainboard với brand AMD
+    //   if (selectedCpu) {
+    //     console.log('Selected CPU:', selectedCpu['attributes']['Socket']);
+    //     // Điều hướng đến Mainboard với Socket 
+    //     navigate(`/components/mainboard?cpu_socket=${selectedCpu['attributes']['Socket']}`);
+    //   } else {
+    //     // Điều hướng đến Mainboard thông thường
+    //     navigate(`/components/mainboard`);
+    //   }
+    // }
+    else {
       navigate(`/components/${componentId}`);
     }
   };
