@@ -562,6 +562,7 @@ def get_products_from_db_by_query(query=None):
         SELECT p.product_id, p.title AS product_name, c.category_name AS type, p.price, p.rating 
         FROM products p
         JOIN categories c ON p.category_id = c.category_id
+        ORDER BY p.product_id ASC
     """
     if query:
         sql += " WHERE p.title LIKE %s"
@@ -569,6 +570,9 @@ def get_products_from_db_by_query(query=None):
     else:
         cursor.execute(sql)
     products = cursor.fetchall()
+    for product in products:
+        if "type" in product and isinstance(product["type"], str):
+            product["type"] = product["type"].lower()
     cursor.close()
     connection.close()
     return products

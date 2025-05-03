@@ -40,6 +40,7 @@ const Orders = () => {
                     order_id: item.order_id,
                     orderNumber: `ORD-${item.order_id}`,
                     date: item.created_at || new Date().toISOString(),
+                    updated_at: item.updated_at || new Date().toISOString(),
                     status: (item.status || '').trim().toLowerCase(),
                     productId: item.product_id,
                     title: item.title,
@@ -173,7 +174,7 @@ const Orders = () => {
                     >
                         Pending
                     </button>
-                    <button
+                    {/* <button
                         className={`odrs__filter-btn ${isFilterActive('shipped') ? 'odrs__active' : ''}`}
                         onClick={() => setFilter('shipped')}
                     >
@@ -184,6 +185,12 @@ const Orders = () => {
                         onClick={() => setFilter('delivered')}
                     >
                         Delivered
+                    </button> */}
+                    <button
+                        className={`odrs__filter-btn ${isFilterActive('completed') ? 'odrs__active' : ''}`}
+                        onClick={() => setFilter('completed')}
+                    >
+                        Completed
                     </button>
                     <button
                         className={`odrs__filter-btn ${isFilterActive('cancelled') ? 'odrs__active' : ''}`}

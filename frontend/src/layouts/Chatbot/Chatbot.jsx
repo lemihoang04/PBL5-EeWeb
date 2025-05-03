@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useContext } from 'react';
+import ReactMarkdown from 'react-markdown'; // Import thêm react-markdown
 import { sendChatbotQuery } from '../../services/chatbotService';
 import { UserContext } from '../../context/UserProvider';
 import './Chatbot.css';
@@ -16,6 +17,12 @@ const Chatbot = () => {
 
     const toggleChat = () => {
         setIsOpen(!isOpen);
+        // Add focus to input when chat opens
+        if (!isOpen) {
+            setTimeout(() => {
+                document.querySelector('.chatbot-input input')?.focus();
+            }, 300);
+        }
     };
 
     const handleSend = async () => {
@@ -32,7 +39,6 @@ const Chatbot = () => {
             const userId = user?.account?.id || null;
             const response = await sendChatbotQuery(input, userId);
 
-            // Add bot response with a slight delay to simulate typing
             setTimeout(() => {
                 if (response && !response.error) {
                     setMessages(prev => [...prev, { text: response.response.output, sender: 'bot' }]);
@@ -54,6 +60,19 @@ const Chatbot = () => {
         }
     };
 
+    // Load messages from sessionStorage on component mount
+    useEffect(() => {
+        const savedMessages = sessionStorage.getItem('chatMessages');
+        if (savedMessages) {
+            setMessages(JSON.parse(savedMessages));
+        }
+    }, []);
+
+    // Save messages to sessionStorage whenever they change
+    useEffect(() => {
+        sessionStorage.setItem('chatMessages', JSON.stringify(messages));
+    }, [messages]);
+
     // Auto-scroll to bottom when messages change
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -61,18 +80,20 @@ const Chatbot = () => {
 
     return (
         <div className="chatbot-container">
-            {/* Chat button */}
-            <button
-                className={`chatbot-button ${isOpen ? 'active' : ''}`}
-                onClick={toggleChat}
-                aria-label="Toggle chat"
-            >
-                {isOpen ? <FaTimes /> : <FaRobot />}
-            </button>
+            {/* Chat button - only shown when chat is closed */}
+            {!isOpen && (
+                <button
+                    className="chatbot-button"
+                    onClick={toggleChat}
+                    aria-label="Toggle chat"
+                >
+                    <FaRobot />
+                </button>
+            )}
 
             {/* Chat window */}
             {isOpen && (
-                <div className="chatbot-window">
+                <div className="chatbot-window chatbot-window-no-button">
                     <div className="chatbot-header">
                         <h3>TechShop Assistant</h3>
                         <button onClick={toggleChat} className="close-button" aria-label="Close chat">
@@ -86,7 +107,11 @@ const Chatbot = () => {
                                 <div className="message-icon">
                                     {msg.sender === 'bot' ? <FaRobot /> : <FaUser />}
                                 </div>
-                                <div className="message-text">{msg.text}</div>
+                                <div className="message-text">
+                                    <div className="markdown-wrapper">
+                                        <ReactMarkdown>{msg.text}</ReactMarkdown>
+                                    </div>
+                                </div>
                             </div>
                         ))}
                         {isTyping && (

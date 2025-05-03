@@ -242,6 +242,11 @@
     color: #1976d2;
 }
 
+.odrs__status-completed {
+    background-color: #90caf9;
+    color: #1976d2;
+}
+
 .odrs__status-delivered {
     background-color: #a5d6a7;
     color: #2e7d32;
