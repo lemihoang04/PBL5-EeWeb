@@ -118,10 +118,22 @@ def change_password(user_id, old_password, new_password):
 def delete_user(user_id):
     connection = get_db_connection()
     cursor = connection.cursor()
-    cursor.execute("DELETE FROM users WHERE id = %s", (user_id,))
-    connection.commit()
-    cursor.close()
-    connection.close()
+    try:
+        # Xóa payments liên quan
+        cursor.execute("DELETE FROM payments WHERE user_id = %s", (user_id,))
+        # Xóa cart liên quan
+        cursor.execute("DELETE FROM cart WHERE user_id = %s", (user_id,))
+        # Xóa order liên quan
+        cursor.execute("DELETE FROM `Order` WHERE user_id = %s", (user_id,))
+        # Xóa user
+        cursor.execute("DELETE FROM users WHERE id = %s", (user_id,))
+        connection.commit()
+    except Exception as e:
+        connection.rollback()
+        raise Exception(str(e))
+    finally:
+        cursor.close()
+        connection.close()
     
 def get_number_of_cart_items(user_id):
     connection = get_db_connection()

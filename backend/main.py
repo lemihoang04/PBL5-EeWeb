@@ -5,6 +5,7 @@ from blueprints.service_blueprint import service_blueprint
 from blueprints.cart_blueprint import cart_blueprint
 from blueprints.product_blueprint import product_blueprint
 from blueprints.order_blueprint import order_blueprint
+from blueprints.category_blueprint import category_blueprint
  
 app = Flask(__name__)
 app.secret_key = "phuocnopro123" 
@@ -16,6 +17,7 @@ app.register_blueprint(service_blueprint)
 app.register_blueprint(cart_blueprint)
 app.register_blueprint(product_blueprint)
 app.register_blueprint(order_blueprint)
+app.register_blueprint(category_blueprint)
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)

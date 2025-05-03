@@ -1,0 +1,109 @@
+.user-manager-container {
+    max-width: 1100px;
+    margin: 30px auto;
+    background: #fff;
+    padding: 32px 24px;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+
+.user-manager-container h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 24px;
+    color: #1976d2;
+    letter-spacing: 1px;
+}
+
+.user-manager-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 24px;
+    background: #fafbfc;
+}
+
+.user-manager-table th, .user-manager-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid #eaeaea;
+    text-align: left;
+    font-size: 15px;
+}
+
+.user-manager-table th {
+    background: #f5f7fa;
+    font-weight: 600;
+    color: #333;
+}
+
+.user-manager-table tr:hover {
+    background: #f0f4fa;
+}
+
+.user-manager-status {
+    padding: 4px 12px;
+    border-radius: 8px;
+    font-weight: 500;
+    text-transform: capitalize;
+}
+
+.user-manager-status-active {
+    background: #e6f4ea;
+    color: #388e3c;
+}
+
+.user-manager-status-inactive {
+    background: #ffeaea;
+    color: #d32f2f;
+}
+
+.user-manager-status-other {
+    background: #e3eafc;
+    color: #1976d2;
+}
+
+.user-manager-btn {
+    border: none;
+    outline: none;
+    padding: 6px 14px;
+    margin-right: 8px;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.2s;
+}
+
+.user-manager-btn-view {
+    background: #e3eafc;
+    color: #1976d2;
+}
+
+.user-manager-btn-delete {
+    background: #ffeaea;
+    color: #d32f2f;
+}
+
+.user-manager-btn-delete:hover {
+    background: #d32f2f;
+    color: #fff;
+}
+
+.user-manager-btn-view:hover {
+    background: #1976d2;
+    color: #fff;
+}
+
+@media (max-width: 700px) {
+    .user-manager-container {
+        padding: 16px 4px;
+    }
+    .user-manager-table th, .user-manager-table td {
+        padding: 8px 6px;
+        font-size: 13px;
+    }
+    .user-manager-container h2 {
+        font-size: 1.3rem;
+    }
+}

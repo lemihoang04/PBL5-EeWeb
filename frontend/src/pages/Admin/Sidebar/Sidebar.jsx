@@ -8,6 +8,7 @@ const Sidebar = ({ activeTab, setActiveTab, collapsed, toggleSidebar }) => {
         { name: "Dashboard", icon: "bi-speedometer2" },
         { name: "Category", icon: "bi-tag" },
         { name: "Order", icon: "bi-cart" },
+        { name: "Product", icon: "bi-box" },
         { name: "Customers", icon: "bi-people" },
         { name: "Reports", icon: "bi-bar-chart" },
         { name: "Settings", icon: "bi-gear" },

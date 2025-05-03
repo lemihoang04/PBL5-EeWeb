@@ -1,6 +1,21 @@
 from config import get_db_connection
 from mysql.connector import Error
 
+def get_all_orders():
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+    cursor.execute("""
+        SELECT 
+            o.*, 
+            u.name AS user_name
+        FROM `Order` o
+        JOIN Users u ON o.user_id = u.id
+    """)
+    orders = cursor.fetchall()
+    cursor.close()
+    connection.close()
+    return orders
+
 def get_order_by_id(order_id):
     connection = get_db_connection()
     if not connection:

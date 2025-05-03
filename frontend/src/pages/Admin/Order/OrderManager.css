@@ -1,0 +1,112 @@
+.admin-order-manager {
+    max-width: 1100px;
+    margin: 30px auto;
+    background: #fff;
+    padding: 32px 24px;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+
+.order-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 24px;
+    background: #fafbfc;
+}
+
+.order-table th, .order-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid #eaeaea;
+    text-align: left;
+}
+
+.order-table th {
+    background: #f5f7fa;
+    font-weight: 600;
+    color: #333;
+}
+
+.order-table tr:hover {
+    background: #f0f4fa;
+}
+
+.order-status {
+    padding: 4px 12px;
+    border-radius: 8px;
+    font-weight: 500;
+    text-transform: capitalize;
+}
+
+.status-cancelled {
+    background: #ffeaea;
+    color: #d32f2f;
+}
+
+.status-completed {
+    background: #e6f4ea;
+    color: #388e3c;
+}
+
+.status-other {
+    background: #e3eafc;
+    color: #1976d2;
+}
+
+.action-btn {
+    border: none;
+    outline: none;
+    padding: 6px 14px;
+    margin-right: 8px;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.2s;
+}
+
+.view-btn {
+    background: #e3eafc;
+    color: #1976d2;
+}
+
+.cancel-btn {
+    background: #ffeaea;
+    color: #d32f2f;
+}
+
+.order-modal {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.order-modal-content {
+    background: #fff;
+    padding: 32px 28px;
+    border-radius: 10px;
+    min-width: 340px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.15);
+    position: relative;
+}
+
+.close-modal-btn {
+    margin-top: 18px;
+    background: #1976d2;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 20px;
+    cursor: pointer;
+    font-size: 15px;
+    transition: background 0.2s;
+}
+
+.close-modal-btn:hover {
+    background: #1251a3;
+}

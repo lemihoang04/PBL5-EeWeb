@@ -2,7 +2,8 @@
     display: flex;
     width: 100%;
     height: 100vh;
-    overflow: hidden;
+    /* overflow: hidden; */
+    overflow-x: hidden;
 }
 
 /* Sidebar Styles */
@@ -89,7 +90,7 @@
     display: flex;
     flex-direction: column;
     background-color: #f8f9fa;
-    overflow: hidden;
+    /* overflow: hidden; */
 }
 
 .top-navbar {

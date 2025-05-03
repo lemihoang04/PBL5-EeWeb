@@ -1,9 +1,13 @@
 import React, { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
-import "./Admin.css"; // Import your CSS file for custom styles
-import Sidebar from "./Sidebar/Sidebar.jsx"; // Adjust the import path as necessary
+import "./Admin.css";
+import Sidebar from "./Sidebar/Sidebar.jsx";
 import Dashboard from "./Dashboard/Dashboard.jsx";
+import UserManager from "./User/UserManager.jsx";
+import OrderManager from "./Order/OrderManager.jsx";
+import CategoryManager from "./Category/CategoryManager.jsx";
+import ProductManager from "./Product/ProductManager.jsx"; // Thêm dòng này
 
 const Admin = () => {
     const [activeTab, setActiveTab] = useState("Dashboard");
@@ -18,11 +22,13 @@ const Admin = () => {
             case "Dashboard":
                 return <Dashboard />;
             case "Category":
-                return <h2>Category Management</h2>;
+                return <CategoryManager />;
             case "Order":
-                return <h2>Order Management</h2>;
+                return <OrderManager />;
             case "Customers":
-                return <h2>Customer Management</h2>;
+                return <UserManager />;
+            case "Product":
+                return <ProductManager />;
             default:
                 return <h2>Welcome to Admin Panel</h2>;
         }
@@ -35,8 +41,6 @@ const Admin = () => {
                 {renderContent()}
             </div>
         </div>
-
-
     );
 };
 

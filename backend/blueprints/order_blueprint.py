@@ -10,6 +10,14 @@ def api_get_orders_by_user(user_id):
         return jsonify({"errCode": 0, "orders": orders}), 200
     except Exception as e:
         return jsonify({"errCode": 1, "message": str(e)}), 500
+    
+@order_blueprint.route('/orders/all', methods=['GET'])
+def api_get_all_orders():
+    try:
+        orders = get_all_orders()
+        return jsonify({"errCode": 0, "orders": orders}), 200
+    except Exception as e:
+        return jsonify({"errCode": 1, "message": str(e)}), 500
 
 @order_blueprint.route('/order/<order_id>', methods=['GET'])
 def api_get_order_by_id(order_id):

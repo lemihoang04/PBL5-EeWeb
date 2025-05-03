@@ -1,0 +1,88 @@
+.product-manager {
+    padding: 2rem;
+    background-color: #f8f9fa;
+    min-height: 100vh;
+}
+
+/* .action-buttons button{
+    margin-right: 0.5rem;
+    background-color: #2a87e3; */
+/* } */
+.product-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.product-title {
+    color: #2c3e50;
+    font-weight: 600;
+    margin: 0;
+}
+
+.add-product-btn {
+    padding: 0.5rem 1.5rem;
+    font-weight: 500;
+    color: cyan;
+}
+
+.product-table {
+    background-color: white;
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    border-radius: 8px;
+}
+
+.product-table thead {
+    background-color: #f8f9fa;
+}
+
+.product-table th {
+    padding: 1rem !important;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.product-table td {
+    padding: 1rem !important;
+    vertical-align: middle;
+}
+
+.product-table td.price-column {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.action-buttons button {
+    margin: 0 0.25rem;
+}
+
+.pagination {
+    margin-top: 2rem;
+    justify-content: center;
+}
+
+.modal-content {
+    border-radius: 8px;
+}
+
+.modal-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.modal-title {
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+.form-label {
+    font-weight: 500;
+    color: #2c3e50;
+}
+
+.form-control:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+}

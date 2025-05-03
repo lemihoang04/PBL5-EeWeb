@@ -94,6 +94,7 @@ def dal_get_components_by_type(type):
         return {'error': 'Database connection failed'}, 500
 
     cursor = db.cursor(dictionary=True)
+    cursor.execute("SET SESSION group_concat_max_len = 100000;")
     try:
         query = """
         SELECT 
@@ -124,5 +125,109 @@ def dal_get_components_by_type(type):
     finally:
         cursor.close()
         db.close()
+       
         
+def dal_get_component_by_id(product_id):
+    """
+    Get a component by its product_id with attributes formatted as JSON string.
+    
+    Args:
+        product_id (int): The ID of the product to retrieve
+        
+    Returns:
+        tuple: (component_data, status_code)
+            component_data: Dictionary containing product information or error message
+            status_code: HTTP status code
+    """
+    db = get_db_connection()
+    if not db:
+        return {'error': 'Database connection failed'}, 500
 
+    cursor = db.cursor(dictionary=True)
+    try:
+        # Get product basic information
+        product_query = """
+        SELECT 
+            p.product_id,
+            p.title,
+            p.price,
+            p.stock,
+            p.rating,
+            p.description,
+            p.image,
+            p.created_at,
+            p.updated_at,
+            c.category_name,
+            c.category_id
+        FROM products p
+        JOIN categories c ON p.category_id = c.category_id
+        WHERE p.product_id = %s
+        """
+        cursor.execute(product_query, (product_id,))
+        product = cursor.fetchone()
+        
+        if not product:
+            return {"error": "Component not found"}, 404
+            
+        # Get attributes as formatted JSON string
+        attributes_query = """
+        SELECT 
+            CONCAT('{', GROUP_CONCAT(CONCAT('"', attribute_name, '":"', attribute_value, '"')), '}') AS attributes
+        FROM 
+            product_attributes
+        WHERE 
+            product_id = %s
+        """
+        cursor.execute(attributes_query, (product_id,))
+        attributes_result = cursor.fetchone()
+        
+        # Parse attributes JSON string if available
+        attributes = {}
+        if attributes_result and attributes_result['attributes']:
+            try:
+                import json
+                attributes = json.loads(attributes_result['attributes'])
+            except json.JSONDecodeError as e:
+                print(f"Error parsing attributes JSON: {e}")
+        
+        # Combine product info with attributes
+        result = {**product, 'attributes': attributes}
+        return result, 200
+        
+    except mysql.connector.Error as err:
+        return {"error": str(err)}, 500
+    finally:
+        cursor.close()
+        db.close()
+
+def dal_get_all_products():
+    db = get_db_connection()
+    if not db:
+        return {'error': 'Database connection failed'}, 500
+
+    cursor = db.cursor(dictionary=True)
+    try:
+        query = """
+        SELECT 
+            p.product_id,
+            p.title,
+            p.price,
+            p.stock,
+            p.rating,
+            p.description,
+            p.image,
+            p.created_at,
+            p.updated_at,
+            c.category_name,
+            c.category_id
+        FROM products p
+        JOIN categories c ON p.category_id = c.category_id
+        """
+        cursor.execute(query)
+        products = cursor.fetchall()
+        return products
+    except mysql.connector.Error as err:
+        return {"error": str(err)}, 500
+    finally:
+        cursor.close()
+        db.close()

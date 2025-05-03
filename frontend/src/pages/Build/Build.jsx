@@ -121,34 +121,34 @@ const Build = () => {
   // Handle data sent from ComponentSearch.jsx
   useEffect(() => {
     if (location.state?.addedComponent) {
-      const addedComponent = location.state.addedComponent;
+      const componentDetail = location.state.addedComponent;
       setComponents((prevComponents) =>
         prevComponents.map((component) => {
-          if (component.name === addedComponent.category_name) {
+          if (component.name === componentDetail.category_name) {
             if (component.id === 'Mainboard') {
               // Special handling for Mainboard to get M2.slot values
-              const m2Slots = addedComponent.attributes?.['m2Slots'] || [];
+              const m2Slots = componentDetail.attributes?.['m2Slots'] || [];
               console.log('M2:', m2Slots);
               return {
                 ...component,
-                selected: { ...addedComponent, m2Slots }, // Save both product and M2.slot
+                selected: { ...componentDetail, m2Slots }, // Save both product and M2.slot
               };
             } else if (component.multiple) {
               // If component supports multiple selections
               return {
                 ...component,
-                selected: [...(component.selected || []), addedComponent],
+                selected: [...(component.selected || []), componentDetail],
               };
             } else {
               // If component only supports one selection
-              return { ...component, selected: addedComponent };
+              return { ...component, selected: componentDetail };
             }
           }
           return component;
         })
       );
-
-      console.log('Added component:', addedComponent);
+  
+      console.log('Added component:', componentDetail);
     }
   }, [location.state]);
 
