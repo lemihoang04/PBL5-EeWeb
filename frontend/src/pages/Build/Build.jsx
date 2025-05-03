@@ -105,9 +105,20 @@ const Build = () => {
   }, [components]);
 
   const handleCategoryClick = (componentId) => {
-    // Navigate to ComponentSearch with component type
+  // Navigate to ComponentSearch with component type
     if (componentId === 'cpu Cooler') {
-      navigate(`/components/cpu%20cooler`);
+      // Kiểm tra nếu CPU đã được chọn
+      const selectedCpu = components.find((component) => component.id === 'cpu')?.selected;
+      
+      // Nếu CPU đã được chọn, điều hướng đến CPU Cooler với brand AMD
+      if (selectedCpu) {
+        console.log('Selected CPU:', selectedCpu['attributes']['Socket']);
+        // Điều hướng đến CPU Cooler với Socket 
+        navigate(`/components/cpu%20cooler?cpu_socket=${selectedCpu['attributes']['Socket']}`);
+      } else {
+        // Điều hướng đến CPU Cooler thông thường
+        navigate(`/components/cpu%20cooler`);
+      }
     } else {
       navigate(`/components/${componentId}`);
     }
@@ -125,15 +136,7 @@ const Build = () => {
       setComponents((prevComponents) =>
         prevComponents.map((component) => {
           if (component.name === componentDetail.category_name) {
-            if (component.id === 'Mainboard') {
-              // Special handling for Mainboard to get M2.slot values
-              const m2Slots = componentDetail.attributes?.['m2Slots'] || [];
-              console.log('M2:', m2Slots);
-              return {
-                ...component,
-                selected: { ...componentDetail, m2Slots }, // Save both product and M2.slot
-              };
-            } else if (component.multiple) {
+            if (component.multiple) {
               // If component supports multiple selections
               return {
                 ...component,

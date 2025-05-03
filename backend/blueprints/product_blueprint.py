@@ -28,16 +28,16 @@ def get_laptops():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@product_blueprint.route("/components/<string:type>", methods=["GET"])
-def get_components_by_type(type):
-    try:
-        components, status = dal_get_components_by_type(type)
-        if status == 200:
-            return jsonify(components), 200
-        else:
-            return jsonify(components), status
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+# @product_blueprint.route("/components/<string:type>", methods=["GET"])
+# def get_components_by_type(type):
+#     try:
+#         components, status = dal_get_components_by_type(type)
+#         if status == 200:
+#             return jsonify(components), 200
+#         else:
+#             return jsonify(components), status
+#     except Exception as e:
+#         return jsonify({"error": str(e)}), 500
     
 @product_blueprint.route("/components/<int:product_id>", methods=["GET"])
 def get_component_by_id(product_id):
@@ -50,6 +50,7 @@ def get_component_by_id(product_id):
     except Exception as e:
         return jsonify({"error": str(e)}), 500  
     
+<<<<<<< HEAD
 @product_blueprint.route("/products", methods=["GET"])
 def get_all_products():
     try:
@@ -57,3 +58,103 @@ def get_all_products():
         return jsonify(products), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+=======
+@product_blueprint.route("/components/<string:type>", methods=["GET"])
+def get_components(type):
+    """
+    API route to get components by type or CPU Coolers compatible with a specific CPU socket.
+
+    Args:
+        type (str): The category name of the component (e.g., 'CPU', 'RAM', 'CPU Cooler').
+    
+    Query Parameters:
+        cpu_socket (str, optional): The CPU socket to filter CPU Coolers (e.g., 'AM4', 'LGA1700').
+    
+    Returns:
+        JSON response with components or error message.
+    """
+    try:
+        # Kiểm tra nếu type là 'CPU Cooler' và có tham số cpu_socket
+        cpu_socket = request.args.get('cpu_socket')
+        if type.lower() == 'cpu cooler' and cpu_socket:
+            print(f"Getting CPU Coolers compatible with socket: {cpu_socket}")
+            coolers, status = dal_CPU_Cooler_vs_CPU(cpu_socket)
+            if status == 200:
+                return jsonify(coolers), 200
+            else:
+                return jsonify(coolers), status
+
+        # Nếu không có cpu_socket, xử lý như bình thường
+        if request.args:
+            # Có query parameters - lọc theo thuộc tính
+            attributes = {}
+            for key, value in request.args.items():
+                attributes[key] = value
+
+            print(f"Filtering {type} with attributes: {attributes}")
+            components, status = dal_get_components_by_attributes(type, attributes)
+        else:
+            # Không có query parameters - lấy tất cả components theo type
+            print(f"Getting all components of type: {type}")
+            components, status = dal_get_components_by_attributes(type)
+        
+        # Trả về kết quả
+        if status == 200:
+            return jsonify(components), 200
+        else:
+            return jsonify(components), status
+    except Exception as e:
+        print(f"Error in get_components: {e}")
+        return jsonify({"error": str(e)}), 500
+    
+# # Đây là đoạn code đã được kết hợp từ cả hai hàm
+# @product_blueprint.route("/components/<string:type>", methods=["GET"])
+# def get_components_by_type(type):
+#     try:
+#         # Kiểm tra xem có query parameters không
+#         if request.args:
+#             # Có query parameters - lọc theo thuộc tính
+#             attributes = {}
+#             for key, value in request.args.items():
+#                 attributes[key] = value
+
+#             print(f"Filtering {type} with attributes: {attributes}")
+#             components, status = dal_get_components_by_attributes(type, attributes)
+#         else:
+#             # Không có query parameters - lấy tất cả components theo type
+#             print(f"Getting all components of type: {type}")
+#             components, status = dal_get_components_by_attributes(type)
+        
+#         # Phần code sau đây sẽ chạy sau khi đã gán giá trị cho components và status
+#         if status == 200:
+#             return jsonify(components), 200
+#         else:
+#             return jsonify(components), status
+#     except Exception as e:
+#         print(f"Error in get_components_by_type: {e}")
+#         return jsonify({"error": str(e)}), 500
+    
+# @product_blueprint.route("/cpu-coolers/compatible/<string:cpu_socket>", methods=["GET"])
+# def get_compatible_cpu_coolers(cpu_socket):
+#     """
+#     API route to get CPU Coolers compatible with a specific CPU socket.
+    
+#     Args:
+#         cpu_socket (str): The CPU socket to match (e.g., 'AM4', 'LGA1700')
+    
+#     Returns:
+#         JSON response with compatible CPU Coolers or error message.
+#     """
+#     try:
+#         # Gọi hàm DAL để lấy danh sách CPU Cooler tương thích
+#         coolers, status = dal_CPU_Cooler_vs_CPU(cpu_socket)
+        
+#         # Trả về kết quả
+#         if status == 200:
+#             return jsonify(coolers), 200
+#         else:
+#             return jsonify(coolers), status
+#     except Exception as e:
+#         print(f"Error in get_compatible_cpu_coolers: {e}")
+#         return jsonify({"error": str(e)}), 500
+>>>>>>> 0fc7324a961e590c11b1f487e1afd6a462b1ce34
