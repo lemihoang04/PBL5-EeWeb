@@ -86,6 +86,21 @@ const CancelOrder = async (order_id) => {
 		},
 	});
 }
+
+// Add product rating
+const SubmitProductRating = async (ratingData) => {
+	try {
+		const response = await axios.post(
+			`/product/rating`,
+			ratingData
+		);
+		return response;
+	} catch (error) {
+		console.error("Error submitting product rating:", error);
+		throw error;
+	}
+}
+
 export {
 	loadCart,
 	addToCart,
@@ -97,4 +112,5 @@ export {
 	GetOrderDetail,
 	GetOrderPayment,
 	CancelOrder,
+	SubmitProductRating,
 };

@@ -2,10 +2,9 @@ import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../../context/UserProvider';
 import { toast } from 'react-toastify';
-import { GetOrdersData } from '../../services/apiService';
+import { GetOrdersData, CancelOrder, SubmitProductRating } from '../../services/apiService';
 import OrderDetailModal from './OrderDetailModal';
-import { CancelOrder } from '../../services/apiService';
-
+import RatingModal from './RatingModal';
 import './Orders.css';
 
 const formatDate = (dateString) => {
@@ -27,6 +26,8 @@ const Orders = () => {
     const [sortOrder, setSortOrder] = useState('desc');
     const [selectedOrderId, setSelectedOrderId] = useState(null);
     const [showModal, setShowModal] = useState(false);
+    const [showRatingModal, setShowRatingModal] = useState(false);
+    const [selectedOrderForRating, setSelectedOrderForRating] = useState(null);
 
     // Đưa fetchOrders ra ngoài để có thể gọi lại sau khi cancel
     const fetchOrders = async () => {
@@ -39,6 +40,7 @@ const Orders = () => {
                     id: item.id,
                     order_id: item.order_id,
                     orderNumber: `ORD-${item.order_id}`,
+                    userId: item.user_id,
                     date: item.created_at || new Date().toISOString(),
                     updated_at: item.updated_at || new Date().toISOString(),
                     status: (item.status || '').trim().toLowerCase(),
@@ -129,6 +131,29 @@ const Orders = () => {
             } catch (error) {
                 toast.error(`Error cancelling order: ${error.message}`);
             }
+        }
+    };
+
+    // Open rating modal
+    const openRatingModal = (order) => {
+        setSelectedOrderForRating(order);
+        setShowRatingModal(true);
+    };
+
+    // Close rating modal
+    const closeRatingModal = () => {
+        setShowRatingModal(false);
+        setSelectedOrderForRating(null);
+    };
+
+    // Handle rating submission
+    const handleRatingSubmit = async (ratingData) => {
+        try {
+            const response = await SubmitProductRating(ratingData);
+            return response;
+        } catch (error) {
+            console.error("Error submitting rating:", error);
+            throw error;
         }
     };
 
@@ -292,6 +317,14 @@ const Orders = () => {
                                         Cancel Order
                                     </button>
                                 )}
+                                {order.status === 'completed' && (
+                                    <button
+                                        className="odrs__button odrs__rating-button"
+                                        onClick={() => openRatingModal(order)}
+                                    >
+                                        Rate Product
+                                    </button>
+                                )}
                             </div>
                         </div>
                     ))}
@@ -303,6 +336,15 @@ const Orders = () => {
                 <OrderDetailModal
                     order={orders.find(order => order.id === selectedOrderId.id)}
                     onClose={closeOrderDetails}
+                />
+            )}
+
+            {/* Rating Modal */}
+            {showRatingModal && selectedOrderForRating && (
+                <RatingModal
+                    order={selectedOrderForRating}
+                    onClose={closeRatingModal}
+                    onSubmit={handleRatingSubmit}
                 />
             )}
         </div>

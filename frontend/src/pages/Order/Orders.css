@@ -349,6 +349,38 @@
     margin-right: auto;
 }
 
+/* Rating button styles */
+.odrs__rating-button {
+    background-color: #f59e0b;
+    color: white;
+    border: 1px solid #f59e0b;
+    transition: all 0.2s ease;
+}
+
+.odrs__rating-button:hover {
+    background-color: #d97706;
+    border-color: #d97706;
+}
+
+/* Animation for new Rating button */
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4);
+    }
+
+    70% {
+        box-shadow: 0 0 0 6px rgba(245, 158, 11, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(245, 158, 11, 0);
+    }
+}
+
+.odrs__rating-button {
+    animation: pulse 2s infinite;
+}
+
 /* Responsive styles */
 @media (max-width: 900px) {
 

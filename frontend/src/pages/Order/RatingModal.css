@@ -1,0 +1,254 @@
+.rating-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(3px);
+}
+
+.rating-modal-content {
+    background-color: white;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    animation: modal-appear 0.3s ease-out;
+    padding: 0;
+}
+
+@keyframes modal-appear {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.rating-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 25px;
+    background-color: #f8f9fb;
+    border-bottom: 1px solid #edf0f5;
+    border-radius: 12px 12px 0 0;
+}
+
+.rating-modal-header h2 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #2a2a2a;
+    margin: 0;
+}
+
+.rating-modal-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #9ca3af;
+    cursor: pointer;
+    padding: 0;
+    margin: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s;
+}
+
+.rating-modal-close:hover {
+    background-color: #f3f4f6;
+    color: #4b5563;
+}
+
+.rating-modal-product {
+    display: flex;
+    align-items: center;
+    padding: 20px 25px;
+    border-bottom: 1px solid #edf0f5;
+}
+
+.rating-modal-product img {
+    width: 70px;
+    height: 70px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-right: 15px;
+    border: 1px solid #eaeaea;
+}
+
+.rating-modal-product-info h3 {
+    font-size: 16px;
+    font-weight: 500;
+    color: #2a2a2a;
+    margin: 0 0 5px 0;
+}
+
+.rating-modal-product-info p {
+    font-size: 14px;
+    color: #6b7280;
+    margin: 0;
+}
+
+.rating-modal-stars {
+    padding: 25px;
+    text-align: center;
+    border-bottom: 1px solid #edf0f5;
+}
+
+.rating-modal-stars p {
+    font-size: 15px;
+    font-weight: 500;
+    color: #374151;
+    margin: 0 0 15px 0;
+}
+
+.star-rating {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.star {
+    font-size: 40px;
+    color: #d1d5db;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.star.active {
+    color: #fbbf24;
+    animation: star-pulse 0.3s ease-in-out;
+}
+
+@keyframes star-pulse {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.15);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+.rating-text {
+    font-size: 16px;
+    font-weight: 500;
+    color: #4b5563;
+    height: 24px;
+    margin-top: 5px;
+}
+
+.rating-modal-comment {
+    padding: 25px;
+}
+
+.rating-modal-comment label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: #4b5563;
+    margin-bottom: 8px;
+}
+
+.rating-modal-comment textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 14px;
+    line-height: 1.5;
+    resize: none;
+    transition: border-color 0.2s;
+}
+
+.rating-modal-comment textarea:focus {
+    border-color: #6366f1;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
+}
+
+.rating-modal-comment textarea::placeholder {
+    color: #9ca3af;
+}
+
+.rating-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 20px 25px 25px;
+}
+
+.rating-cancel-btn,
+.rating-submit-btn {
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.rating-cancel-btn {
+    background-color: #f9fafb;
+    color: #4b5563;
+    border: 1px solid #d1d5db;
+}
+
+.rating-cancel-btn:hover {
+    background-color: #f3f4f6;
+}
+
+.rating-submit-btn {
+    background-color: #4f46e5;
+    color: white;
+    border: 1px solid #4f46e5;
+}
+
+.rating-submit-btn:hover {
+    background-color: #4338ca;
+}
+
+.rating-cancel-btn:disabled,
+.rating-submit-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+@media (max-width: 640px) {
+    .rating-modal-content {
+        width: 95%;
+    }
+
+    .star {
+        font-size: 32px;
+        gap: 8px;
+    }
+
+    .rating-modal-header h2 {
+        font-size: 18px;
+    }
+
+    .rating-modal-actions {
+        padding: 15px 20px 20px;
+    }
+}
