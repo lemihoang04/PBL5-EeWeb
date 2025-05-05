@@ -37,7 +37,8 @@ const OrderDetailModal = ({ order, onClose }) => {
             'processing': 'odtm__status-processing',
             'shipped': 'odtm__status-shipped',
             'delivered': 'odtm__status-delivered',
-            'cancelled': 'odtm__status-cancelled'
+            'cancelled': 'odtm__status-cancelled',
+            'completed': 'odtm__status-completed'
         };
         return statusMap[status.toLowerCase()] || 'odtm__status-default';
     };
@@ -149,7 +150,15 @@ const OrderDetailModal = ({ order, onClose }) => {
                         <div className="odtm__order-header">
                             <div>
                                 <h3>Order #{orderDetails.order_id}</h3>
-                                <p className="odtm__order-date">Placed on: {formatDate(orderDetails.date)}</p>
+                                <p className="odtm__order-date"><strong>Placed on:</strong> {formatDate(orderDetails.date)}
+                                    <br />
+                                    {
+                                        (orderDetails.status === 'completed' || orderDetails.status === 'cancelled') && (
+                                            <span><strong>{orderDetails.status.charAt(0).toUpperCase() + orderDetails.status.slice(1)} on:</strong> {formatDate(orderDetails.updated_at)}</span>
+                                        )
+                                    }
+                                </p>
+
                             </div>
                             <div className={`odtm__status ${getStatusClass(orderDetails.status)}`}>
                                 {orderDetails.status ? (orderDetails.status.charAt(0).toUpperCase() + orderDetails.status.slice(1)) : 'Unknown'}

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { fetchComponents } from '../../services/componentService';
+import { fetchCompatibleCpuCoolers, fetchCompatibleMainboards, fetchComponents } from '../../services/componentService';
 import './ComponentSearch.css';
 import { fetchComponentById } from '../../services/componentService';
 
@@ -41,122 +41,177 @@ const ComponentSearch = () => {
   }, []);
 
 
-  useEffect(() => {
-    const loadComponents = async () => {
-      try {
-        setError(null);
-        
-        // Trích xuất query params từ URL
-        const searchParams = new URLSearchParams(window.location.search);
-        const queryFilters = {};
-        
-        // Convert query params thành object filters
-        for (const [key, value] of searchParams.entries()) {
-          if (key !== 'type') { // Bỏ qua tham số 'type' nếu có
-            queryFilters[key] = value;
-          }
-        }
-        
-        console.log('Filtering components with:', queryFilters);
-        
-        // Gọi API với các bộ lọc từ URL
-        const data = await fetchComponents(normalizedType, queryFilters);
-        
-        // Kiểm tra lỗi từ API
-        if (!data || data.error) {
-          setError(data?.error || 'Failed to load components');
-          setComponents([]);
-          setFilteredComponents([]);
-          return;
-        }
-        
-        // Đảm bảo data là một mảng
-        if (!Array.isArray(data)) {
-          setError('Invalid data format from server');
-          return;
-        }
-        
-        // Xử lý dữ liệu components
-        const parsedComponents = data.map((component) => {
-          // Xử lý trường hợp attributes đã được format dưới dạng object từ server
-          let attributes = component.attributes || {};
-          
-          // Nếu attributes là string, chuyển đổi nó thành object
-          if (typeof component.attributes === 'string') {
-            try {
-              attributes = Object.fromEntries(
-                component.attributes.split(',').map((attr) => {
-                  const [name, value] = attr.split(':').map((s) => s?.trim() || '');
-                  return [name, value];
-                })
-              );
-            } catch (err) {
-              console.error(`Error parsing attributes for component:`, component, err);
-            }
-          }
-          
-          // Đảm bảo giá tiền là số
-          const parsedPrice = parseFloat(component.price) || 0;
-          
-          return { 
-            ...component, 
-            price: parsedPrice, 
-            attributes 
-          };
-        });
-        
-        setComponents(parsedComponents);
-        setFilteredComponents(parsedComponents);
-      } catch (err) {
-        console.error('Error loading components:', err);
-        setError('Failed to load components');
-      }
-    };
-    
-    if (normalizedType) {
-      loadComponents();
-    }
-  }, [normalizedType, window.location.search]); // Thêm location.search vào dependencies để reload khi query params thay đổi
-
   // useEffect(() => {
   //   const loadComponents = async () => {
   //     try {
-  //       const data = await fetchComponents(normalizedType);
+  //       setError(null);
+        
+  //       // Trích xuất query params từ URL
+  //       const searchParams = new URLSearchParams(window.location.search);
+  //       const queryFilters = {};
+        
+  //       // Convert query params thành object filters
+  //       for (const [key, value] of searchParams.entries()) {
+  //         if (key !== 'type') { // Bỏ qua tham số 'type' nếu có
+  //           queryFilters[key] = value;
+  //         }
+  //       }
+        
+  //       console.log('Filtering components with:', queryFilters);
+        
+  //       // Gọi API với các bộ lọc từ URL
+  //       const data = await fetchComponents(normalizedType, queryFilters);
+        
+  //       // Kiểm tra lỗi từ API
   //       if (!data || data.error) {
   //         setError(data?.error || 'Failed to load components');
   //         setComponents([]);
   //         setFilteredComponents([]);
   //         return;
   //       }
+        
+  //       // Đảm bảo data là một mảng
   //       if (!Array.isArray(data)) {
   //         setError('Invalid data format from server');
   //         return;
   //       }
+        
+  //       // Xử lý dữ liệu components
   //       const parsedComponents = data.map((component) => {
-  //         let attributes = {};
-  //         try {
-  //           if (component.attributes && typeof component.attributes === 'string') {
+  //         // Xử lý trường hợp attributes đã được format dưới dạng object từ server
+  //         let attributes = component.attributes || {};
+          
+  //         // Nếu attributes là string, chuyển đổi nó thành object
+  //         if (typeof component.attributes === 'string') {
+  //           try {
   //             attributes = Object.fromEntries(
   //               component.attributes.split(',').map((attr) => {
   //                 const [name, value] = attr.split(':').map((s) => s?.trim() || '');
   //                 return [name, value];
   //               })
   //             );
+  //           } catch (err) {
+  //             console.error(`Error parsing attributes for component:`, component, err);
   //           }
-  //         } catch (err) {
-  //           console.error(`Error parsing attributes for component:`, component, err);
   //         }
+          
+  //         // Đảm bảo giá tiền là số
   //         const parsedPrice = parseFloat(component.price) || 0;
-  //         return { ...component, price: parsedPrice, attributes };
+          
+  //         return { 
+  //           ...component, 
+  //           price: parsedPrice, 
+  //           attributes 
+  //         };
   //       });
+        
   //       setComponents(parsedComponents);
   //       setFilteredComponents(parsedComponents);
   //     } catch (err) {
+  //       console.error('Error loading components:', err);
   //       setError('Failed to load components');
   //     }
   //   };
-  //   loadComponents();
-  // }, [normalizedType]);
+    
+  //   if (normalizedType) {
+  //     loadComponents();
+  //   }
+  // }, [normalizedType, window.location.search]); // Thêm location.search vào dependencies để reload khi query params thay đổi
+
+  // Line 97: Add this at the end of the useEffect function to actually call loadComponents
+
+  const loadComponents = async () => {
+    try {
+      setError(null);
+      
+      // Trích xuất query params từ URL
+      const searchParams = new URLSearchParams(window.location.search);
+      const queryFilters = {};
+      let cpuSocket = null;
+      
+      // Chuyển đổi query params thành bộ lọc
+      for (const [key, value] of searchParams.entries()) {
+        if (key === 'cpu_socket') {
+          cpuSocket = value;
+        } else if (key !== 'type') { // Bỏ qua tham số 'type' nếu có
+          queryFilters[key] = value;
+        }
+      }
+      
+      console.log('Filtering components with:', queryFilters);
+      
+      let data;
+      
+      // Sử dụng API phù hợp dựa trên loại component và socket CPU
+      if (normalizedType === 'CPU Cooler' && cpuSocket) {
+        console.log(`Fetching compatible CPU coolers for socketss: ${cpuSocket}`);
+        data = await fetchCompatibleCpuCoolers(cpuSocket);
+      }
+      else if (normalizedType === 'Mainboard' && cpuSocket) {
+        console.log(`Fetching compatible Mainboard for socket: ${cpuSocket}`);
+        data = await fetchCompatibleMainboards(cpuSocket);
+      }
+      else {
+        // Sử dụng API lấy component thông thường
+        data = await fetchComponents(normalizedType, queryFilters);
+      }
+      
+      // Kiểm tra lỗi từ API
+      if (!data || data.error) {
+        setError(data?.error || 'Failed to load components');
+        setComponents([]);
+        setFilteredComponents([]);
+        return;
+      }
+      
+      // Đảm bảo data là một mảng
+      if (!Array.isArray(data)) {
+        setError('Invalid data format from server');
+        return;
+      }
+      
+      // Xử lý dữ liệu component với các chuyển đổi phù hợp
+      const parsedComponents = data.map((component) => {
+        // Xử lý thuộc tính
+        let attributes = component.attributes || {};
+        
+        // Nếu attributes là một chuỗi, chuyển nó thành đối tượng
+        if (typeof component.attributes === 'string') {
+          try {
+            attributes = Object.fromEntries(
+              component.attributes.split(',').map((attr) => {
+                const [name, value] = attr.split(':').map((s) => s?.trim() || '');
+                return [name, value];
+              })
+            );
+          } catch (err) {
+            console.error(`Error parsing attributes for component:`, component, err);
+          }
+        }
+        
+        // Đảm bảo giá là một số
+        const parsedPrice = parseFloat(component.price) || 0;
+        
+        return { 
+          ...component, 
+          price: parsedPrice, 
+          attributes 
+        };
+      });
+      
+      setComponents(parsedComponents);
+      setFilteredComponents(parsedComponents);
+    } catch (err) {
+      console.error('Error loading components:', err);
+      setError('Failed to load components');
+    }
+  };
+  useEffect(() => {
+  // Inside the loadComponents async function in the useEffect
+    // Actually call the function to load components
+    loadComponents();
+  
+}, [normalizedType, window.location.search]); // Thêm location.search vào dependencies để reload khi query params thay đổi
 
   const itemsPerPage = 50;
   const indexOfLastItem = currentPage * itemsPerPage;

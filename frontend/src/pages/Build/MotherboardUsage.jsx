@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import './MotherboardUsage.css';
 
+function countM2slot(input) {
+  if (!input) return 0;
+  return input.split(',').length;
+}
+
 const MotherboardUsage = ({ motherboard, rams, cpu, storages, gpus }) => {
   const [animateSection, setAnimateSection] = useState(null);
 
@@ -35,11 +40,12 @@ const MotherboardUsage = ({ motherboard, rams, cpu, storages, gpus }) => {
   }
 
   // Extract motherboard specs - with error handling for missing properties
-  const ramSlots = motherboard.specs?.memorySlots || 4;
-  const m2Slots = motherboard.specs?.m2Slots || 2;
+
+  const ramSlots = motherboard.attributes?.["Memory Slots"] || 3;
+  const m2Slots = countM2slot(motherboard.attributes?.["M.2 Slots"]);
   const pcieX16Slots = motherboard.specs?.pcieX16Slots || 2;
   const pcieX1Slots = motherboard.specs?.pcieX1Slots || 2;
-  const socketType = motherboard.specs?.socketType || "Unknown";
+  const socketType = motherboard.attributes?.["Socket/CPU"] || "Unknown";
 
   // Filter M.2 type storage devices
   const m2Storages = storages.filter(storage =>
@@ -54,6 +60,7 @@ const MotherboardUsage = ({ motherboard, rams, cpu, storages, gpus }) => {
   // Function to safely get images with fallbacks
   const getSafeImage = (item, defaultImage) => {
     try {
+      console.log(item['attributes']['M.2 Slots']);
       return item?.image || defaultImage;
     } catch (error) {
       console.error("Error accessing image property:", error);
@@ -103,7 +110,7 @@ const MotherboardUsage = ({ motherboard, rams, cpu, storages, gpus }) => {
         </div>
         <div className="mb-title">
           {getSafeName(motherboard, "Motherboard")}
-          <div className="mb-subtitle">{motherboard.specs?.chipset || 'Unknown Chipset'}</div>
+          <div className="mb-subtitle">{motherboard.attributes?.["Chipset"] || 'Unknown Chipset'}</div>
         </div>
       </div>
 
@@ -194,7 +201,7 @@ const MotherboardUsage = ({ motherboard, rams, cpu, storages, gpus }) => {
 
               return (
                 <div className="slot-item" key={`m2-${index}`}>
-                  <div className="slot-label">M2_{index + 1} (PCIe/SATA)</div>
+                  <div className="slot-label">M2_{index + 1} (M)</div>
                   <div className="slot-connection"></div>
                   {m2Storage ? (
                     <div className="component-item">
@@ -225,41 +232,37 @@ const MotherboardUsage = ({ motherboard, rams, cpu, storages, gpus }) => {
 
         <div className="mb-section">
           <div className="section-header">
-            <span className="section-icon">💿</span> SATA Ports (6 ports)
+            <span className="section-icon">💿</span> SATA Port ({ramSlots} slots)
           </div>
           <div className="section-content">
-            {/* Display up to 6 SATA ports */}
-            {Array.from({ length: 6 }, (_, index) => {
-              const sataStorage = sataStorages[index];
-
-              return (
-                <div className="slot-item" key={`sata-${index}`}>
-                  <div className="slot-label">SATA_{index + 1}</div>
-                  <div className="slot-connection"></div>
-                  {sataStorage ? (
-                    <div className="component-item">
-                      <img
-                        src={getSafeImage(sataStorage, "/images/sata-placeholder.png")}
-                        alt="SATA Storage"
-                        className="component-image"
-                        onError={(e) => {
-                          e.target.onerror = null;
-                          e.target.src = "/images/sata-placeholder.png";
-                        }}
-                      />
-                      <div className="component-name">
-                        {getSafeName(sataStorage, "Storage")}
-                        <div className="component-specs">
-                          {sataStorage.specs?.capacity || 'N/A'}, {sataStorage.specs?.type || 'SATA'}
-                        </div>
+            {/* Dynamically generate RAM slots based on motherboard specs */}
+            {Array.from({ length: ramSlots }, (_, index) => (
+              <div className="memory-item" key={`ram-${index}`}>
+                <div className="memory-label">RAM_{index + 1} (DDR4)</div>
+                <div className="memory-connection"></div>
+                {rams && index < rams.length ? (
+                  <div className="component-item">
+                    <img
+                      src={getSafeImage(rams[index], "/images/ram-placeholder.png")}
+                      alt="RAM"
+                      className="component-image"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = "/images/ram-placeholder.png";
+                      }}
+                    />
+                    <div className="component-name">
+                      {getSafeName(rams[index], "RAM")}
+                      <div className="component-specs">
+                        {rams[index].specs?.capacity || 'N/A'}, {rams[index].specs?.speed || 'N/A'}
                       </div>
                     </div>
-                  ) : (
-                    <div className="component-empty">No SATA device selected</div>
-                  )}
-                </div>
-              );
-            }).slice(0, 3)} {/* Only show 3 slots to save space */}
+                  </div>
+                ) : (
+                  <div className="component-empty">No RAM selected</div>
+                )}
+              </div>
+            ))}
           </div>
         </div>
       </div>

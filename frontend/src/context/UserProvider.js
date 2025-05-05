@@ -71,7 +71,8 @@ const UserProvider = ({ children }) => {
 
 	const logoutUser = () => {
 		setUser(null);
-		sessionStorage.removeItem("user");
+		sessionStorage.removeItem("user", "chatMessages");
+
 	};
 
 	const logoutAdmin = () => {

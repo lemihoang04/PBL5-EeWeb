@@ -119,7 +119,22 @@ const Build = () => {
         // Điều hướng đến CPU Cooler thông thường
         navigate(`/components/cpu%20cooler`);
       }
-    } else {
+    }
+    else if (componentId === 'Mainboard') {
+      // Check if CPU has been selected
+      const selectedCpu = components.find((component) => component.id === 'cpu')?.selected;
+      
+      // If CPU is selected, navigate to Mainboard with socket filter
+      if (selectedCpu) {
+        console.log('Selected CPU:', selectedCpu['attributes']['Socket']);
+        // Navigate to Mainboard with Socket parameter
+        navigate(`/components/mainboard?cpu_socket=${selectedCpu['attributes']['Socket']}`);
+      } else {
+        // Navigate to regular Mainboard selection
+        navigate(`/components/mainboard`);
+      }
+    }
+    else {
       navigate(`/components/${componentId}`);
     }
   };

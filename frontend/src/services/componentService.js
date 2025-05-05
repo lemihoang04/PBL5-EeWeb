@@ -77,6 +77,61 @@ const fetchComponentById = async (componentId) => {
   }
 };
 
+const fetchCompatibleCpuCoolers = async (cpuSocket) => {
+  try {
+    const response = await axios.get(`/cpu-coolers/compatible/${cpuSocket}`);
+    
+    // Check if we have valid data
+    if (response && Array.isArray(response)) {
+      console.log(`Received ${response.length} compatible CPU coolers`);
+      return response;
+    } else if (response && typeof response === 'object') {
+      console.log('Compatible CPU coolers data:', response);
+      return response;
+    } else {
+      console.error('Invalid data format:', response);
+      return { error: 'Invalid data format from server' };
+    }
+  } catch (error) {
+    console.error(`Error fetching compatible CPU coolers for socket ${cpuSocket}:`, {
+      message: error.message,
+      status: error.response?.status,
+      data: error.response?.data,
+    });
+    return { 
+      error: error.response?.data?.error || `Failed to fetch compatible CPU coolers for socket ${cpuSocket}`,
+      status: error.response?.status
+    };
+  }
+};
+
+const fetchCompatibleMainboards = async (cpuSocket) => {
+  try {
+    const response = await axios.get(`/mainboards/compatible/${cpuSocket}`);
+    
+    // Check if we have valid data
+    if (response && Array.isArray(response)) {
+      console.log(`Received ${response.length} compatible Mainboards`);
+      return response;
+    } else if (response && typeof response === 'object') {
+      console.log('Compatible Mainboards data:', response);
+      return response;
+    } else {
+      console.error('Invalid data format:', response);
+      return { error: 'Invalid data format from server' };
+    }
+  } catch (error) {
+    console.error(`Error fetching compatible Mainboards for socket ${cpuSocket}:`, {
+      message: error.message,
+      status: error.response?.status,
+      data: error.response?.data,
+    });
+    return { 
+      error: error.response?.data?.error || `Failed to fetch compatible Mainboards for socket ${cpuSocket}`,
+      status: error.response?.status
+    };
+  }
+};
 
 
-export { fetchComponents, fetchComponentById };
+export { fetchComponents, fetchComponentById, fetchCompatibleCpuCoolers, fetchCompatibleMainboards };
