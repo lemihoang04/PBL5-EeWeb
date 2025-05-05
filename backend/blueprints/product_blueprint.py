@@ -3,6 +3,18 @@ from DAL.product_dal import *
 
 product_blueprint = Blueprint('product', __name__)
 
+@product_blueprint.route("/products", methods=["GET"])
+def get_all_products():
+    try:
+        products, status = dal_get_all_products()
+        if status == 200:
+            return jsonify(products), 200
+        else:
+            return jsonify(products), status
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
 @product_blueprint.route("/filters", methods=["GET"])
 def get_filters():
     try:
@@ -50,15 +62,6 @@ def get_component_by_id(product_id):
     except Exception as e:
         return jsonify({"error": str(e)}), 500  
     
-<<<<<<< HEAD
-@product_blueprint.route("/products", methods=["GET"])
-def get_all_products():
-    try:
-        products = dal_get_all_products()
-        return jsonify(products), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-=======
 @product_blueprint.route("/components/<string:type>", methods=["GET"])
 def get_components(type):
     """
@@ -157,4 +160,3 @@ def get_components(type):
 #     except Exception as e:
 #         print(f"Error in get_compatible_cpu_coolers: {e}")
 #         return jsonify({"error": str(e)}), 500
->>>>>>> 0fc7324a961e590c11b1f487e1afd6a462b1ce34

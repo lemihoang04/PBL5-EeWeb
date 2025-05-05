@@ -281,15 +281,25 @@ const ComponentInfo = () => {
             <h2 className="section-title">Specifications</h2>
             <div className="specs-container">
               {componentInfo?.attributes ? (
-                componentInfo.attributes.split(",").map((attr, index) => {
-                  const [name, value] = attr.split(":");
-                  return (
+                typeof componentInfo.attributes === 'string' ? (
+                  componentInfo.attributes.split(",").map((attr, index) => {
+                    const [name, value] = attr.split(":");
+                    return (
+                      <div className="spec-item" key={index}>
+                        <div className="spec-name">{name}</div>
+                        <div className="spec-value">{value}</div>
+                      </div>
+                    );
+                  })
+                ) : (
+                  // Handle case where attributes is an object
+                  Object.entries(componentInfo.attributes).map(([name, value], index) => (
                     <div className="spec-item" key={index}>
                       <div className="spec-name">{name}</div>
-                      <div className="spec-value">{value}</div>
+                      <div className="spec-value">{String(value)}</div>
                     </div>
-                  );
-                })
+                  ))
+                )
               ) : (
                 <p>No specifications available.</p>
               )}

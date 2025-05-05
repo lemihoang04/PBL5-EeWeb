@@ -3,6 +3,31 @@ import pandas as pd
 import json
 import mysql.connector
 
+def dal_get_all_products():
+    db = get_db_connection()
+    try:
+        query = """
+        SELECT 
+            p.product_id,
+            p.title,
+            p.price,
+            p.stock,
+            p.rating,
+            p.description,
+            p.image,
+            p.created_at,
+            p.updated_at,
+            c.category_name
+        FROM products p
+        JOIN categories c ON p.category_id = c.category_id
+        """
+        df = pd.read_sql_query(query, db)
+        return df.to_dict(orient="records"), 200
+    except Exception as e:
+        return {"error": str(e)}, 500
+    finally:
+        db.close()
+
 def dal_get_filters():
     db = get_db_connection()
     cursor = db.cursor(dictionary=True)
@@ -220,9 +245,6 @@ def get_products(limit=None):
         cursor.close()
         connection.close()
 
-<<<<<<< HEAD
-def dal_get_all_products():
-=======
 def get_product_by_id(product_id):
     connection = get_db_connection()
     cursor = connection.cursor(dictionary=True)
@@ -484,16 +506,12 @@ def dal_get_components_by_attributes(type, attributes=None):
     
     print(f"Getting components of type: {type} with attributes: {attributes}")
 
->>>>>>> 0fc7324a961e590c11b1f487e1afd6a462b1ce34
     db = get_db_connection()
     if not db:
         return {'error': 'Database connection failed'}, 500
 
     cursor = db.cursor(dictionary=True)
     try:
-<<<<<<< HEAD
-        query = """
-=======
         params = [type]
         joins = ""
         conditions = ""
@@ -512,7 +530,6 @@ def dal_get_components_by_attributes(type, attributes=None):
                     params.extend([attr_name, attr_value])
 
         query = f"""
->>>>>>> 0fc7324a961e590c11b1f487e1afd6a462b1ce34
         SELECT 
             p.product_id,
             p.title,
@@ -524,15 +541,6 @@ def dal_get_components_by_attributes(type, attributes=None):
             p.created_at,
             p.updated_at,
             c.category_name,
-<<<<<<< HEAD
-            c.category_id
-        FROM products p
-        JOIN categories c ON p.category_id = c.category_id
-        """
-        cursor.execute(query)
-        products = cursor.fetchall()
-        return products
-=======
             IFNULL(pa_group.attributes, '') AS attributes
         FROM products p
         JOIN categories c ON p.category_id = c.category_id
@@ -568,14 +576,10 @@ def dal_get_components_by_attributes(type, attributes=None):
             return {"message": f"No components found for {type} with the specified attributes"}, 404
         
         return components, 200
->>>>>>> 0fc7324a961e590c11b1f487e1afd6a462b1ce34
     except mysql.connector.Error as err:
         return {"error": str(err)}, 500
     finally:
         cursor.close()
-<<<<<<< HEAD
-        db.close()
-=======
         db.close()
 def get_products_from_db_by_query(query=None):
     connection = get_db_connection()
@@ -594,4 +598,3 @@ def get_products_from_db_by_query(query=None):
     cursor.close()
     connection.close()
     return products
->>>>>>> 0fc7324a961e590c11b1f487e1afd6a462b1ce34
