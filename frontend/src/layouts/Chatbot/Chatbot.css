@@ -3,8 +3,8 @@
     position: fixed;
     bottom: 15px;
     right: 15px;
-    z-index: 1000;
-    font-family: 'Roboto', 'Segoe UI', sans-serif;
+    z-index: 100;
+    /* font-family: 'Roboto', 'Segoe UI', sans-serif; */
 }
 
 /* Chatbot Toggle Button */
@@ -64,7 +64,7 @@
     position: absolute;
     bottom: 65px;
     right: 0;
-    width: 280px;
+    width: 300px;
     height: 340px;
     background-color: white;
     border-radius: 10px;
@@ -73,6 +73,11 @@
     flex-direction: column;
     overflow: hidden;
     transition: all 0.3s ease;
+}
+
+/* Position adjustment when button is hidden */
+.chatbot-window-no-button {
+    bottom: 15px;
 }
 
 /* Chatbot Header */
@@ -157,6 +162,18 @@
     font-size: 13px;
 }
 
+.message-text h2 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.message-text h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 500;
+}
+
 .message.user .message-text {
     background-color: #4299e1;
     color: white;
@@ -223,6 +240,74 @@
     border-radius: 18px;
     margin-right: 8px;
     font-size: 13px;
+    transition: all 0.3s ease;
+    outline: none;
+    /* Remove default focus outline */
+}
+
+.chatbot-input input:focus {
+    border-color: transparent;
+    /* Hide the standard border */
+    box-shadow: 0 0 0 2px transparent;
+    /* Create space for the gradient */
+    background-image:
+        linear-gradient(white, white),
+        linear-gradient(45deg,
+            #ff0000 0%,
+            #ff8000 14%,
+            #ffff00 28%,
+            #00ff00 42%,
+            #00ffff 56%,
+            #0000ff 70%,
+            #8000ff 84%,
+            #ff0080 100%);
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+    animation: rainbowRotate 3s linear infinite, borderPulse 2s ease infinite;
+}
+
+@keyframes rainbowRotate {
+    0% {
+        background-image:
+            linear-gradient(white, white),
+            linear-gradient(45deg,
+                #ff0000 0%,
+                #ff8000 14%,
+                #ffff00 28%,
+                #00ff00 42%,
+                #00ffff 56%,
+                #0000ff 70%,
+                #8000ff 84%,
+                #ff0080 100%);
+    }
+
+    100% {
+        background-image:
+            linear-gradient(white, white),
+            linear-gradient(405deg,
+                #ff0000 0%,
+                #ff8000 14%,
+                #ffff00 28%,
+                #00ff00 42%,
+                #00ffff 56%,
+                #0000ff 70%,
+                #8000ff 84%,
+                #ff0080 100%);
+    }
+}
+
+@keyframes borderPulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(66, 153, 225, 0.4);
+    }
+
+    70% {
+        box-shadow: 0 0 0 6px rgba(66, 153, 225, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(66, 153, 225, 0);
+    }
 }
 
 .chatbot-input button {
@@ -247,6 +332,30 @@
 .chatbot-input button:disabled {
     background-color: #a0aec0;
     cursor: not-allowed;
+}
+
+/* Fix for markdown extra line break */
+.markdown-content>p:last-child {
+    margin-bottom: 0;
+}
+
+.markdown-content>p:only-child {
+    margin: 0;
+}
+
+.markdown-wrapper {
+    display: inline-block;
+    width: 100%;
+}
+
+.markdown-wrapper p {
+    margin: 0;
+    padding: 0;
+}
+
+/* If there are multiple paragraphs, only add spacing between them */
+.markdown-wrapper p+p {
+    margin-top: 0.5em;
 }
 
 /* Responsive Design */

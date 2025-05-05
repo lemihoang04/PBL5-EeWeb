@@ -38,7 +38,15 @@ def get_laptops():
 #             return jsonify(components), status
 #     except Exception as e:
 #         return jsonify({"error": str(e)}), 500
-    
+@product_blueprint.route("/getallproduct", methods=["GET"])
+def get_all_product():
+    try:
+        products = get_products_from_db_by_query()
+        return jsonify(products), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
 @product_blueprint.route("/components/<int:product_id>", methods=["GET"])
 def get_component_by_id(product_id):
     try:
