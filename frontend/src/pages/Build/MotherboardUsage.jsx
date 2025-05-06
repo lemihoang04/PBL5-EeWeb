@@ -43,8 +43,8 @@ const MotherboardUsage = ({ motherboard, rams, cpu, storages, gpus }) => {
 
   const ramSlots = motherboard.attributes?.["Memory Slots"] || 3;
   const m2Slots = countM2slot(motherboard.attributes?.["M.2 Slots"]);
-  const pcieX16Slots = motherboard.specs?.pcieX16Slots || 2;
-  const pcieX1Slots = motherboard.specs?.pcieX1Slots || 2;
+  const pcieX16Slots = motherboard.attributes?.["PCIe x16 Slots"] || 2;
+  const pcieX1Slots = motherboard.attributes?.["PCIe x1 Slots"] || 0;
   const socketType = motherboard.attributes?.["Socket/CPU"] || "Unknown";
 
   // Filter M.2 type storage devices
