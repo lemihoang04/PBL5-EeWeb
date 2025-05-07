@@ -8,6 +8,8 @@ const OrderManager = () => {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(false);
     const [selectedOrder, setSelectedOrder] = useState(null);
+    const [activeTab, setActiveTab] = useState("all");
+    const [filteredOrders, setFilteredOrders] = useState([]);
 
     const fetchOrders = async () => {
         setLoading(true);
@@ -15,6 +17,7 @@ const OrderManager = () => {
             const response = await GetOrdersData("all");
             if (response && response.errCode === 0) {
                 setOrders(response.orders || []);
+                filterOrdersByStatus(response.orders || [], activeTab);
             } else {
                 toast.error("Failed to fetch orders.");
             }
@@ -25,9 +28,26 @@ const OrderManager = () => {
         }
     };
 
+    const filterOrdersByStatus = (ordersData, status) => {
+        if (status === "all") {
+            setFilteredOrders(ordersData);
+        } else {
+            const filtered = ordersData.filter(order => order.status === status);
+            setFilteredOrders(filtered);
+        }
+    };
+
     useEffect(() => {
         fetchOrders();
     }, []);
+
+    useEffect(() => {
+        filterOrdersByStatus(orders, activeTab);
+    }, [activeTab, orders]);
+
+    const handleTabChange = (status) => {
+        setActiveTab(status);
+    };
 
     const handleCancelOrder = async (orderId) => {
         if (!window.confirm("Are you sure you want to cancel this order?")) return;
@@ -57,14 +77,45 @@ const OrderManager = () => {
         if (!status) return "";
         if (status === "cancelled") return "status-cancelled";
         if (status === "completed") return "status-completed";
+        if (status === "pending") return "status-pending";
         return "status-other";
     };
 
     return (
         <div className="admin-order-manager">
             <h2>Order Management</h2>
+            
+            <div className="order-status-tabs">
+                <button 
+                    className={`tab-btn ${activeTab === "all" ? "active" : ""}`} 
+                    onClick={() => handleTabChange("all")}
+                >
+                    All Orders
+                </button>
+                <button 
+                    className={`tab-btn ${activeTab === "pending" ? "active" : ""}`} 
+                    onClick={() => handleTabChange("pending")}
+                >
+                    Pending
+                </button>
+                <button 
+                    className={`tab-btn ${activeTab === "completed" ? "active" : ""}`} 
+                    onClick={() => handleTabChange("completed")}
+                >
+                    Completed
+                </button>
+                <button 
+                    className={`tab-btn ${activeTab === "cancelled" ? "active" : ""}`} 
+                    onClick={() => handleTabChange("cancelled")}
+                >
+                    Cancelled
+                </button>
+            </div>
+
             {loading ? (
                 <div>Loading orders...</div>
+            ) : filteredOrders.length === 0 ? (
+                <div className="no-orders-message">No {activeTab !== "all" ? activeTab : ""} orders found</div>
             ) : (
                 <table className="order-table">
                     <thead>
@@ -78,7 +129,7 @@ const OrderManager = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {orders.map((order) => (
+                        {filteredOrders.map((order) => (
                             <tr key={order.order_id || order.id}>
                                 <td>{order.order_id || order.id}</td>
                                 <td>{order.user_name || order.userId || "N/A"}</td>

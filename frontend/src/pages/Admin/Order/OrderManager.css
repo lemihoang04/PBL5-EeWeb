@@ -7,6 +7,43 @@
     box-shadow: 0 2px 12px rgba(0,0,0,0.08);
 }
 
+.order-status-tabs {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    border-bottom: 1px solid #eaeaea;
+    padding-bottom: 10px;
+}
+
+.tab-btn {
+    padding: 8px 20px;
+    border: none;
+    border-radius: 6px;
+    background: #f5f7fa;
+    cursor: pointer;
+    font-size: 15px;
+    color: #555;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.tab-btn:hover {
+    background: #e3eafc;
+    color: #1976d2;
+}
+
+.tab-btn.active {
+    background: #1976d2;
+    color: white;
+}
+
+.no-orders-message {
+    margin: 30px 0;
+    text-align: center;
+    color: #666;
+    font-size: 16px;
+}
+
 .order-table {
     width: 100%;
     border-collapse: collapse;
@@ -45,6 +82,11 @@
 .status-completed {
     background: #e6f4ea;
     color: #388e3c;
+}
+
+.status-pending {
+    background: #fff8e6;
+    color: #f57c00;
 }
 
 .status-other {

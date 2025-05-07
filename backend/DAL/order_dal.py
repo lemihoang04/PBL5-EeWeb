@@ -73,9 +73,17 @@ def cancel_order(order_id):
         raise Exception("Database connection failed")
     cursor = connection.cursor()
     try:
+        # First try to update using the id column
         cursor.execute("""
-            UPDATE `order` SET status = %s WHERE id = %s
+            UPDATE `Order` SET status = %s WHERE id = %s
         """, ('cancelled', order_id))
+        
+        # If no rows were updated, try with order_id instead
+        if cursor.rowcount == 0:
+            cursor.execute("""
+                UPDATE `Order` SET status = %s WHERE order_id = %s
+            """, ('cancelled', order_id))
+            
         connection.commit()
         return cursor.rowcount  
     except Error as e:
