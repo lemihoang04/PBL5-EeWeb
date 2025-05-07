@@ -131,7 +131,36 @@ const fetchCompatibleMainboards = async (cpuSocket) => {
       status: error.response?.status
     };
   }
+
+};
+
+const fetchCompatibleRam = async (memory_type) => {
+  try {
+    const response = await axios.get(`/ram/compatible/${memory_type}`);
+    console.log('Response:', response);
+    // Check if we have valid data
+    if (response && Array.isArray(response)) {
+      console.log(`Received ${response.length} compatible RAM modules`);
+      return response;
+    } else if (response && typeof response === 'object') {
+      console.log('Compatible RAM data:', response);
+      return response;
+    } else {
+      console.error('Invalid data format:', response);
+      return { error: 'Invalid data format from server' };
+    }
+  } catch (error) {
+    console.error(`Error fetching compatible RAM for mainboard ID ${memory_type}:`, {
+      message: error.message,
+      status: error.response?.status,
+      data: error.response?.data,
+    });
+    return { 
+      error: error.response?.data?.error || `Failed to fetch compatible RAM for mainboard ID ${memory_type}`,
+      status: error.response?.status
+    };
+  }
 };
 
 
-export { fetchComponents, fetchComponentById, fetchCompatibleCpuCoolers, fetchCompatibleMainboards };
+export { fetchComponents, fetchComponentById, fetchCompatibleCpuCoolers, fetchCompatibleMainboards, fetchCompatibleRam };

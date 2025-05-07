@@ -195,3 +195,26 @@ def get_compatible_mainboards(cpu_socket):
         print(f"Error in get_compatible_mainboards: {e}")
         return jsonify({"error": str(e)}), 500
 
+@product_blueprint.route("/ram/compatible/<string:memory_type>", methods=["GET"])
+def get_compatible_Ram(memory_type):
+    """
+    API route to get Mainboards compatible with a specific CPU socket.
+    
+    Args:
+        cpu_socket (str): The CPU socket to match (e.g., 'AM4', 'LGA1700')
+    
+    Returns:
+        JSON response with compatible Mainboards or error message.
+    """
+    try:
+        # Call the DAL function to get compatible mainboards
+        ram, status = dal_RAM_vs_Mainboard(memory_type)
+        
+        # Return the result
+        if status == 200:
+            return jsonify(ram), 200
+        else:
+            return jsonify(ram), status
+    except Exception as e:
+        print(f"Error in get_compatible_mainboards: {e}")
+        return jsonify({"error": str(e)}), 500

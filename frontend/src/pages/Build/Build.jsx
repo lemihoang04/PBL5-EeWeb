@@ -134,6 +134,20 @@ const Build = () => {
         navigate(`/components/mainboard`);
       }
     }
+    else if (componentId === 'ram') {
+      // Check if Mainboard has been selected
+      const selectedMainboard = components.find((component) => component.id === 'Mainboard')?.selected;
+      
+      // If Mainboard is selected, navigate to RAM with memory type filter
+      if (selectedMainboard) {
+        console.log('Selected Mainboard:', selectedMainboard['attributes']['Memory Type']);
+        // Navigate to RAM with Memory Type parameter
+        navigate(`/components/ram?memory_type=${selectedMainboard['attributes']['Memory Type']}`);
+      } else {
+        // Navigate to regular RAM selection
+        navigate(`/components/ram`);
+      }
+    }
     else {
       navigate(`/components/${componentId}`);
     }

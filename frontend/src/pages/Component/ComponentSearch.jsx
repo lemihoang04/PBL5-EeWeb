@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { fetchCompatibleCpuCoolers, fetchCompatibleMainboards, fetchComponents } from '../../services/componentService';
+import { fetchCompatibleCpuCoolers, fetchCompatibleMainboards, fetchComponents, fetchCompatibleRam } from '../../services/componentService';
 import './ComponentSearch.css';
 import { fetchComponentById } from '../../services/componentService';
 
@@ -128,17 +128,23 @@ const ComponentSearch = () => {
       const searchParams = new URLSearchParams(window.location.search);
       const queryFilters = {};
       let cpuSocket = null;
+      let memory_type = null;
       
       // Chuyển đổi query params thành bộ lọc
       for (const [key, value] of searchParams.entries()) {
         if (key === 'cpu_socket') {
           cpuSocket = value;
-        } else if (key !== 'type') { // Bỏ qua tham số 'type' nếu có
+        }
+        else if (key === 'memory_type') {
+          memory_type = value;
+        }
+        else if (key !== 'type') { // Bỏ qua tham số 'type' nếu có
           queryFilters[key] = value;
         }
+        
       }
       
-      console.log('Filtering components with:', queryFilters);
+      console.log('Filtering components with:', memory_type);
       
       let data;
       
@@ -150,6 +156,10 @@ const ComponentSearch = () => {
       else if (normalizedType === 'Mainboard' && cpuSocket) {
         console.log(`Fetching compatible Mainboard for socket: ${cpuSocket}`);
         data = await fetchCompatibleMainboards(cpuSocket);
+      }
+      else if (normalizedType === 'RAM' && memory_type) {
+        console.log(`Fetching compatible RAM for memory type: ${memory_type}`);
+        data = await fetchCompatibleRam(memory_type);
       }
       else {
         // Sử dụng API lấy component thông thường

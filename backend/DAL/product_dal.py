@@ -535,6 +535,48 @@ def dal_Mainboard_vs_CPU(cpu_socket):
     finally:
         db.close()
 
+def dal_RAM_vs_Mainboard(memory_type):
+    """
+    Get product IDs of RAMs compatible with a specific Mainboard memory type.
+    
+    Args:
+        memory_type (str): The memory type to match (e.g., 'DDR4', 'DDR5')
+    
+    Returns:
+        tuple: (products, status_code)
+            products: List of compatible RAMs with details or error message
+            status_code: HTTP status code
+    """
+    db = get_db_connection()
+    if not db:
+        return {'error': 'Database connection failed'}, 500
+
+    try:
+        # Query to find RAMs compatible with the given memory type
+        query = """
+        SELECT DISTINCT pa.product_id
+        FROM product_attributes pa
+        JOIN products p ON pa.product_id = p.product_id
+        WHERE p.category_id = 16  
+          AND pa.attribute_name = 'Speed'
+          AND pa.attribute_value LIKE %s
+        """
+
+        # Use pandas to read data from database
+        df = pd.read_sql_query(query, db, params=(f"%{memory_type}%",))
+
+        # Get product IDs list
+        product_ids = df['product_id'].tolist()
+
+        # Return detailed product information using existing function
+        return dal_get_products_by_ids(product_ids)
+
+    except Exception as e:
+        return {'error': str(e)}, 500
+
+    finally:
+        db.close()
+
 
 def dal_get_components_by_attributes(type, attributes=None):
     """

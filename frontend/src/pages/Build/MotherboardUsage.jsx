@@ -46,6 +46,11 @@ const MotherboardUsage = ({ motherboard, rams, cpu, storages, gpus }) => {
   const pcieX16Slots = motherboard.attributes?.["PCIe x16 Slots"] || 2;
   const pcieX1Slots = motherboard.attributes?.["PCIe x1 Slots"] || 0;
   const socketType = motherboard.attributes?.["Socket/CPU"] || "Unknown";
+  const sataPorts = motherboard.attributes?.["SATA 6.0 Gb/s"] || 0;
+
+  // Extract Rams spect
+  
+
 
   // Filter M.2 type storage devices
   const m2Storages = storages.filter(storage =>
@@ -60,7 +65,7 @@ const MotherboardUsage = ({ motherboard, rams, cpu, storages, gpus }) => {
   // Function to safely get images with fallbacks
   const getSafeImage = (item, defaultImage) => {
     try {
-      console.log(item['attributes']['M.2 Slots']);
+      
       return item?.image || defaultImage;
     } catch (error) {
       console.error("Error accessing image property:", error);
@@ -137,7 +142,7 @@ const MotherboardUsage = ({ motherboard, rams, cpu, storages, gpus }) => {
                   />
                   <div className="component-name">
                     {getSafeName(cpu, "CPU")}
-                    <div className="component-specs">{cpu.specs?.cores || 'N/A'} cores, {cpu.specs?.frequency || 'N/A'}</div>
+                    {/* <div className="component-specs">{cpu.specs?.cores || 'N/A'} cores, {cpu.specs?.frequency || 'N/A'}</div> */}
                   </div>
                 </div>
               ) : (
@@ -170,9 +175,9 @@ const MotherboardUsage = ({ motherboard, rams, cpu, storages, gpus }) => {
                     />
                     <div className="component-name">
                       {getSafeName(rams[index], "RAM")}
-                      <div className="component-specs">
+                      {/* <div className="component-specs">
                         {rams[index].specs?.capacity || 'N/A'}, {rams[index].specs?.speed || 'N/A'}
-                      </div>
+                      </div> */}
                     </div>
                   </div>
                 ) : (
@@ -232,13 +237,13 @@ const MotherboardUsage = ({ motherboard, rams, cpu, storages, gpus }) => {
 
         <div className="mb-section">
           <div className="section-header">
-            <span className="section-icon">💿</span> SATA Port ({ramSlots} slots)
+            <span className="section-icon">💿</span> SATA Port ({sataPorts} slots)
           </div>
           <div className="section-content">
             {/* Dynamically generate RAM slots based on motherboard specs */}
             {Array.from({ length: ramSlots }, (_, index) => (
               <div className="memory-item" key={`ram-${index}`}>
-                <div className="memory-label">RAM_{index + 1} (DDR4)</div>
+                <div className="memory-label">SATA_{index + 1} (6.0 Gb/s)</div>
                 <div className="memory-connection"></div>
                 {rams && index < rams.length ? (
                   <div className="component-item">
@@ -253,13 +258,13 @@ const MotherboardUsage = ({ motherboard, rams, cpu, storages, gpus }) => {
                     />
                     <div className="component-name">
                       {getSafeName(rams[index], "RAM")}
-                      <div className="component-specs">
+                      {/* <div className="component-specs">
                         {rams[index].specs?.capacity || 'N/A'}, {rams[index].specs?.speed || 'N/A'}
-                      </div>
+                      </div> */}
                     </div>
                   </div>
                 ) : (
-                  <div className="component-empty">No RAM selected</div>
+                  <div className="component-empty">No SATA 6.0 Gb/s selected</div>
                 )}
               </div>
             ))}
