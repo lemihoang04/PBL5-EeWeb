@@ -3,6 +3,68 @@ import React, { useState, useEffect } from 'react';
 import './Build.css';
 import MotherboardUsage from './MotherboardUsage';
 
+// Helper function to parse memory capacity and convert to GB
+function parseMemoryToGB(memoryString) {
+  if (!memoryString) return 0;
+  
+  // Extract numeric part and unit
+  const match = memoryString.match(/(\d+)\s*([GMK]B)/i);
+  if (!match) return 0;
+  
+  const value = parseInt(match[1], 10);
+  const unit = match[2].toUpperCase();
+  
+  // Convert to GB
+  switch (unit) {
+    case 'KB': return value / (1024 * 1024);
+    case 'MB': return value / 1024;
+    case 'GB': return value;
+    default: return value;
+  }
+}
+
+// Function to calculate total RAM capacity from modules
+function calculateTotalRAMCapacity(rams) {
+  let totalGB = 0;
+  
+  rams.forEach(ram => {
+    if (!ram || !ram.attributes || !ram.attributes["Modules"]) return;
+    
+    const modulesStr = ram.attributes["Modules"];
+    // Expected format: "2 x 8GB", extract numbers
+    const match = modulesStr.match(/(\d+)\s*x\s*(\d+)\s*([GMK]B)/i);
+    if (match && match[1] && match[2] && match[3]) {
+      const moduleCount = parseInt(match[1], 10);
+      const moduleSize = parseInt(match[2], 10);
+      const unit = match[3].toUpperCase();
+      
+      // Convert to GB and add to total
+      let sizeInGB = moduleSize;
+      switch (unit) {
+        case 'KB': sizeInGB = moduleSize / (1024 * 1024); break;
+        case 'MB': sizeInGB = moduleSize / 1024; break;
+      }
+      
+      totalGB += moduleCount * sizeInGB;
+    }
+  });
+  
+  return totalGB;
+}
+
+// Function to extract module count from RAM's Modules attribute
+function getModuleCount(ram) {
+  if (!ram || !ram.attributes || !ram.attributes["Modules"]) return 1; // Default to 1 if not specified
+  
+  const modulesStr = ram.attributes["Modules"];
+  // Expected format: "2 x 8GB", extract the first number
+  const match = modulesStr.match(/^(\d+)\s*x/);
+  if (match && match[1]) {
+    return parseInt(match[1], 10);
+  }
+  return 1; // Default to 1 if parsing fails
+}
+
 const Build = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -43,6 +105,9 @@ const Build = () => {
     { type: 'disclaimer', message: 'Some physical constraints are not checked, such as RAM clearance with CPU Coolers.' }
   ]);
 
+  // Memory compatibility check state
+  const [memoryCompatible, setMemoryCompatible] = useState(true);
+
   const calculateTotalPrice = () => {
     return components.reduce((sum, component) => {
       if (!component.selected) return sum;
@@ -73,19 +138,45 @@ const Build = () => {
   // Update compatibility issues whenever components change
   useEffect(() => {
     const issues = [];
+    let isCompatible = true;
 
     // Check RAM compatibility
     const motherboard = components.find(c => c.id === 'Mainboard')?.selected;
     const rams = components.find(c => c.id === 'ram')?.selected || [];
 
     if (motherboard && rams.length > 0) {
-      const ramSlots = motherboard.specs?.memorySlots || 4;
-      if (rams.length > ramSlots) {
+      // Calculate total RAM modules using getModuleCount
+      const totalRamModules = rams.reduce((sum, ram) => {
+        return sum + getModuleCount(ram);
+      }, 0);
+      
+      // Check RAM slot count against total module count
+      const ramSlots = motherboard.specs?.memorySlots || motherboard.attributes?.["Memory Slots"] || 4;
+      if (totalRamModules > ramSlots) {
         issues.push({
           type: 'problem',
-          message: `Your motherboard only supports ${ramSlots} RAM modules, but you've selected ${rams.length}.`
+          message: `Your motherboard only supports ${ramSlots} RAM modules, but you've selected ${totalRamModules} modules in total.`
         });
+        isCompatible = false; // RAM slots exceeded, set compatibility to false
       }
+
+      // Check RAM capacity against motherboard max memory
+      const maxMemoryStr = motherboard.attributes?.["Memory Max"];
+      if (maxMemoryStr) {
+        const maxMemoryGB = parseMemoryToGB(maxMemoryStr);
+        const totalRAMCapacityGB = calculateTotalRAMCapacity(rams);
+        
+        if (totalRAMCapacityGB > maxMemoryGB) {
+          issues.push({
+            type: 'problem',
+            message: `Total RAM capacity (${totalRAMCapacityGB}GB) exceeds motherboard maximum (${maxMemoryGB}GB).`
+          });
+          isCompatible = false; // RAM capacity exceeded, set compatibility to false
+        }
+      }
+
+      // Set memory compatibility based on all checks above
+      setMemoryCompatible(isCompatible);
 
       // Add the standard disclaimer
       issues.push({
@@ -99,6 +190,7 @@ const Build = () => {
         type: 'disclaimer',
         message: 'Some physical constraints are not checked, such as RAM clearance with CPU Coolers.'
       });
+      setMemoryCompatible(true);
     }
 
     setCompatibilityIssues(issues);
@@ -205,7 +297,7 @@ const Build = () => {
 
   return (
     <div className="build-container">
-      <div className="header">
+      <div className={`header ${!memoryCompatible ? 'incompatible' : ''}`}>
         <div className="compatibility">
           <span className="icon">📋</span>
           <span className="label">Compatibility:</span>

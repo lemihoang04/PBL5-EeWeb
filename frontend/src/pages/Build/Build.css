@@ -19,6 +19,12 @@
   background: linear-gradient(135deg, #19a463 0%, #0f7b48 100%);
   color: white;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: background 0.3s ease;
+}
+
+.header.incompatible {
+  background: linear-gradient(135deg, #e53935 0%, #c62828 100%);
+  box-shadow: 0 4px 10px rgba(229, 57, 53, 0.3);
 }
 
 .compatibility {
