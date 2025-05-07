@@ -192,7 +192,7 @@ const ProductInfo = () => {
                 </span>
               </div>
 
-              <div className="product-id">ID: {productInfo?.id || 'N/A'}</div>
+              {/* <div className="product-id">ID: {productInfo?.id || 'N/A'}</div> */}
             </div>
           </div>
 

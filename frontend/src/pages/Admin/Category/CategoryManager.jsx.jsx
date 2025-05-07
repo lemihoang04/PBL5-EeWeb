@@ -1,21 +1,23 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
-import "./CategoryManager.css"; // Tạo file CSS nếu cần
+import "./CategoryManager.css";
 import axios from "../../../setup/axios";
 
 const CategoryManager = () => {
     const [categories, setCategories] = useState([]);
     const [newCategory, setNewCategory] = useState("");
+    const [newDescription, setNewDescription] = useState("");
     const [editingId, setEditingId] = useState(null);
     const [editingName, setEditingName] = useState("");
+    const [editingDescription, setEditingDescription] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
+    const [searchTerm, setSearchTerm] = useState("");
 
-    // Lấy danh sách category từ backend
+    // Fetch categories from backend
     const fetchCategories = async () => {
+        setIsLoading(true);
         try {
             const res = await axios.get("/categories");
-            console.log("Raw response:", res); 
-                
-            // Kiểm tra nếu res là array thì dùng res, không thì dùng res.data
             const data = Array.isArray(res) ? res : res.data;
                 
             if (!data) {
@@ -33,8 +35,10 @@ const CategoryManager = () => {
             setCategories(data);
         } catch (error) {
             console.error("Error fetching categories:", error);
-            toast.error("Lỗi khi tải danh mục");
+            toast.error("Error loading categories");
             setCategories([]);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -42,122 +46,251 @@ const CategoryManager = () => {
         fetchCategories();
     }, []);
 
-    // Thêm category mới
+    // Add new category
     const handleAddCategory = async (e) => {
         e.preventDefault();
         if (!newCategory.trim()) {
-            toast.warning("Tên danh mục không được để trống");
+            toast.warning("Category name cannot be empty");
             return;
         }
+        
+        setIsLoading(true);
         try {
-            await axios.post("/categories", { name: newCategory });
-            toast.success("Thêm danh mục thành công");
+            await axios.post("/categories", { 
+                name: newCategory,
+                description: newDescription 
+            });
+            toast.success("Category added successfully");
             setNewCategory("");
+            setNewDescription("");
             fetchCategories();
         } catch (error) {
-            toast.error("Lỗi khi thêm danh mục");
+            toast.error("Error adding category");
+            console.error(error);
+        } finally {
+            setIsLoading(false);
         }
     };
 
-    // Xóa category
+    // Delete category
     const handleDelete = async (id) => {
-        if (!window.confirm("Bạn có chắc muốn xóa danh mục này?")) return;
+        if (!window.confirm("Are you sure you want to delete this category?")) return;
+        
+        setIsLoading(true);
         try {
             await axios.delete(`/categories/${id}`);
-            toast.success("Xóa danh mục thành công");
+            toast.success("Category deleted successfully");
             fetchCategories();
         } catch (error) {
-            toast.error("Lỗi khi xóa danh mục");
+            toast.error("Error deleting category");
+            console.error(error);
+        } finally {
+            setIsLoading(false);
         }
     };
 
-    // Bắt đầu chỉnh sửa
-    const handleEdit = (id, name) => {
+    // Start editing
+    const handleEdit = (id, name, description = "") => {
         setEditingId(id);
         setEditingName(name);
+        setEditingDescription(description || "");
     };
 
-    // Lưu chỉnh sửa
+    // Save edits
     const handleSaveEdit = async (id) => {
         if (!editingName.trim()) {
-            toast.warning("Tên danh mục không được để trống");
+            toast.warning("Category name cannot be empty");
             return;
         }
+        
+        setIsLoading(true);
         try {
-            await axios.put(`/categories/${id}`, { name: editingName });
-            toast.success("Cập nhật danh mục thành công");
+            await axios.put(`/categories/${id}`, { 
+                name: editingName,
+                description: editingDescription 
+            });
+            toast.success("Category updated successfully");
             setEditingId(null);
             setEditingName("");
+            setEditingDescription("");
             fetchCategories();
         } catch (error) {
-            toast.error("Lỗi khi cập nhật danh mục");
+            toast.error("Error updating category");
+            console.error(error);
+        } finally {
+            setIsLoading(false);
         }
     };
 
-    // Hủy chỉnh sửa
+    // Cancel edit
     const handleCancelEdit = () => {
         setEditingId(null);
         setEditingName("");
+        setEditingDescription("");
+    };
+
+    // Filter categories by search term
+    const filteredCategories = categories.filter(cat => 
+        cat.category_name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+        (cat.description && cat.description.toLowerCase().includes(searchTerm.toLowerCase()))
+    );
+
+    // Format date to be more readable
+    const formatDate = (dateString) => {
+        if (!dateString) return "N/A";
+        const date = new Date(dateString);
+        return date.toLocaleString();
     };
 
     return (
         <div className="category-manager-container">
-            <h2>Quản lý danh mục</h2>
-            <form className="category-add-form" onSubmit={handleAddCategory}>
-                <input
-                    type="text"
-                    placeholder="Tên danh mục mới"
-                    value={newCategory}
-                    onChange={(e) => setNewCategory(e.target.value)}
-                />
-                <button type="submit">Thêm</button>
-            </form>
-            <table className="category-table">
-                <thead>
-                    <tr>
-                    <th>ID</th>
-                    <th>Tên danh mục</th>
-                    <th>Mô tả</th>
-                    <th>Ngày tạo</th>
-                    <th>Ngày cập nhật</th>
-                    <th>Hành động</th>
-                    </tr>
-                </thead>
-                <tbody>
-                {categories.map((cat) => (
-                    <tr key={cat.category_id}>
-                        <td>{cat.category_id}</td>
-                        <td>
-                            {editingId === cat.category_id ? (
-                                <input
-                                    type="text"
-                                    value={editingName}
-                                    onChange={(e) => setEditingName(e.target.value)}
-                                />
-                            ) : (
-                                cat.category_name
-                            )}
-                        </td>
-                        <td>{cat.description}</td>
-                        <td>{cat.created_at}</td>
-                        <td>{cat.updated_at}</td>
-                        <td>
-                            {editingId === cat.category_id ? (
-                                <>
-                                    <button onClick={() => handleSaveEdit(cat.category_id)}>Lưu</button>
-                                    <button onClick={handleCancelEdit}>Hủy</button>
-                                </>
-                            ) : (
-                                <>
-                                    <button onClick={() => handleEdit(cat.category_id, cat.category_name)}>Sửa</button>
-                                    <button onClick={() => handleDelete(cat.category_id)}>Xóa</button>
-                                </>
-                            )}
-                        </td>
-                    </tr>
-                ))}
-            </tbody>
-            </table>
+            <div className="category-header">
+                <h2>Category Management</h2>
+                <div className="search-container">
+                    <input
+                        type="text"
+                        placeholder="Search categories..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="search-input"
+                    />
+                </div>
+            </div>
+
+            <div className="card">
+                <div className="card-header">
+                    <h3>Add New Category</h3>
+                </div>
+                <div className="card-body">
+                    <form className="category-add-form" onSubmit={handleAddCategory}>
+                        <div className="form-group">
+                            <label htmlFor="categoryName">Name</label>
+                            <input
+                                id="categoryName"
+                                type="text"
+                                placeholder="Category name"
+                                value={newCategory}
+                                onChange={(e) => setNewCategory(e.target.value)}
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="categoryDescription">Description</label>
+                            <textarea
+                                id="categoryDescription"
+                                placeholder="Category description (optional)"
+                                value={newDescription}
+                                onChange={(e) => setNewDescription(e.target.value)}
+                            />
+                        </div>
+                        <button 
+                            type="submit" 
+                            className="btn-primary"
+                            disabled={isLoading}
+                        >
+                            {isLoading ? "Adding..." : "Add Category"}
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div className="card mt-4">
+                <div className="card-header">
+                    <h3>Categories List</h3>
+                    <span className="category-count">{filteredCategories.length} categories</span>
+                </div>
+                <div className="card-body">
+                    {isLoading && <div className="loading-indicator">Loading...</div>}
+                    
+                    {!isLoading && filteredCategories.length === 0 && (
+                        <div className="empty-state">
+                            {searchTerm ? "No categories match your search" : "No categories available"}
+                        </div>
+                    )}
+                    
+                    {!isLoading && filteredCategories.length > 0 && (
+                        <div className="table-responsive">
+                            <table className="category-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Name</th>
+                                        <th>Description</th>
+                                        <th>Created</th>
+                                        <th>Updated</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {filteredCategories.map((cat) => (
+                                        <tr key={cat.category_id}>
+                                            <td>{cat.category_id}</td>
+                                            <td>
+                                                {editingId === cat.category_id ? (
+                                                    <input
+                                                        type="text"
+                                                        value={editingName}
+                                                        onChange={(e) => setEditingName(e.target.value)}
+                                                        className="edit-input"
+                                                    />
+                                                ) : (
+                                                    <span className="category-name">{cat.category_name}</span>
+                                                )}
+                                            </td>
+                                            <td>
+                                                {editingId === cat.category_id ? (
+                                                    <textarea
+                                                        value={editingDescription}
+                                                        onChange={(e) => setEditingDescription(e.target.value)}
+                                                        className="edit-textarea"
+                                                    />
+                                                ) : (
+                                                    <span className="category-description">{cat.description || "—"}</span>
+                                                )}
+                                            </td>
+                                            <td>{formatDate(cat.created_at)}</td>
+                                            <td>{formatDate(cat.updated_at)}</td>
+                                            <td className="actions-cell">
+                                                {editingId === cat.category_id ? (
+                                                    <>
+                                                        <button 
+                                                            onClick={() => handleSaveEdit(cat.category_id)}
+                                                            className="btn-save"
+                                                            disabled={isLoading}
+                                                        >
+                                                            Save
+                                                        </button>
+                                                        <button 
+                                                            onClick={handleCancelEdit}
+                                                            className="btn-cancel"
+                                                        >
+                                                            Cancel
+                                                        </button>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <button 
+                                                            onClick={() => handleEdit(cat.category_id, cat.category_name, cat.description)}
+                                                            className="btn-edit"
+                                                        >
+                                                            Edit
+                                                        </button>
+                                                        <button 
+                                                            onClick={() => handleDelete(cat.category_id)}
+                                                            className="btn-delete"
+                                                        >
+                                                            Delete
+                                                        </button>
+                                                    </>
+                                                )}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
+                </div>
+            </div>
         </div>
     );
 };

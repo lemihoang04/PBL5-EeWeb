@@ -136,16 +136,6 @@ def get_components_by_type(type):
             print(f"Getting all components of type: {type}")
             components, status = dal_get_components_by_attributes(type)
         
-<<<<<<< HEAD
-#         # Trả về kết quả
-#         if status == 200:
-#             return jsonify(coolers), 200
-#         else:
-#             return jsonify(coolers), status
-#     except Exception as e:
-#         print(f"Error in get_compatible_cpu_coolers: {e}")
-#         return jsonify({"error": str(e)}), 500
-=======
         # Phần code sau đây sẽ chạy sau khi đã gán giá trị cho components và status
         if status == 200:
             return jsonify(components), 200
@@ -203,4 +193,3 @@ def get_compatible_mainboards(cpu_socket):
     except Exception as e:
         print(f"Error in get_compatible_mainboards: {e}")
         return jsonify({"error": str(e)}), 500
->>>>>>> 7221ad255cf3439e9bd5417775a3ebaad8b39326
