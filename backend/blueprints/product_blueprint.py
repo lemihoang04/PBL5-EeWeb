@@ -193,6 +193,7 @@ def get_compatible_mainboards(cpu_socket):
     except Exception as e:
         print(f"Error in get_compatible_mainboards: {e}")
         return jsonify({"error": str(e)}), 500
+<<<<<<< HEAD
 
 @product_blueprint.route("/product/<int:product_id>", methods=["DELETE"])
 def delete_product(product_id):
@@ -210,3 +211,5 @@ def delete_product(product_id):
         return jsonify(result), status
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+=======
+>>>>>>> 102d18f6efb7d1bf55eccc781c48b4973b386def

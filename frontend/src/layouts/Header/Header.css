@@ -4,7 +4,7 @@
 
 /* Base styles and reset */
 .header-container {
-  font-family: 'Poppins', sans-serif;
+  /* font-family: 'Poppins', sans-serif; */
   --primary-color: #0070f3;
   --primary-hover: #0062d3;
   --light-bg: #f5f9ff;
