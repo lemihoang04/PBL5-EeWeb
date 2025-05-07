@@ -6,6 +6,19 @@ function countM2slot(input) {
   return input.split(',').length;
 }
 
+// Function to extract module count from RAM's Modules attribute
+function getModuleCount(ram) {
+  if (!ram || !ram.attributes || !ram.attributes["Modules"]) return 1; // Default to 1 if not specified
+  
+  const modulesStr = ram.attributes["Modules"];
+  // Expected format: "2 x 8GB", extract the first number
+  const match = modulesStr.match(/^(\d+)\s*x/);
+  if (match && match[1]) {
+    return parseInt(match[1], 10);
+  }
+  return 1; // Default to 1 if parsing fails
+}
+
 const MotherboardUsage = ({ motherboard, rams, cpu, storages, gpus }) => {
   const [animateSection, setAnimateSection] = useState(null);
 
@@ -40,7 +53,6 @@ const MotherboardUsage = ({ motherboard, rams, cpu, storages, gpus }) => {
   }
 
   // Extract motherboard specs - with error handling for missing properties
-
   const ramSlots = motherboard.attributes?.["Memory Slots"] || 3;
   const m2Slots = countM2slot(motherboard.attributes?.["M.2 Slots"]);
   const pcieX16Slots = motherboard.attributes?.["PCIe x16 Slots"] || 2;
@@ -48,9 +60,27 @@ const MotherboardUsage = ({ motherboard, rams, cpu, storages, gpus }) => {
   const socketType = motherboard.attributes?.["Socket/CPU"] || "Unknown";
   const sataPorts = motherboard.attributes?.["SATA 6.0 Gb/s"] || 0;
 
-  // Extract Rams spect
+  // Generate RAM modules array based on Modules attribute in each RAM
+  const ramModules = [];
+  let currentSlotIndex = 0;
   
-
+  for (const ram of rams) {
+    const moduleCount = getModuleCount(ram);
+    
+    // Add this RAM's modules to our tracking array
+    for (let i = 0; i < moduleCount; i++) {
+      if (currentSlotIndex < ramSlots) {
+        ramModules[currentSlotIndex] = ram;
+        currentSlotIndex++;
+      }
+    }
+  }
+  
+  // Fill remaining slots with null
+  while (currentSlotIndex < ramSlots) {
+    ramModules[currentSlotIndex] = null;
+    currentSlotIndex++;
+  }
 
   // Filter M.2 type storage devices
   const m2Storages = storages.filter(storage =>
@@ -65,7 +95,6 @@ const MotherboardUsage = ({ motherboard, rams, cpu, storages, gpus }) => {
   // Function to safely get images with fallbacks
   const getSafeImage = (item, defaultImage) => {
     try {
-      
       return item?.image || defaultImage;
     } catch (error) {
       console.error("Error accessing image property:", error);
@@ -142,7 +171,6 @@ const MotherboardUsage = ({ motherboard, rams, cpu, storages, gpus }) => {
                   />
                   <div className="component-name">
                     {getSafeName(cpu, "CPU")}
-                    {/* <div className="component-specs">{cpu.specs?.cores || 'N/A'} cores, {cpu.specs?.frequency || 'N/A'}</div> */}
                   </div>
                 </div>
               ) : (
@@ -162,10 +190,10 @@ const MotherboardUsage = ({ motherboard, rams, cpu, storages, gpus }) => {
               <div className="memory-item" key={`ram-${index}`}>
                 <div className="memory-label">RAM_{index + 1} (DDR4)</div>
                 <div className="memory-connection"></div>
-                {rams && index < rams.length ? (
+                {ramModules && index < ramModules.length && ramModules[index] ? (
                   <div className="component-item">
                     <img
-                      src={getSafeImage(rams[index], "/images/ram-placeholder.png")}
+                      src={getSafeImage(ramModules[index], "/images/ram-placeholder.png")}
                       alt="RAM"
                       className="component-image"
                       onError={(e) => {
@@ -174,10 +202,10 @@ const MotherboardUsage = ({ motherboard, rams, cpu, storages, gpus }) => {
                       }}
                     />
                     <div className="component-name">
-                      {getSafeName(rams[index], "RAM")}
-                      {/* <div className="component-specs">
-                        {rams[index].specs?.capacity || 'N/A'}, {rams[index].specs?.speed || 'N/A'}
-                      </div> */}
+                      {getSafeName(ramModules[index], "RAM")}
+                      <div className="component-specs">
+                        {ramModules[index].attributes?.["Modules"] || 'N/A'}
+                      </div>
                     </div>
                   </div>
                 ) : (
@@ -258,9 +286,6 @@ const MotherboardUsage = ({ motherboard, rams, cpu, storages, gpus }) => {
                     />
                     <div className="component-name">
                       {getSafeName(rams[index], "RAM")}
-                      {/* <div className="component-specs">
-                        {rams[index].specs?.capacity || 'N/A'}, {rams[index].specs?.speed || 'N/A'}
-                      </div> */}
                     </div>
                   </div>
                 ) : (
