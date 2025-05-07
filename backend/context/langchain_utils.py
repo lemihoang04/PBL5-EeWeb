@@ -1,5 +1,5 @@
 from langchain_experimental.agents import create_pandas_dataframe_agent
-from langchain_groq import ChatGroq  # Thêm import này
+from langchain_groq import ChatGroq 
 import pandas as pd
 from DAL.product_dal import get_products_from_db_by_query
 
@@ -7,8 +7,8 @@ def create_product_agent():
     products = get_products_from_db_by_query()
     df = pd.DataFrame(products)
     llm = ChatGroq(
-        groq_api_key="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",  # Thay bằng API key của bạn hoặc lấy từ biến môi trường
-        model_name="meta-llama/llama-4-scout-17b-16e-instruct",   # Hoặc model Groq khác bạn muốn dùng
+        groq_api_key="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",  
+        model_name="meta-llama/llama-4-scout-17b-16e-instruct",  
         temperature=0.1,
     )
     agent = create_pandas_dataframe_agent(

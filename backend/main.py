@@ -20,7 +20,7 @@ app.register_blueprint(cart_blueprint)
 app.register_blueprint(product_blueprint)
 app.register_blueprint(order_blueprint)
 app.register_blueprint(category_blueprint)
-app.register_blueprint(chatbot_blueprint)  # Thêm dòng này
+app.register_blueprint(chatbot_blueprint)  
 app.register_blueprint(review_blueprint)
 
 if __name__ == "__main__":

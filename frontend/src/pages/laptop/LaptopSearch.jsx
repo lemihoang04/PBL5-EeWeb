@@ -552,17 +552,19 @@ const LaptopSearch = () => {
             {renderFilterSection("Graphics Coprocessor", "graphicsCoprocessor", (
               <>
                 {[
-
-                  "Intel Iris Xe Graphics",
-                  "NVIDIA GeForce RTX 2060",
-                  "NVIDIA GeForce RTX 2070",
-                  "NVIDIA GeForce GTX 1650",
-                  "NVIDIA GeForce RTX 2080",
-                  "NVIDIA GeForce RTX 3050 Ti",
-                  "NVIDIA GeForce RTX 3070",
-                  "AMD Radeon Graphics",
+                  "NVIDIA GeForce RTX",
+                  "NVIDIA GeForce GTX",
                   "Intel UHD Graphics",
-                  "NVIDIA GeForce RTX 3060"
+                  "Intel Iris Xe Graphics",
+                  // "NVIDIA GeForce RTX 2060",
+                  // "NVIDIA GeForce RTX 2070",
+                  // "NVIDIA GeForce GTX 1650",
+                  // "NVIDIA GeForce RTX 2080",
+                  // "NVIDIA GeForce RTX 3050 Ti",
+                  // "NVIDIA GeForce RTX 3070",
+                  // "AMD Radeon Graphics",
+                  // "Intel UHD Graphics",
+                  // "NVIDIA GeForce RTX 3060"
                 ].map(gpu => (
                   <label key={gpu}>
                     <input

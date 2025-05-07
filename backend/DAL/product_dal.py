@@ -626,7 +626,7 @@ def get_products_from_db_by_query(query=None):
     connection = get_db_connection()
     cursor = connection.cursor(dictionary=True)
     sql = """
-        SELECT p.product_id, p.title AS product_name, c.category_name AS type, p.price, p.rating 
+        SELECT p.product_id, p.title AS product_name, c.category_name AS type, p.price
         FROM products p
         JOIN categories c ON p.category_id = c.category_id
         ORDER BY p.product_id ASC
