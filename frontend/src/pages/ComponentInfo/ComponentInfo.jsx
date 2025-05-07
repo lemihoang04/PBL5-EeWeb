@@ -317,7 +317,7 @@ const ComponentInfo = () => {
               <div
                 key={component.product_id}
                 className="similar-product-card"
-                onClick={() => navigate(`/component-info/${normalizeType}/${component.product_id}`)}
+                onClick={() => navigate(`/component-info/${normalizedType}/${component.product_id}`)}
               >
                 <div className="similar-product-img-container">
                   <img

@@ -358,99 +358,6 @@ def dal_get_products_by_ids(product_ids):
         cursor.close()
         db.close()
 
-# def dal_get_components_by_attributes(type, attributes=None):
-#     """
-#     Get components by type and optionally filter by specific attributes.
-    
-#     Args:
-#         type (str): The category name of the component (e.g., 'CPU', 'RAM')
-#         attributes (dict, optional): Dictionary of attributes to filter by, where
-#                                      keys are attribute names and values are attribute values.
-#                                      Example: {'brand': 'AMD', 'Core Count': '6'}
-    
-#     Returns:
-#         tuple: (components_data, status_code)
-#             components_data: List of components or error message
-#             status_code: HTTP status code
-#     """
-#     valid_types = ['Storage', 'PSU', 'Mainboard', 'GPU', 'CPU', 'RAM', 'CPU Cooler', 'Case']
-#     if type not in valid_types:
-#         return {"error": "Invalid component type"}, 400
-    
-#     print(f"Getting components of type: {type} with attributes: {attributes}")
-
-#     db = get_db_connection()
-#     if not db:
-#         return {'error': 'Database connection failed'}, 500
-
-#     cursor = db.cursor(dictionary=True)
-#     try:
-#         params = [type]
-#         joins = ""
-#         conditions = ""
-
-#         if attributes:
-#             for idx, (attr_name, attr_value) in enumerate(attributes.items()):
-#                 alias = f"pa{idx}"
-#                 joins += f" JOIN product_attributes {alias} ON p.product_id = {alias}.product_id"
-#                 conditions += f" AND {alias}.attribute_name = %s AND {alias}.attribute_value = %s"
-#                 params.extend([attr_name, attr_value])
-
-#         query = f"""
-#         SELECT 
-#             p.product_id,
-#             p.title,
-#             p.price,
-#             p.stock,
-#             p.rating,
-#             p.description,
-#             p.image,
-#             p.created_at,
-#             p.updated_at,
-#             c.category_name,
-#             IFNULL(pa_group.attributes, '') AS attributes
-#         FROM products p
-#         JOIN categories c ON p.category_id = c.category_id
-#         LEFT JOIN (
-#             SELECT 
-#                 product_id,
-#                 GROUP_CONCAT(CONCAT(attribute_name, ':', attribute_value) SEPARATOR '; ') AS attributes
-#             FROM 
-#                 product_attributes
-#             GROUP BY 
-#                 product_id
-#         ) pa_group ON p.product_id = pa_group.product_id
-#         {joins}
-#         WHERE c.category_name = %s
-#         {conditions}
-#         GROUP BY p.product_id
-#         """
-
-#         cursor.execute(query, params)
-#         components = cursor.fetchall()
-
-#         # Parse attributes string into dict
-#         for component in components:
-#             attrs = {}
-#             if component.get('attributes'):
-#                 for pair in component['attributes'].split('; '):
-#                     if ':' in pair:
-#                         key, value = pair.split(':', 1)
-#                         attrs[key.strip()] = value.strip()
-#             component['attributes'] = attrs
-
-#         if not components:
-#             return {"message": f"No components found for {type} with the specified attributes"}, 404
-        
-#         return components, 200
-#     except mysql.connector.Error as err:
-#         return {"error": str(err)}, 500
-#     finally:
-#         cursor.close()
-#         db.close()
-
-
-
 def dal_CPU_Cooler_vs_CPU(cpu_socket):
     """
     Get product IDs of CPU Coolers compatible with a specific CPU socket.
@@ -622,6 +529,7 @@ def dal_get_components_by_attributes(type, attributes=None):
     finally:
         cursor.close()
         db.close()
+
 def get_products_from_db_by_query(query=None):
     connection = get_db_connection()
     cursor = connection.cursor(dictionary=True)
@@ -643,3 +551,41 @@ def get_products_from_db_by_query(query=None):
     cursor.close()
     connection.close()
     return products
+
+def dal_delete_product(product_id):
+    """
+    Delete a product from the database.
+    
+    Args:
+        product_id (int): The ID of the product to delete.
+        
+    Returns:
+        tuple: (result, status_code)
+            result: Dict with success or error message
+            status_code: HTTP status code
+    """
+    db = get_db_connection()
+    if not db:
+        return {"error": "Database connection failed"}, 500
+    
+    cursor = db.cursor()
+    try:
+        # First delete related data from product_attributes table
+        cursor.execute("DELETE FROM product_attributes WHERE product_id = %s", (product_id,))
+        
+        # Then delete the product from products table
+        cursor.execute("DELETE FROM products WHERE product_id = %s", (product_id,))
+        
+        if cursor.rowcount > 0:
+            db.commit()
+            return {"message": f"Product with ID {product_id} successfully deleted"}, 200
+        else:
+            db.rollback()
+            return {"error": f"No product found with ID {product_id}"}, 404
+            
+    except mysql.connector.Error as err:
+        db.rollback()
+        return {"error": str(err)}, 500
+    finally:
+        cursor.close()
+        db.close()

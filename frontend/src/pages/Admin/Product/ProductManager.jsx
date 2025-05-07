@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Table, Button, Modal, Form, Pagination as BootstrapPagination, Dropdown } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./ProductManager.css";
-import { fetchAllProducts } from "../../../services/productService";
+import { fetchAllProducts, deleteProduct } from "../../../services/productService";
 
 const PAGE_SIZE = 40; // Reduced from 50 to show more pages for testing
 
@@ -14,6 +14,7 @@ const ProductManager = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [categoryFilter, setCategoryFilter] = useState("All");
   const [loading, setLoading] = useState(true);
+  const [deleteConfirmation, setDeleteConfirmation] = useState({ show: false, productId: null }); // State for delete confirmation
 
   // Define product categories based on your data
   const productCategories = [
@@ -29,19 +30,20 @@ const ProductManager = () => {
     "PSU"
   ];
 
+  const loadProducts = async () => {
+    setLoading(true);
+    try {
+      const data = await fetchAllProducts();
+      console.log("Loaded products:", data.length);
+      setProducts(data);
+    } catch (error) {
+      console.error("Error loading products:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const loadProducts = async () => {
-      setLoading(true);
-      try {
-        const data = await fetchAllProducts();
-        console.log("Loaded products:", data.length);
-        setProducts(data);
-      } catch (error) {
-        console.error("Error loading products:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
     loadProducts();
   }, []);
 
@@ -76,6 +78,56 @@ const ProductManager = () => {
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
+  };
+
+  // Function to show delete confirmation
+  const showDeleteConfirmation = (productId) => {
+    setDeleteConfirmation({
+      show: true,
+      productId
+    });
+  };
+
+  // Function to cancel delete
+  const cancelDelete = () => {
+    setDeleteConfirmation({
+      show: false,
+      productId: null
+    });
+  };
+
+  // Function to handle delete
+  const handleDelete = async () => {
+    const { productId } = deleteConfirmation;
+    if (!productId) return;
+    
+    try {
+      // Use the productService instead of direct axios call
+      const result = await deleteProduct(productId);
+      
+      if (result.success) {
+        // Remove product from state if deletion was successful
+        setProducts(products.filter(prod => prod.product_id !== productId));
+        
+        // If the current page becomes empty after deletion, go to previous page
+        const remainingProductsInPage = paginatedProducts.filter(prod => prod.product_id !== productId);
+        if (remainingProductsInPage.length === 0 && currentPage > 1) {
+          setCurrentPage(currentPage - 1);
+        }
+        
+        // Show success message
+        alert("Product has been successfully deleted");
+      } else {
+        // Show error message
+        alert(result.message || "Unable to delete product. Please try again later.");
+      }
+    } catch (error) {
+      console.error("Error deleting product:", error);
+      alert("An error occurred while deleting the product. Please try again later.");
+    } finally {
+      // Close the confirmation modal
+      cancelDelete();
+    }
   };
 
   // Generate pagination items
@@ -145,7 +197,7 @@ const ProductManager = () => {
   return (
     <div className="product-manager">
       <div className="product-header">
-        <h2 className="product-title">Quản lý sản phẩm</h2>
+        <h2 className="product-title">Product Management</h2>
         <div className="product-actions">
           <Dropdown className="category-filter">
             <Dropdown.Toggle variant="outline-secondary" id="dropdown-category">
@@ -164,28 +216,28 @@ const ProductManager = () => {
             </Dropdown.Menu>
           </Dropdown>
           <Button variant="primary" className="add-product-btn" onClick={() => handleShowModal()}>
-            Thêm sản phẩm
+            Add Product
           </Button>
         </div>
       </div>
 
       {loading ? (
-        <div className="loading-indicator">Đang tải sản phẩm...</div>
+        <div className="loading-indicator">Loading products...</div>
       ) : (
         <>
           <div className="product-stats">
-            {/* <span>Tổng số sản phẩm: {products.length}</span>
-            <span>Sản phẩm trong danh mục này: {filteredProducts.length}</span>
-            <span>Hiển thị: {Math.min(filteredProducts.length, paginatedProducts.length)} / {PAGE_SIZE} mỗi trang</span> */}
+            {/* <span>Total products: {products.length}</span>
+            <span>Products in this category: {filteredProducts.length}</span>
+            <span>Showing: {Math.min(filteredProducts.length, paginatedProducts.length)} / {PAGE_SIZE} per page</span> */}
           </div>
 
           <Table striped bordered hover className="product-table">
             <thead>
               <tr>
-                <th>Tên sản phẩm</th>
-                <th>Danh mục</th>
-                <th>Giá</th>
-                <th>Hành động</th>
+                <th>Product Name</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -197,17 +249,17 @@ const ProductManager = () => {
                     <td className="price-column">{prod.price?.toLocaleString()} $</td>
                     <td className="action-buttons">
                       <Button variant="info" size="sm" onClick={() => handleShowModal(prod)}>
-                        Sửa
+                        Edit
                       </Button>
-                      <Button variant="danger" size="sm" onClick={() => {/* handleDelete(prod.product_id) */}}>
-                        Xóa
+                      <Button variant="danger" size="sm" onClick={() => showDeleteConfirmation(prod.product_id)}>
+                        Delete
                       </Button>
                     </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan="4" className="text-center">Không có sản phẩm nào</td>
+                  <td colSpan="4" className="text-center">No products available</td>
                 </tr>
               )}
             </tbody>
@@ -224,10 +276,26 @@ const ProductManager = () => {
               </BootstrapPagination>
             </div>
           )}
+          
+          {/* Delete Confirmation Modal */}
+          <Modal show={deleteConfirmation.show} onHide={cancelDelete} centered>
+            <Modal.Header closeButton>
+              <Modal.Title>Delete Confirmation</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              Are you sure you want to delete this product? This action cannot be undone.
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={cancelDelete}>
+                Cancel
+              </Button>
+              <Button variant="danger" onClick={handleDelete}>
+                Delete Product
+              </Button>
+            </Modal.Footer>
+          </Modal>
         </>
       )}
-      
-      {/* Add CSS for the pagination container */}
     </div>
   );
 };

@@ -124,11 +124,11 @@
     background-color: #3498db;
     color: white;
 }
-
+/* 
 .action-buttons button:nth-child(2) {
     background-color: #f39c12;
     color: white;
-}
+} */
 
 .action-buttons button:nth-child(3) {
     background-color: #e74c3c;
