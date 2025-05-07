@@ -193,3 +193,20 @@ def get_compatible_mainboards(cpu_socket):
     except Exception as e:
         print(f"Error in get_compatible_mainboards: {e}")
         return jsonify({"error": str(e)}), 500
+
+@product_blueprint.route("/product/<int:product_id>", methods=["DELETE"])
+def delete_product(product_id):
+    """
+    API endpoint to delete a product by ID
+    
+    Args:
+        product_id (int): The ID of the product to delete
+        
+    Returns:
+        JSON response with success or error message
+    """
+    try:
+        result, status = dal_delete_product(product_id)
+        return jsonify(result), status
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500

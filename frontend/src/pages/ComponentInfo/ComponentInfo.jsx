@@ -16,7 +16,7 @@ const extractRating = (ratingText) => {
 
 const RatingStars = ({ rating }) => {
   if (typeof rating !== "number" || rating < 0 || rating > 5) {
-    return <p className="no-rating">No ratings yet</p>;
+    return <p className="no-rating"></p>;
   }
 
   const fullStars = Math.floor(rating);
@@ -206,7 +206,7 @@ const ComponentInfo = () => {
                 </span>
               </div>
 
-              <div className="product-id">ID: {componentInfo?.product_id || "N/A"}</div>
+              {/* <div className="product-id">ID: {componentInfo?.product_id || "N/A"}</div> */}
             </div>
           </div>
 
@@ -317,7 +317,7 @@ const ComponentInfo = () => {
               <div
                 key={component.product_id}
                 className="similar-product-card"
-                onClick={() => navigate(`/component-info/${normalizeType}/${component.product_id}`)}
+                onClick={() => navigate(`/component-info/${normalizedType}/${component.product_id}`)}
               >
                 <div className="similar-product-img-container">
                   <img
