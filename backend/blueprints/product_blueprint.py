@@ -210,3 +210,22 @@ def delete_product(product_id):
         return jsonify(result), status
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+@product_blueprint.route("/product/<int:product_id>", methods=["GET"])
+def get_product_by_id(product_id):
+    try:
+        product, status = dal_get_product_by_id(product_id)
+        if status == 200:
+            return jsonify(product), 200
+        else:
+            return jsonify({"error": "Product not found"}), status
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@product_blueprint.route("/category/<int:category_id>/products", methods=["GET"])
+def get_products_by_category(category_id):
+    try:
+        products, status = dal_get_products_by_category(category_id)
+        return jsonify(products), status
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500

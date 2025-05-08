@@ -111,6 +111,57 @@ def dal_get_laptops():
         cursor.close()
         connection.close()
 
+def dal_get_product_by_id(product_id):
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+    try:
+        # Get basic product info
+        cursor.execute("""
+            SELECT 
+                p.product_id,
+                p.title,
+                p.price,
+                p.stock,
+                p.rating,
+                p.description,
+                p.image,
+                p.category_id
+            FROM Products p
+            WHERE p.product_id = %s
+        """, (product_id,))
+        
+        product = cursor.fetchone()
+        
+        if not product:
+            return None, 404
+        
+        # Get product attributes
+        cursor.execute("""
+            SELECT 
+                attribute_name,
+                attribute_value
+            FROM Product_Attributes
+            WHERE product_id = %s
+        """, (product_id,))
+        
+        attributes = cursor.fetchall()
+        
+        # Convert attributes to dictionary
+        attributes_dict = {}
+        for attr in attributes:
+            attributes_dict[attr['attribute_name']] = attr['attribute_value']
+        
+        # Add attributes to product
+        product['attributes'] = attributes_dict
+        
+        return product, 200
+    except Exception as e:
+        print(f"Error fetching product: {str(e)}")
+        return {"error": str(e)}, 500
+    finally:
+        cursor.close()
+        connection.close()
+
 def dal_get_components_by_type(type):
     valid_types = ['Storage', 'PSU', 'Mainboard', 'GPU', 'CPU', 'RAM', 'CPU Cooler', 'Case']
     if type not in valid_types:
@@ -589,3 +640,40 @@ def dal_delete_product(product_id):
     finally:
         cursor.close()
         db.close()
+
+def dal_get_products_by_category(category_id):
+    db = get_db_connection()
+    if not db:
+        return {"error": "Database connection failed"}, 500
+        
+    cursor = db.cursor(dictionary=True)
+    try:
+        query = """
+        SELECT 
+            p.product_id,
+            p.title,
+            p.price,
+            p.stock,
+            p.rating,
+            p.image
+        FROM products p
+        WHERE p.category_id = %s
+        LIMIT 10
+        """
+        
+        cursor.execute(query, (category_id,))
+        products = cursor.fetchall()
+        
+        if not products:
+            return {"message": f"No products found for category ID {category_id}"}, 404
+            
+        return products, 200
+        
+    except Exception as e:
+        return {"error": str(e)}, 500
+        
+    finally:
+        cursor.close()
+        db.close()
+
+

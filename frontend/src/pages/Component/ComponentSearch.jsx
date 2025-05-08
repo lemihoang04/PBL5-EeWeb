@@ -45,23 +45,23 @@ const ComponentSearch = () => {
   //   const loadComponents = async () => {
   //     try {
   //       setError(null);
-        
+
   //       // Trích xuất query params từ URL
   //       const searchParams = new URLSearchParams(window.location.search);
   //       const queryFilters = {};
-        
+
   //       // Convert query params thành object filters
   //       for (const [key, value] of searchParams.entries()) {
   //         if (key !== 'type') { // Bỏ qua tham số 'type' nếu có
   //           queryFilters[key] = value;
   //         }
   //       }
-        
+
   //       console.log('Filtering components with:', queryFilters);
-        
+
   //       // Gọi API với các bộ lọc từ URL
   //       const data = await fetchComponents(normalizedType, queryFilters);
-        
+
   //       // Kiểm tra lỗi từ API
   //       if (!data || data.error) {
   //         setError(data?.error || 'Failed to load components');
@@ -69,18 +69,18 @@ const ComponentSearch = () => {
   //         setFilteredComponents([]);
   //         return;
   //       }
-        
+
   //       // Đảm bảo data là một mảng
   //       if (!Array.isArray(data)) {
   //         setError('Invalid data format from server');
   //         return;
   //       }
-        
+
   //       // Xử lý dữ liệu components
   //       const parsedComponents = data.map((component) => {
   //         // Xử lý trường hợp attributes đã được format dưới dạng object từ server
   //         let attributes = component.attributes || {};
-          
+
   //         // Nếu attributes là string, chuyển đổi nó thành object
   //         if (typeof component.attributes === 'string') {
   //           try {
@@ -94,17 +94,17 @@ const ComponentSearch = () => {
   //             console.error(`Error parsing attributes for component:`, component, err);
   //           }
   //         }
-          
+
   //         // Đảm bảo giá tiền là số
   //         const parsedPrice = parseFloat(component.price) || 0;
-          
+
   //         return { 
   //           ...component, 
   //           price: parsedPrice, 
   //           attributes 
   //         };
   //       });
-        
+
   //       setComponents(parsedComponents);
   //       setFilteredComponents(parsedComponents);
   //     } catch (err) {
@@ -112,7 +112,7 @@ const ComponentSearch = () => {
   //       setError('Failed to load components');
   //     }
   //   };
-    
+
   //   if (normalizedType) {
   //     loadComponents();
   //   }
@@ -123,12 +123,12 @@ const ComponentSearch = () => {
   const loadComponents = async () => {
     try {
       setError(null);
-      
+
       // Trích xuất query params từ URL
       const searchParams = new URLSearchParams(window.location.search);
       const queryFilters = {};
       let cpuSocket = null;
-      
+
       // Chuyển đổi query params thành bộ lọc
       for (const [key, value] of searchParams.entries()) {
         if (key === 'cpu_socket') {
@@ -137,11 +137,11 @@ const ComponentSearch = () => {
           queryFilters[key] = value;
         }
       }
-      
+
       console.log('Filtering components with:', queryFilters);
-      
+
       let data;
-      
+
       // Sử dụng API phù hợp dựa trên loại component và socket CPU
       if (normalizedType === 'CPU Cooler' && cpuSocket) {
         console.log(`Fetching compatible CPU coolers for socketss: ${cpuSocket}`);
@@ -155,7 +155,7 @@ const ComponentSearch = () => {
         // Sử dụng API lấy component thông thường
         data = await fetchComponents(normalizedType, queryFilters);
       }
-      
+
       // Kiểm tra lỗi từ API
       if (!data || data.error) {
         setError(data?.error || 'Failed to load components');
@@ -163,18 +163,18 @@ const ComponentSearch = () => {
         setFilteredComponents([]);
         return;
       }
-      
+
       // Đảm bảo data là một mảng
       if (!Array.isArray(data)) {
         setError('Invalid data format from server');
         return;
       }
-      
+
       // Xử lý dữ liệu component với các chuyển đổi phù hợp
       const parsedComponents = data.map((component) => {
         // Xử lý thuộc tính
         let attributes = component.attributes || {};
-        
+
         // Nếu attributes là một chuỗi, chuyển nó thành đối tượng
         if (typeof component.attributes === 'string') {
           try {
@@ -188,17 +188,17 @@ const ComponentSearch = () => {
             console.error(`Error parsing attributes for component:`, component, err);
           }
         }
-        
+
         // Đảm bảo giá là một số
         const parsedPrice = parseFloat(component.price) || 0;
-        
-        return { 
-          ...component, 
-          price: parsedPrice, 
-          attributes 
+
+        return {
+          ...component,
+          price: parsedPrice,
+          attributes
         };
       });
-      
+
       setComponents(parsedComponents);
       setFilteredComponents(parsedComponents);
     } catch (err) {
@@ -207,11 +207,11 @@ const ComponentSearch = () => {
     }
   };
   useEffect(() => {
-  // Inside the loadComponents async function in the useEffect
+    // Inside the loadComponents async function in the useEffect
     // Actually call the function to load components
     loadComponents();
-  
-}, [normalizedType, window.location.search]); // Thêm location.search vào dependencies để reload khi query params thay đổi
+
+  }, [normalizedType, window.location.search]); // Thêm location.search vào dependencies để reload khi query params thay đổi
 
   const itemsPerPage = 50;
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -675,7 +675,7 @@ const ComponentSearch = () => {
                                   }}
                                 />
                                 <span
-                                  onClick={() => navigate(`/component-info/${type}/${component.product_id}`)}
+                                  onClick={() => navigate(`/product-info/${component.product_id}`)}
                                 >
                                   {data}
                                 </span>
@@ -686,10 +686,10 @@ const ComponentSearch = () => {
                           </td>
                         ))}
                         <td>
-                        <button
+                          <button
                             className="comp-search-add-button"
                             onClick={async () => {
-            
+
                               try {
                                 const productId = parseInt(component.product_id, 10); // Cơ số 10 để tránh các vấn đề với số bắt đầu bằng 0
                                 // Gọi API để lấy thông tin chi tiết của component
@@ -706,7 +706,7 @@ const ComponentSearch = () => {
                                   state: {
                                     addedComponent: componentDetail,
                                   },
-                                  
+
                                 });
                                 console.log('Navigating to build with component:', componentDetail);
                               } catch (error) {
@@ -721,7 +721,7 @@ const ComponentSearch = () => {
                             }}
                           >
                             <i className="fas fa-plus"></i> Add
-                        </button>
+                          </button>
                         </td>
                       </tr>
                     ))}

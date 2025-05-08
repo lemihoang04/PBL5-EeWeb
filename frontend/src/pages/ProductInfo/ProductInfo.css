@@ -86,7 +86,7 @@ textarea {
 
 .main-image-container {
   position: relative;
-  background-color: #f8fafc;
+  /* background-color: #f8fafc; */
   border-radius: var(--radius-md);
   overflow: hidden;
   aspect-ratio: 1 / 1;
