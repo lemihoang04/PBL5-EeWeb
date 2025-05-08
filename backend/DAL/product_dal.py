@@ -658,7 +658,7 @@ def dal_get_products_by_category(category_id):
             p.image
         FROM products p
         WHERE p.category_id = %s
-        LIMIT 10
+        LIMIT 12
         """
         
         cursor.execute(query, (category_id,))
