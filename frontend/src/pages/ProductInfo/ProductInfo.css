@@ -583,7 +583,7 @@
   aspect-ratio: 4/3;
   /* Changed aspect ratio to be less tall */
   overflow: hidden;
-  background-color: var(--pi-background-light);
+  /* background-color: var(--pi-background-light); */
   display: flex;
   align-items: center;
   justify-content: center;

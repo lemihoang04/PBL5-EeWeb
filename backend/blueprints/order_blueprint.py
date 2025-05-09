@@ -3,7 +3,7 @@ from DAL.order_dal import *
 
 order_blueprint = Blueprint('order', __name__)
 
-@order_blueprint.route('/orders/user/<int:user_id>', methods=['GET'])
+@order_blueprint.route('/orders/<int:user_id>', methods=['GET'])
 def api_get_orders_by_user(user_id):
     try:
         orders = get_orders_by_user_id(user_id)

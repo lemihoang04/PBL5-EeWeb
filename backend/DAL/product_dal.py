@@ -86,6 +86,7 @@ def dal_get_laptops():
             FROM Products p
             LEFT JOIN Product_Attributes pa ON p.product_id = pa.product_id
             WHERE p.category_id = 4
+            ORDER BY p.product_id DESC
         """)
         rows = cursor.fetchall()
 

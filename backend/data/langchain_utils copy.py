@@ -1,15 +1,15 @@
 from langchain_experimental.agents import create_pandas_dataframe_agent
-from langchain_cerebras import ChatCerebras  # Import Cerebras LLM class
+from langchain_groq import ChatGroq 
 import pandas as pd
 from DAL.product_dal import get_products_from_db_by_query
 
 def create_product_agent():
     products = get_products_from_db_by_query()
     df = pd.DataFrame(products)
-    llm = ChatCerebras(  # Replace ChatGroq with ChatCerebras
-        api_key="csk-fx2tkjjm3ecprf228rx3dxkndjxet5h6mxm3jv8x3r553866",  # Replace with Cerebras API key
-        model="llama-3.3-70b",  # Update model name if needed
-        temperature=0
+    llm = ChatGroq(
+        groq_api_key="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",  
+        model_name="meta-llama/llama-4-scout-17b-16e-instruct",  
+        temperature=0,
     )
     agent = create_pandas_dataframe_agent(
         llm, 
@@ -27,4 +27,3 @@ For example, if a product has id 3416 and title "Acer Aspire 3", its entry shoul
 Ensure all product listings follow this format for easy interaction in the frontend..
         """
     )
-    return agent
