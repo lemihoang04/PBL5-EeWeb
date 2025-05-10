@@ -53,4 +53,15 @@ const fetchProductsByCategoryId = async (categoryId) => {
         return [];
     }
 };
-export { fetchAllProducts, deleteProduct, fetchProductById, fetchProductsByCategoryId };
+const fetchFeaturedProducts = async () => {
+    try {
+        const response = await axios.get("/featured-categories");
+        console.log("Products fetched successfully:", response);
+        return response;
+    } catch (error) {
+        console.error("Error fetching featured products:", error);
+        return [];
+    }
+}
+
+export { fetchAllProducts, deleteProduct, fetchProductById, fetchProductsByCategoryId, fetchFeaturedProducts };

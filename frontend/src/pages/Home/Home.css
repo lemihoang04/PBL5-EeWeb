@@ -296,12 +296,12 @@
 }
 
 .techshop-product__image-container {
-    height: 180px;
+    /* height: 180px; */
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 20px;
-    background-color: var(--light-bg);
+    /* background-color: var(--light-bg); */
     transition: var(--transition);
 }
 

@@ -677,4 +677,40 @@ def dal_get_products_by_category(category_id):
         cursor.close()
         db.close()
 
+def dal_get_products_from_different_categories(limit=4):
+    db = get_db_connection()
+    if not db:
+        return {"error": "Database connection failed"}, 500
+        
+    cursor = db.cursor(dictionary=True)
+    try:
+        query = """
+        SELECT p.product_id, p.title, p.price, p.image, p.rating, c.category_id, c.category_name
+        FROM (
+            SELECT DISTINCT category_id 
+            FROM products 
+            ORDER BY category_id DESC
+            LIMIT %s
+        ) as distinct_categories
+        JOIN categories c ON distinct_categories.category_id = c.category_id
+        JOIN products p ON c.category_id = p.category_id
+        GROUP BY c.category_id
+        LIMIT %s
+        """
+        
+        cursor.execute(query, (limit, limit))
+        products = cursor.fetchall()
+        
+        if not products:
+            return {"message": "No products found"}, 404
+            
+        return products, 200
+        
+    except Exception as e:
+        return {"error": str(e)}, 500
+        
+    finally:
+        cursor.close()
+        db.close()
+
 
