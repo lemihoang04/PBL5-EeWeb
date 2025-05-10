@@ -19,11 +19,11 @@ const ComponentSearch = () => {
     ASUS: false,
     MSI: false,
     Gigabyte: false,
-  });
-  const [currentPage, setCurrentPage] = useState(1);
+  }); const [currentPage, setCurrentPage] = useState(1);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [isFilterVisible, setIsFilterVisible] = useState(false);
+  const [showAllManufacturers, setShowAllManufacturers] = useState(false);
   const navigate = useNavigate();
 
   const validTypes = ['Storage', 'PSU', 'Mainboard', 'GPU', 'CPU', 'RAM', 'CPU Cooler', 'Case'];
@@ -226,37 +226,69 @@ const ComponentSearch = () => {
     );
     setFilteredComponents(filtered);
     setCurrentPage(1);
-  };
-
-  const handlePriceFilter = () => {
+  }; const handlePriceFilter = () => {
+    // Lọc các component trong khoảng giá đã chọn
     const filtered = components.filter(
-      (component) =>
-        component.price >= priceRange[0] && component.price <= priceRange[1]
-    );
-    setFilteredComponents(filtered);
-    setCurrentPage(1);
-  };
+      (component) => {
+        // Đảm bảo component có giá hợp lệ
+        if (component.price === undefined || component.price === null) {
+          return false;
+        }
 
+        // Chuyển đổi giá thành số nếu cần
+        const price = typeof component.price === 'number'
+          ? component.price
+          : parseFloat(component.price);
+
+        // Kiểm tra xem giá có hợp lệ không (là một số)
+        if (isNaN(price)) {
+          return false;
+        }
+
+        // Kiểm tra xem giá có nằm trong khoảng không
+        return price >= priceRange[0] && price <= priceRange[1];
+      }
+    );
+
+    console.log(`Price filter applied: $${priceRange[0]} - $${priceRange[1]}`);
+    console.log(`Filtered from ${components.length} to ${filtered.length} components`);
+
+    setFilteredComponents(filtered);
+    setCurrentPage(1); // Reset về trang đầu tiên sau khi lọc
+  };
   const handleManufacturerFilter = (e) => {
     const { name, checked } = e.target;
     const updatedFilter = { ...manufacturerFilter, [name]: checked };
     setManufacturerFilter(updatedFilter);
 
+    // Get list of active manufacturers
     const activeManufacturers = Object.keys(updatedFilter).filter(
       (key) => updatedFilter[key]
     );
+
+    // If no manufacturers are selected, show all components
     if (activeManufacturers.length === 0) {
       setFilteredComponents(components);
       setCurrentPage(1);
       return;
     }
-    const filtered = components.filter((component) =>
-      activeManufacturers.some((man) =>
-        component.title?.toLowerCase().includes(man.toLowerCase())
-      )
-    );
+
+    // Filter components based on selected manufacturers
+    const filtered = components.filter((component) => {
+      if (!component.title) return false;
+      const componentTitle = component.title.toLowerCase();
+      // Check if any of the selected manufacturers are in the title
+      return activeManufacturers.some((manufacturer) =>
+        componentTitle.includes(manufacturer.toLowerCase())
+      );
+    });
+
+    // Log for debugging
+    console.log(`Filtered by manufacturers: ${activeManufacturers.join(', ')}`);
+    console.log(`Found ${filtered.length} matching components`);
+
     setFilteredComponents(filtered);
-    setCurrentPage(1);
+    setCurrentPage(1); // Reset to first page after filtering
   };
 
   const handleNextPage = () => {
@@ -499,18 +531,17 @@ const ComponentSearch = () => {
       </div>
     );
   }
-
   // Get manufacturers relevant to the current component type
   const getRelevantManufacturers = () => {
     const manufacturerMap = {
       CPU: ['AMD', 'Intel'],
-      GPU: ['AMD', 'Nvidia', 'ASUS', 'MSI', 'Gigabyte'],
-      RAM: ['Corsair', 'G.Skill', 'Kingston', 'Crucial'],
-      Storage: ['Western Digital', 'Samsung', 'Seagate', 'Crucial'],
-      Mainboard: ['ASUS', 'MSI', 'Gigabyte', 'ASRock'],
-      PSU: ['Corsair', 'EVGA', 'Seasonic', 'be quiet!'],
-      'CPU Cooler': ['Noctua', 'Cooler Master', 'NZXT', 'be quiet!'],
-      Case: ['Corsair', 'NZXT', 'Fractal Design', 'Lian Li']
+      GPU: ['AMD', 'Nvidia', 'ASUS', 'MSI', 'Gigabyte', 'EVGA', 'Zotac', 'Sapphire'],
+      RAM: ['Corsair', 'G.Skill', 'Kingston', 'Crucial', 'HyperX', 'Team Group', 'ADATA', 'Patriot'],
+      Storage: ['Western Digital', 'Samsung', 'Seagate', 'Crucial', 'Kingston', 'SanDisk', 'ADATA', 'Intel'],
+      Mainboard: ['ASUS', 'MSI', 'Gigabyte', 'ASRock', 'EVGA', 'Biostar', 'NZXT'],
+      PSU: ['Corsair', 'EVGA', 'Seasonic', 'be quiet!', 'Thermaltake', 'Cooler Master', 'Antec', 'Silverstone'],
+      'CPU Cooler': ['Noctua', 'Cooler Master', 'NZXT', 'be quiet!', 'Corsair', 'Deepcool', 'Arctic', 'Thermaltake'],
+      Case: ['Corsair', 'NZXT', 'Fractal Design', 'Lian Li', 'Phanteks', 'Cooler Master', 'Thermaltake', 'be quiet!']
     };
 
     return manufacturerMap[normalizedType] || [];
@@ -560,18 +591,28 @@ const ComponentSearch = () => {
               <h3>Price Range</h3>
               <div className="comp-search-price-label">
                 ${priceRange[0]} - ${priceRange[1].toLocaleString()}
-              </div>
-              <div className="comp-search-price-slider">
+              </div>              <div className="comp-search-price-slider">
+                <div className="comp-search-price-track"></div>
+                <div
+                  className="comp-search-price-range-selected"
+                  style={{
+                    left: `${(priceRange[0] / 5000) * 100}%`,
+                    right: `${100 - (priceRange[1] / 5000) * 100}%`
+                  }}
+                ></div>
                 <input
                   type="range"
                   min="0"
                   max="5000"
                   value={priceRange[0]}
                   onChange={(e) => {
-                    const newRange = [parseInt(e.target.value), priceRange[1]];
-                    setPriceRange(newRange);
-                    handlePriceFilter();
+                    const value = parseInt(e.target.value);
+                    // Đảm bảo giá trị min không vượt quá giá trị max - 50
+                    const newMin = Math.min(value, priceRange[1] - 50);
+                    setPriceRange([newMin, priceRange[1]]);
                   }}
+                  onMouseUp={handlePriceFilter} // Chỉ áp dụng bộ lọc khi người dùng thả chuột
+                  onTouchEnd={handlePriceFilter} // Cho thiết bị cảm ứng
                 />
                 <input
                   type="range"
@@ -579,18 +620,19 @@ const ComponentSearch = () => {
                   max="5000"
                   value={priceRange[1]}
                   onChange={(e) => {
-                    const newRange = [priceRange[0], parseInt(e.target.value)];
-                    setPriceRange(newRange);
-                    handlePriceFilter();
+                    const value = parseInt(e.target.value);
+                    // Đảm bảo giá trị max không nhỏ hơn giá trị min + 50
+                    const newMax = Math.max(value, priceRange[0] + 50);
+                    setPriceRange([priceRange[0], newMax]);
                   }}
+                  onMouseUp={handlePriceFilter} // Chỉ áp dụng bộ lọc khi người dùng thả chuột
+                  onTouchEnd={handlePriceFilter} // Cho thiết bị cảm ứng
                 />
               </div>
-            </div>
-
-            <div className="comp-search-filter-section">
+            </div>            <div className="comp-search-filter-section">
               <h3>Manufacturer</h3>
               <div className="comp-search-checkbox-group">
-                {getRelevantManufacturers().map(manufacturer => (
+                {getRelevantManufacturers().slice(0, showAllManufacturers ? getRelevantManufacturers().length : 4).map((manufacturer) => (
                   <label key={manufacturer}>
                     <input
                       type="checkbox"
@@ -602,6 +644,13 @@ const ComponentSearch = () => {
                   </label>
                 ))}
               </div>
+              {getRelevantManufacturers().length > 4 && (<button
+                className="comp-search-see-more"
+                onClick={() => setShowAllManufacturers(!showAllManufacturers)}
+              >
+                {showAllManufacturers ? 'See Less' : 'See More'}
+              </button>
+              )}
             </div>
 
             <button
