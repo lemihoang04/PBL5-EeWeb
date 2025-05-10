@@ -229,3 +229,11 @@ def get_products_by_category(category_id):
         return jsonify(products), status
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+@product_blueprint.route("/featured-categories", methods=["GET"])
+def get_products_from_different_categories():
+    try:
+        products, status = dal_get_products_from_different_categories()
+        return jsonify(products), status
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500

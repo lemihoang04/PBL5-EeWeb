@@ -228,6 +228,12 @@ const LaptopSearch = () => {
     const term = e.target.value.toLowerCase();
     setSearchTerm(term);
     setCurrentPage(1); // Reset to first page when search changes
+  };  // Function to scroll to top of products list
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
   };
 
   const handleNextPage = () => {
@@ -241,6 +247,11 @@ const LaptopSearch = () => {
       setCurrentPage(currentPage - 1);
     }
   };
+
+  // Scroll to top when page changes
+  useEffect(() => {
+    scrollToTop();
+  }, [currentPage]);
 
   const toggleShowAllBrands = () => {
     setShowAllBrands(!showAllBrands);
@@ -298,12 +309,10 @@ const LaptopSearch = () => {
         >
           <h3>{title}</h3>
           {expandedFilterSections[section] ? <FaChevronUp /> : <FaChevronDown />}
-        </div>
-
-        {expandedFilterSections[section] && (
+        </div>        {expandedFilterSections[section] && (
           <div className="ls-checkbox-group">
             {items}
-            {showAll !== null && items.length > 6 && (
+            {showAll !== null && section === "brand" && availableBrands.length > 5 && (
               <div className="ls-see-more" onClick={toggleShowAll}>
                 <span>{showAll ? "See less" : "See more"}</span>
               </div>
@@ -434,7 +443,7 @@ const LaptopSearch = () => {
             {renderFilterSection("Brands", "brand", (
               <>
                 {availableBrands
-                  .slice(0, showAllBrands ? availableBrands.length : 7)
+                  .slice(0, showAllBrands ? availableBrands.length : 5)
                   .map(brand => (
                     <label key={brand}>
                       <input

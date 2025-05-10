@@ -1,48 +1,58 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { fetchFeaturedProducts } from '../../services/productService';
 import './Home.css'; // We'll keep the same CSS filename
 
 const Home = () => {
     const navigate = useNavigate();
     const [currentSlide, setCurrentSlide] = useState(0);
+    const [featuredProducts, setFeaturedProducts] = useState([]);
+
+    useEffect(() => {
+        const getFeaturedProducts = async () => {
+            const products = await fetchFeaturedProducts();
+            setFeaturedProducts(products);
+        };
+        getFeaturedProducts();
+    }, []);
 
     // Sample data - replace with your actual data
-    const featuredProducts = [
-        {
-            id: 1,
-            name: "NVIDIA RTX 4080 Super",
-            category: "Graphics Cards",
-            price: 999.99,
-            rating: 4.8,
-            image: "https://cdn-icons-png.flaticon.com/128/7414/7414141.png",
-            discount: 15
-        },
-        {
-            id: 2,
-            name: "AMD Ryzen 9 7950X",
-            category: "Processors",
-            price: 649.99,
-            rating: 4.9,
-            image: "https://cdn-icons-png.flaticon.com/128/5974/5974636.png"
-        },
-        {
-            id: 3,
-            name: "ROG STRIX Z790-E Gaming",
-            category: "Motherboards",
-            price: 499.99,
-            rating: 4.7,
-            image: "https://cdn-icons-png.flaticon.com/128/4275/4275113.png",
-            discount: 10
-        },
-        {
-            id: 4,
-            name: "Corsair 32GB DDR5-6000",
-            category: "Memory",
-            price: 249.99,
-            rating: 4.8,
-            image: "https://cdn-icons-png.flaticon.com/128/4275/4275113.png"
-        }
-    ];
+    // const featuredProducts = [
+    //     {
+    //         id: 1,
+    //         name: "NVIDIA RTX 4080 Super",
+    //         category: "Graphics Cards",
+    //         price: 999.99,
+    //         rating: 4.8,
+    //         image: "https://cdn-icons-png.flaticon.com/128/7414/7414141.png",
+    //         discount: 15
+    //     },
+    //     {
+    //         id: 2,
+    //         name: "AMD Ryzen 9 7950X",
+    //         category: "Processors",
+    //         price: 649.99,
+    //         rating: 4.9,
+    //         image: "https://cdn-icons-png.flaticon.com/128/5974/5974636.png"
+    //     },
+    //     {
+    //         id: 3,
+    //         name: "ROG STRIX Z790-E Gaming",
+    //         category: "Motherboards",
+    //         price: 499.99,
+    //         rating: 4.7,
+    //         image: "https://cdn-icons-png.flaticon.com/128/4275/4275113.png",
+    //         discount: 10
+    //     },
+    //     {
+    //         id: 4,
+    //         name: "Corsair 32GB DDR5-6000",
+    //         category: "Memory",
+    //         price: 249.99,
+    //         rating: 4.8,
+    //         image: "https://cdn-icons-png.flaticon.com/128/4275/4275113.png"
+    //     }
+    // ];
 
     const categories = [
         {
@@ -262,7 +272,7 @@ const Home = () => {
             <section className="techshop-products">
                 <div className="techshop-section__header">
                     <h2 className="techshop-section__title">Featured Products</h2>
-                    <button className="techshop-section__view-all" onClick={() => navigate('/products')}>
+                    <button className="techshop-section__view-all" onClick={() => navigate('/components/cpu')}>
                         View All <i className="fas fa-arrow-right"></i>
                     </button>
                 </div>
@@ -272,28 +282,30 @@ const Home = () => {
                         <div
                             key={product.id}
                             className="techshop-product"
-                            onClick={() => navigate(`/product/${product.id}`)}
+                            onClick={() => navigate(`/product-info/${product.product_id}`)}
                         >
                             {product.discount && (
                                 <div className="techshop-product__discount-badge">-{product.discount}%</div>
                             )}
                             <div className="techshop-product__image-container">
-                                <img src={product.image} alt={product.name} className="techshop-product__image" />
+                                <img src={product.image} alt={product.title} className="techshop-product__image" />
                             </div>
                             <div className="techshop-product__info">
-                                <span className="techshop-product__category">{product.category}</span>
-                                <h3 className="techshop-product__name">{product.name}</h3>
+                                <span className="techshop-product__category">{product.category_name}</span>
+                                <h3 className="techshop-product__name">{product.title}</h3>
                                 <RatingStars rating={product.rating} />
                                 <div className="techshop-product__price">
                                     {product.discount ? (
                                         <>
                                             <span className="techshop-product__price--current">
-                                                ${(product.price * (1 - product.discount / 100)).toFixed(2)}
+                                                ${(parseFloat(product.price) * (1 - parseFloat(product.discount) / 100)).toFixed(2)}
                                             </span>
-                                            <span className="techshop-product__price--original">${product.price.toFixed(2)}</span>
+                                            <span className="techshop-product__price--original">${parseFloat(product.price).toFixed(2)}</span>
                                         </>
                                     ) : (
-                                        <span className="techshop-product__price--current">${product.price.toFixed(2)}</span>
+                                        <span className="techshop-product__price--current">
+                                            ${typeof product.price === 'number' ? product.price.toFixed(2) : parseFloat(product.price).toFixed(2)}
+                                        </span>
                                     )}
                                 </div>
                             </div>
@@ -337,7 +349,7 @@ const Home = () => {
                             <div className="techshop-category__icon">
                                 <i className={`fas ${category.icon}`}></i>
                             </div>
-                            <h3 className="techshop-category__name">{category.name}</h3>
+                            <h4 className="techshop-category__name">{category.name}</h4>
                         </div>
                     ))}
                 </div>
