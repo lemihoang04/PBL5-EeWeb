@@ -269,11 +269,11 @@ const MotherboardUsage = ({ motherboard, rams, cpu, storages, gpus }) => {
           </div>
           <div className="section-content">
             {/* Dynamically generate RAM slots based on motherboard specs */}
-            {Array.from({ length: ramSlots }, (_, index) => (
-              <div className="memory-item" key={`ram-${index}`}>
+            {Array.from({ length: sataPorts }, (_, index) => (
+              <div className="memory-item" key={`sata${index}`}>
                 <div className="memory-label">SATA_{index + 1} (6.0 Gb/s)</div>
                 <div className="memory-connection"></div>
-                {rams && index < rams.length ? (
+                {storages && index < storages.length ? (
                   <div className="component-item">
                     <img
                       src={getSafeImage(rams[index], "/images/ram-placeholder.png")}
