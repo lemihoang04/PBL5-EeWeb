@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchFeaturedProducts } from '../../services/productService';
 import './Home.css'; // We'll keep the same CSS filename
+import BuiLdPCImg from '../../assets/images/buildpc.png';
 
 const Home = () => {
     const navigate = useNavigate();
@@ -15,45 +16,6 @@ const Home = () => {
         };
         getFeaturedProducts();
     }, []);
-
-    // Sample data - replace with your actual data
-    // const featuredProducts = [
-    //     {
-    //         id: 1,
-    //         name: "NVIDIA RTX 4080 Super",
-    //         category: "Graphics Cards",
-    //         price: 999.99,
-    //         rating: 4.8,
-    //         image: "https://cdn-icons-png.flaticon.com/128/7414/7414141.png",
-    //         discount: 15
-    //     },
-    //     {
-    //         id: 2,
-    //         name: "AMD Ryzen 9 7950X",
-    //         category: "Processors",
-    //         price: 649.99,
-    //         rating: 4.9,
-    //         image: "https://cdn-icons-png.flaticon.com/128/5974/5974636.png"
-    //     },
-    //     {
-    //         id: 3,
-    //         name: "ROG STRIX Z790-E Gaming",
-    //         category: "Motherboards",
-    //         price: 499.99,
-    //         rating: 4.7,
-    //         image: "https://cdn-icons-png.flaticon.com/128/4275/4275113.png",
-    //         discount: 10
-    //     },
-    //     {
-    //         id: 4,
-    //         name: "Corsair 32GB DDR5-6000",
-    //         category: "Memory",
-    //         price: 249.99,
-    //         rating: 4.8,
-    //         image: "https://cdn-icons-png.flaticon.com/128/4275/4275113.png"
-    //     }
-    // ];
-
     const categories = [
         {
             id: 1,
@@ -328,7 +290,7 @@ const Home = () => {
                         </button>
                     </div>
                     <div className="techshop-builder-banner__image-container">
-                        <img src="/api/placeholder/600/400" alt="PC Builder" className="techshop-builder-banner__image" />
+                        <img src={BuiLdPCImg} alt="PC Builder" className="techshop-builder-banner__image" />
                     </div>
                 </div>
             </section>

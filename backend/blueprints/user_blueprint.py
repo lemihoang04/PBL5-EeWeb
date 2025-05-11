@@ -74,7 +74,8 @@ def api_delete_user(user_id):
 
 @user_blueprint.route('/login', methods=['POST'])
 def api_login():
-    session.clear()
+    session.clear(user_id=None)
+    session.clear(email=None)
     data = request.form
     email = data.get('email')
     password = data.get('password')
