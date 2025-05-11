@@ -20,7 +20,7 @@ const Chatbot = () => {
         // Add focus to input when chat opens
         if (!isOpen) {
             setTimeout(() => {
-                document.querySelector('.chatbot-input input')?.focus();
+                document.querySelector('.ts-chatbot-input input')?.focus();
             }, 300);
         }
     };
@@ -79,11 +79,11 @@ const Chatbot = () => {
     }, [messages]);
 
     return (
-        <div className="chatbot-container">
+        <div className="ts-chatbot-container">
             {/* Chat button - only shown when chat is closed */}
             {!isOpen && (
                 <button
-                    className="chatbot-button"
+                    className="ts-chatbot-button"
                     onClick={toggleChat}
                     aria-label="Toggle chat"
                 >
@@ -93,31 +93,31 @@ const Chatbot = () => {
 
             {/* Chat window */}
             {isOpen && (
-                <div className="chatbot-window chatbot-window-no-button">
-                    <div className="chatbot-header">
+                <div className="ts-chatbot-window ts-chatbot-window-no-button">
+                    <div className="ts-chatbot-header">
                         <h3>TechShop Assistant</h3>
-                        <button onClick={toggleChat} className="close-button" aria-label="Close chat">
+                        <button onClick={toggleChat} className="ts-close-button" aria-label="Close chat">
                             <FaTimes />
                         </button>
                     </div>
 
-                    <div className="chatbot-messages">
+                    <div className="ts-chatbot-messages">
                         {messages.map((msg, index) => (
-                            <div key={index} className={`message ${msg.sender}`}>
-                                <div className="message-icon">
+                            <div key={index} className={`ts-message ${msg.sender}`}>
+                                <div className="ts-message-icon">
                                     {msg.sender === 'bot' ? <FaRobot /> : <FaUser />}
                                 </div>
-                                <div className="message-text">
-                                    <div className="markdown-wrapper">
+                                <div className="ts-message-text">
+                                    <div className="ts-markdown-wrapper">
                                         <ReactMarkdown>{msg.text}</ReactMarkdown>
                                     </div>
                                 </div>
                             </div>
                         ))}
                         {isTyping && (
-                            <div className="message bot">
-                                <div className="message-icon"><FaRobot /></div>
-                                <div className="typing-indicator">
+                            <div className="ts-message bot">
+                                <div className="ts-message-icon"><FaRobot /></div>
+                                <div className="ts-typing-indicator">
                                     <span></span>
                                     <span></span>
                                     <span></span>
@@ -127,7 +127,7 @@ const Chatbot = () => {
                         <div ref={messagesEndRef} />
                     </div>
 
-                    <div className="chatbot-input">
+                    <div className="ts-chatbot-input">
                         <input
                             type="text"
                             placeholder="Type your message..."

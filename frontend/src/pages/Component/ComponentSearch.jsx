@@ -19,11 +19,11 @@ const ComponentSearch = () => {
     ASUS: false,
     MSI: false,
     Gigabyte: false,
-  });
-  const [currentPage, setCurrentPage] = useState(1);
+  }); const [currentPage, setCurrentPage] = useState(1);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [isFilterVisible, setIsFilterVisible] = useState(false);
+  const [showAllManufacturers, setShowAllManufacturers] = useState(false);
   const navigate = useNavigate();
 
   const validTypes = ['Storage', 'PSU', 'Mainboard', 'GPU', 'CPU', 'RAM', 'CPU Cooler', 'Case'];
@@ -45,23 +45,23 @@ const ComponentSearch = () => {
   //   const loadComponents = async () => {
   //     try {
   //       setError(null);
-        
+
   //       // Trích xuất query params từ URL
   //       const searchParams = new URLSearchParams(window.location.search);
   //       const queryFilters = {};
-        
+
   //       // Convert query params thành object filters
   //       for (const [key, value] of searchParams.entries()) {
   //         if (key !== 'type') { // Bỏ qua tham số 'type' nếu có
   //           queryFilters[key] = value;
   //         }
   //       }
-        
+
   //       console.log('Filtering components with:', queryFilters);
-        
+
   //       // Gọi API với các bộ lọc từ URL
   //       const data = await fetchComponents(normalizedType, queryFilters);
-        
+
   //       // Kiểm tra lỗi từ API
   //       if (!data || data.error) {
   //         setError(data?.error || 'Failed to load components');
@@ -69,18 +69,18 @@ const ComponentSearch = () => {
   //         setFilteredComponents([]);
   //         return;
   //       }
-        
+
   //       // Đảm bảo data là một mảng
   //       if (!Array.isArray(data)) {
   //         setError('Invalid data format from server');
   //         return;
   //       }
-        
+
   //       // Xử lý dữ liệu components
   //       const parsedComponents = data.map((component) => {
   //         // Xử lý trường hợp attributes đã được format dưới dạng object từ server
   //         let attributes = component.attributes || {};
-          
+
   //         // Nếu attributes là string, chuyển đổi nó thành object
   //         if (typeof component.attributes === 'string') {
   //           try {
@@ -94,17 +94,17 @@ const ComponentSearch = () => {
   //             console.error(`Error parsing attributes for component:`, component, err);
   //           }
   //         }
-          
+
   //         // Đảm bảo giá tiền là số
   //         const parsedPrice = parseFloat(component.price) || 0;
-          
+
   //         return { 
   //           ...component, 
   //           price: parsedPrice, 
   //           attributes 
   //         };
   //       });
-        
+
   //       setComponents(parsedComponents);
   //       setFilteredComponents(parsedComponents);
   //     } catch (err) {
@@ -112,7 +112,7 @@ const ComponentSearch = () => {
   //       setError('Failed to load components');
   //     }
   //   };
-    
+
   //   if (normalizedType) {
   //     loadComponents();
   //   }
@@ -123,12 +123,11 @@ const ComponentSearch = () => {
   const loadComponents = async () => {
     try {
       setError(null);
-      
+
       // Trích xuất query params từ URL
       const searchParams = new URLSearchParams(window.location.search);
       const queryFilters = {};
       let cpuSocket = null;
-      let memory_type = null;
       
       // Chuyển đổi query params thành bộ lọc
       for (const [key, value] of searchParams.entries()) {
@@ -144,10 +143,10 @@ const ComponentSearch = () => {
         
       }
       
-      console.log('Filtering components with:', memory_type);
+      console.log('Filtering components with:', queryFilters);
       
       let data;
-      
+
       // Sử dụng API phù hợp dựa trên loại component và socket CPU
       if (normalizedType === 'CPU Cooler' && cpuSocket) {
         console.log(`Fetching compatible CPU coolers for socketss: ${cpuSocket}`);
@@ -165,7 +164,7 @@ const ComponentSearch = () => {
         // Sử dụng API lấy component thông thường
         data = await fetchComponents(normalizedType, queryFilters);
       }
-      
+
       // Kiểm tra lỗi từ API
       if (!data || data.error) {
         setError(data?.error || 'Failed to load components');
@@ -173,18 +172,18 @@ const ComponentSearch = () => {
         setFilteredComponents([]);
         return;
       }
-      
+
       // Đảm bảo data là một mảng
       if (!Array.isArray(data)) {
         setError('Invalid data format from server');
         return;
       }
-      
+
       // Xử lý dữ liệu component với các chuyển đổi phù hợp
       const parsedComponents = data.map((component) => {
         // Xử lý thuộc tính
         let attributes = component.attributes || {};
-        
+
         // Nếu attributes là một chuỗi, chuyển nó thành đối tượng
         if (typeof component.attributes === 'string') {
           try {
@@ -198,17 +197,17 @@ const ComponentSearch = () => {
             console.error(`Error parsing attributes for component:`, component, err);
           }
         }
-        
+
         // Đảm bảo giá là một số
         const parsedPrice = parseFloat(component.price) || 0;
-        
-        return { 
-          ...component, 
-          price: parsedPrice, 
-          attributes 
+
+        return {
+          ...component,
+          price: parsedPrice,
+          attributes
         };
       });
-      
+
       setComponents(parsedComponents);
       setFilteredComponents(parsedComponents);
     } catch (err) {
@@ -217,11 +216,11 @@ const ComponentSearch = () => {
     }
   };
   useEffect(() => {
-  // Inside the loadComponents async function in the useEffect
+    // Inside the loadComponents async function in the useEffect
     // Actually call the function to load components
     loadComponents();
-  
-}, [normalizedType, window.location.search]); // Thêm location.search vào dependencies để reload khi query params thay đổi
+
+  }, [normalizedType, window.location.search]); // Thêm location.search vào dependencies để reload khi query params thay đổi
 
   const itemsPerPage = 50;
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -236,37 +235,69 @@ const ComponentSearch = () => {
     );
     setFilteredComponents(filtered);
     setCurrentPage(1);
-  };
-
-  const handlePriceFilter = () => {
+  }; const handlePriceFilter = () => {
+    // Lọc các component trong khoảng giá đã chọn
     const filtered = components.filter(
-      (component) =>
-        component.price >= priceRange[0] && component.price <= priceRange[1]
-    );
-    setFilteredComponents(filtered);
-    setCurrentPage(1);
-  };
+      (component) => {
+        // Đảm bảo component có giá hợp lệ
+        if (component.price === undefined || component.price === null) {
+          return false;
+        }
 
+        // Chuyển đổi giá thành số nếu cần
+        const price = typeof component.price === 'number'
+          ? component.price
+          : parseFloat(component.price);
+
+        // Kiểm tra xem giá có hợp lệ không (là một số)
+        if (isNaN(price)) {
+          return false;
+        }
+
+        // Kiểm tra xem giá có nằm trong khoảng không
+        return price >= priceRange[0] && price <= priceRange[1];
+      }
+    );
+
+    console.log(`Price filter applied: $${priceRange[0]} - $${priceRange[1]}`);
+    console.log(`Filtered from ${components.length} to ${filtered.length} components`);
+
+    setFilteredComponents(filtered);
+    setCurrentPage(1); // Reset về trang đầu tiên sau khi lọc
+  };
   const handleManufacturerFilter = (e) => {
     const { name, checked } = e.target;
     const updatedFilter = { ...manufacturerFilter, [name]: checked };
     setManufacturerFilter(updatedFilter);
 
+    // Get list of active manufacturers
     const activeManufacturers = Object.keys(updatedFilter).filter(
       (key) => updatedFilter[key]
     );
+
+    // If no manufacturers are selected, show all components
     if (activeManufacturers.length === 0) {
       setFilteredComponents(components);
       setCurrentPage(1);
       return;
     }
-    const filtered = components.filter((component) =>
-      activeManufacturers.some((man) =>
-        component.title?.toLowerCase().includes(man.toLowerCase())
-      )
-    );
+
+    // Filter components based on selected manufacturers
+    const filtered = components.filter((component) => {
+      if (!component.title) return false;
+      const componentTitle = component.title.toLowerCase();
+      // Check if any of the selected manufacturers are in the title
+      return activeManufacturers.some((manufacturer) =>
+        componentTitle.includes(manufacturer.toLowerCase())
+      );
+    });
+
+    // Log for debugging
+    console.log(`Filtered by manufacturers: ${activeManufacturers.join(', ')}`);
+    console.log(`Found ${filtered.length} matching components`);
+
     setFilteredComponents(filtered);
-    setCurrentPage(1);
+    setCurrentPage(1); // Reset to first page after filtering
   };
 
   const handleNextPage = () => {
@@ -509,18 +540,17 @@ const ComponentSearch = () => {
       </div>
     );
   }
-
   // Get manufacturers relevant to the current component type
   const getRelevantManufacturers = () => {
     const manufacturerMap = {
       CPU: ['AMD', 'Intel'],
-      GPU: ['AMD', 'Nvidia', 'ASUS', 'MSI', 'Gigabyte'],
-      RAM: ['Corsair', 'G.Skill', 'Kingston', 'Crucial'],
-      Storage: ['Western Digital', 'Samsung', 'Seagate', 'Crucial'],
-      Mainboard: ['ASUS', 'MSI', 'Gigabyte', 'ASRock'],
-      PSU: ['Corsair', 'EVGA', 'Seasonic', 'be quiet!'],
-      'CPU Cooler': ['Noctua', 'Cooler Master', 'NZXT', 'be quiet!'],
-      Case: ['Corsair', 'NZXT', 'Fractal Design', 'Lian Li']
+      GPU: ['AMD', 'Nvidia', 'ASUS', 'MSI', 'Gigabyte', 'EVGA', 'Zotac', 'Sapphire'],
+      RAM: ['Corsair', 'G.Skill', 'Kingston', 'Crucial', 'HyperX', 'Team Group', 'ADATA', 'Patriot'],
+      Storage: ['Western Digital', 'Samsung', 'Seagate', 'Crucial', 'Kingston', 'SanDisk', 'ADATA', 'Intel'],
+      Mainboard: ['ASUS', 'MSI', 'Gigabyte', 'ASRock', 'EVGA', 'Biostar', 'NZXT'],
+      PSU: ['Corsair', 'EVGA', 'Seasonic', 'be quiet!', 'Thermaltake', 'Cooler Master', 'Antec', 'Silverstone'],
+      'CPU Cooler': ['Noctua', 'Cooler Master', 'NZXT', 'be quiet!', 'Corsair', 'Deepcool', 'Arctic', 'Thermaltake'],
+      Case: ['Corsair', 'NZXT', 'Fractal Design', 'Lian Li', 'Phanteks', 'Cooler Master', 'Thermaltake', 'be quiet!']
     };
 
     return manufacturerMap[normalizedType] || [];
@@ -570,18 +600,28 @@ const ComponentSearch = () => {
               <h3>Price Range</h3>
               <div className="comp-search-price-label">
                 ${priceRange[0]} - ${priceRange[1].toLocaleString()}
-              </div>
-              <div className="comp-search-price-slider">
+              </div>              <div className="comp-search-price-slider">
+                <div className="comp-search-price-track"></div>
+                <div
+                  className="comp-search-price-range-selected"
+                  style={{
+                    left: `${(priceRange[0] / 5000) * 100}%`,
+                    right: `${100 - (priceRange[1] / 5000) * 100}%`
+                  }}
+                ></div>
                 <input
                   type="range"
                   min="0"
                   max="5000"
                   value={priceRange[0]}
                   onChange={(e) => {
-                    const newRange = [parseInt(e.target.value), priceRange[1]];
-                    setPriceRange(newRange);
-                    handlePriceFilter();
+                    const value = parseInt(e.target.value);
+                    // Đảm bảo giá trị min không vượt quá giá trị max - 50
+                    const newMin = Math.min(value, priceRange[1] - 50);
+                    setPriceRange([newMin, priceRange[1]]);
                   }}
+                  onMouseUp={handlePriceFilter} // Chỉ áp dụng bộ lọc khi người dùng thả chuột
+                  onTouchEnd={handlePriceFilter} // Cho thiết bị cảm ứng
                 />
                 <input
                   type="range"
@@ -589,18 +629,19 @@ const ComponentSearch = () => {
                   max="5000"
                   value={priceRange[1]}
                   onChange={(e) => {
-                    const newRange = [priceRange[0], parseInt(e.target.value)];
-                    setPriceRange(newRange);
-                    handlePriceFilter();
+                    const value = parseInt(e.target.value);
+                    // Đảm bảo giá trị max không nhỏ hơn giá trị min + 50
+                    const newMax = Math.max(value, priceRange[0] + 50);
+                    setPriceRange([priceRange[0], newMax]);
                   }}
+                  onMouseUp={handlePriceFilter} // Chỉ áp dụng bộ lọc khi người dùng thả chuột
+                  onTouchEnd={handlePriceFilter} // Cho thiết bị cảm ứng
                 />
               </div>
-            </div>
-
-            <div className="comp-search-filter-section">
+            </div>            <div className="comp-search-filter-section">
               <h3>Manufacturer</h3>
               <div className="comp-search-checkbox-group">
-                {getRelevantManufacturers().map(manufacturer => (
+                {getRelevantManufacturers().slice(0, showAllManufacturers ? getRelevantManufacturers().length : 4).map((manufacturer) => (
                   <label key={manufacturer}>
                     <input
                       type="checkbox"
@@ -612,6 +653,13 @@ const ComponentSearch = () => {
                   </label>
                 ))}
               </div>
+              {getRelevantManufacturers().length > 4 && (<button
+                className="comp-search-see-more"
+                onClick={() => setShowAllManufacturers(!showAllManufacturers)}
+              >
+                {showAllManufacturers ? 'See Less' : 'See More'}
+              </button>
+              )}
             </div>
 
             <button
@@ -685,7 +733,7 @@ const ComponentSearch = () => {
                                   }}
                                 />
                                 <span
-                                  onClick={() => navigate(`/component-info/${type}/${component.product_id}`)}
+                                  onClick={() => navigate(`/product-info/${component.product_id}`)}
                                 >
                                   {data}
                                 </span>
@@ -696,10 +744,10 @@ const ComponentSearch = () => {
                           </td>
                         ))}
                         <td>
-                        <button
+                          <button
                             className="comp-search-add-button"
                             onClick={async () => {
-            
+
                               try {
                                 const productId = parseInt(component.product_id, 10); // Cơ số 10 để tránh các vấn đề với số bắt đầu bằng 0
                                 // Gọi API để lấy thông tin chi tiết của component
@@ -716,7 +764,7 @@ const ComponentSearch = () => {
                                   state: {
                                     addedComponent: componentDetail,
                                   },
-                                  
+
                                 });
                                 console.log('Navigating to build with component:', componentDetail);
                               } catch (error) {
@@ -731,7 +779,7 @@ const ComponentSearch = () => {
                             }}
                           >
                             <i className="fas fa-plus"></i> Add
-                        </button>
+                          </button>
                         </td>
                       </tr>
                     ))}

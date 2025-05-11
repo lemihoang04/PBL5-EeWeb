@@ -11,16 +11,16 @@ const UserManager = () => {
         setLoading(true);
         try {
             const response = await GetAllUser();
-            // Nếu response là mảng, set luôn, nếu không thì lấy response.data
+            // If response is an array, set it directly, otherwise use response.data
             if (Array.isArray(response)) {
                 setUsers(response);
             } else if (response && Array.isArray(response.data)) {
                 setUsers(response.data);
             } else {
-                toast.error("Không thể tải danh sách người dùng.");
+                toast.error("Unable to load user list.");
             }
         } catch (error) {
-            toast.error("Lỗi khi tải danh sách người dùng.");
+            toast.error("Error loading user list.");
         } finally {
             setLoading(false);
         }
@@ -31,38 +31,38 @@ const UserManager = () => {
     }, []);
 
     const handleDelete = async (userId) => {
-        if (window.confirm("Bạn có chắc chắn muốn xóa người dùng này?")) {
+        if (window.confirm("Are you sure you want to delete this user?")) {
             try {
                 await DeleteUser(userId);
-                toast.success("Đã xóa người dùng.");
+                toast.success("User deleted successfully.");
                 fetchUsers();
             } catch (error) {
-                toast.error("Lỗi khi xóa người dùng.");
+                toast.error("Error deleting user.");
             }
         }
     };
 
     return (
         <div className="user-manager-container">
-            <h2>Quản lý người dùng</h2>
+            <h2>User Management</h2>
             {loading ? (
-                <p>Đang tải...</p>
+                <p>Loading...</p>
             ) : (
                 <table className="table table-bordered">
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Tên</th>
+                            <th>Name</th>
                             <th>Email</th>
-                            <th>Điện thoại</th>
-                            <th>Địa chỉ</th>
-                            <th>Hành động</th>
+                            <th>Phone</th>
+                            <th>Address</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {users.length === 0 ? (
                             <tr>
-                                <td colSpan="6">Không có người dùng nào.</td>
+                                <td colSpan="6">No users found.</td>
                             </tr>
                         ) : (
                             users.map((user) => (
@@ -73,12 +73,12 @@ const UserManager = () => {
                                     <td>{user.phone}</td>
                                     <td>{user.address}</td>
                                     <td>
-                                        {/* Nút xóa, có thể thêm nút sửa nếu muốn */}
+                                        {/* Delete button, can add edit button if needed */}
                                         <button
                                             className="btn btn-danger btn-sm"
                                             onClick={() => handleDelete(user.id)}
                                         >
-                                            Xóa
+                                            Delete
                                         </button>
                                     </td>
                                 </tr>

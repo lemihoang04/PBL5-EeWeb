@@ -30,7 +30,7 @@ def api_get_order_by_id(order_id):
     except Exception as e:
         return jsonify({"errCode": 1, "message": str(e)}), 500
     
-@order_blueprint.route('/cancel_order/<order_id>', methods=['POST'])
+@order_blueprint.route('/orders/cancel/<order_id>', methods=['POST'])
 def api_cancel_order(order_id):
     try:
         if not order_id:
@@ -41,4 +41,4 @@ def api_cancel_order(order_id):
         else:
             return jsonify({"errCode": 1, "message": "Order not found or already cancelled"}), 404
     except Exception as e:
-        return jsonify({"errCode": 1, "message": str(e)}), 500    
+        return jsonify({"errCode": 1, "message": str(e)}), 500

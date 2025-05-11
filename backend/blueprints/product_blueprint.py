@@ -136,7 +136,10 @@ def get_components_by_type(type):
             print(f"Getting all components of type: {type}")
             components, status = dal_get_components_by_attributes(type)
         
+<<<<<<< HEAD
 
+=======
+>>>>>>> ff8aec13d25055ea7ad855f2e62d62738a9e1452
         # Phần code sau đây sẽ chạy sau khi đã gán giá trị cho components và status
         if status == 200:
             return jsonify(components), 200
@@ -195,6 +198,7 @@ def get_compatible_mainboards(cpu_socket):
         print(f"Error in get_compatible_mainboards: {e}")
         return jsonify({"error": str(e)}), 500
 
+<<<<<<< HEAD
 @product_blueprint.route("/ram/compatible/<string:memory_type>", methods=["GET"])
 def get_compatible_Ram(memory_type):
     """
@@ -217,4 +221,48 @@ def get_compatible_Ram(memory_type):
             return jsonify(ram), status
     except Exception as e:
         print(f"Error in get_compatible_mainboards: {e}")
+=======
+@product_blueprint.route("/product/<int:product_id>", methods=["DELETE"])
+def delete_product(product_id):
+    """
+    API endpoint to delete a product by ID
+    
+    Args:
+        product_id (int): The ID of the product to delete
+        
+    Returns:
+        JSON response with success or error message
+    """
+    try:
+        result, status = dal_delete_product(product_id)
+        return jsonify(result), status
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@product_blueprint.route("/product/<int:product_id>", methods=["GET"])
+def get_product_by_id(product_id):
+    try:
+        product, status = dal_get_product_by_id(product_id)
+        if status == 200:
+            return jsonify(product), 200
+        else:
+            return jsonify({"error": "Product not found"}), status
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@product_blueprint.route("/category/<int:category_id>/products", methods=["GET"])
+def get_products_by_category(category_id):
+    try:
+        products, status = dal_get_products_by_category(category_id)
+        return jsonify(products), status
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+@product_blueprint.route("/featured-categories", methods=["GET"])
+def get_products_from_different_categories():
+    try:
+        products, status = dal_get_products_from_different_categories()
+        return jsonify(products), status
+    except Exception as e:
+>>>>>>> ff8aec13d25055ea7ad855f2e62d62738a9e1452
         return jsonify({"error": str(e)}), 500

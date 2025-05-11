@@ -20,7 +20,6 @@ import CheckPayment from "../pages/Private/CheckPayment/CheckPayment";
 import FailPayment from "../pages/Private/failPayment/failPayment";
 import ForgetPassword from "../pages/ForgerPassword/ForgetPassword";
 import ScrollToTop from "../components/ScrollToTop";
-import ComponentInfo from "../pages/ComponentInfo/ComponentInfo";
 import LoginAdmin from "../pages/Admin/Login/AdminLogin";
 const AppRoutes = () => {
     return (
@@ -78,7 +77,6 @@ const AppRoutes = () => {
                             }
                         />
                         <Route path="/components/:type" element={<ComponentSearch />} />
-                        <Route path="/component-info/:type/:componentId" element={<ComponentInfo />} />
                         <Route path="/checkPayment" element={<CheckPayment />} />
                         <Route path="/failPayment" element={<FailPayment />} />
                         <Route path="/forgot-password" element={<ForgetPassword />} /> {/* Added route for ForgetPassword */}
