@@ -198,7 +198,6 @@ def get_compatible_mainboards(cpu_socket):
         print(f"Error in get_compatible_mainboards: {e}")
         return jsonify({"error": str(e)}), 500
 
-<<<<<<< HEAD
 @product_blueprint.route("/ram/compatible/<string:memory_type>", methods=["GET"])
 def get_compatible_Ram(memory_type):
     """
@@ -221,7 +220,6 @@ def get_compatible_Ram(memory_type):
             return jsonify(ram), status
     except Exception as e:
         print(f"Error in get_compatible_mainboards: {e}")
-=======
 @product_blueprint.route("/product/<int:product_id>", methods=["DELETE"])
 def delete_product(product_id):
     """
@@ -264,5 +262,4 @@ def get_products_from_different_categories():
         products, status = dal_get_products_from_different_categories()
         return jsonify(products), status
     except Exception as e:
->>>>>>> ff8aec13d25055ea7ad855f2e62d62738a9e1452
         return jsonify({"error": str(e)}), 500
