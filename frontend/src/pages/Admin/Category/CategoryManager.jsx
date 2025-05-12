@@ -19,19 +19,19 @@ const CategoryManager = () => {
         try {
             const res = await axios.get("/categories");
             const data = Array.isArray(res) ? res : res.data;
-                
+
             if (!data) {
                 console.error("No data received from server");
                 setCategories([]);
                 return;
             }
-                
+
             if (!Array.isArray(data)) {
                 console.error("Invalid data format - expected array");
                 setCategories([]);
                 return;
             }
-                
+
             setCategories(data);
         } catch (error) {
             console.error("Error fetching categories:", error);
@@ -53,12 +53,12 @@ const CategoryManager = () => {
             toast.warning("Category name cannot be empty");
             return;
         }
-        
+
         setIsLoading(true);
         try {
-            await axios.post("/categories", { 
+            await axios.post("/categories", {
                 name: newCategory,
-                description: newDescription 
+                description: newDescription
             });
             toast.success("Category added successfully");
             setNewCategory("");
@@ -75,7 +75,7 @@ const CategoryManager = () => {
     // Delete category
     const handleDelete = async (id) => {
         if (!window.confirm("Are you sure you want to delete this category?")) return;
-        
+
         setIsLoading(true);
         try {
             await axios.delete(`/categories/${id}`);
@@ -102,12 +102,12 @@ const CategoryManager = () => {
             toast.warning("Category name cannot be empty");
             return;
         }
-        
+
         setIsLoading(true);
         try {
-            await axios.put(`/categories/${id}`, { 
+            await axios.put(`/categories/${id}`, {
                 name: editingName,
-                description: editingDescription 
+                description: editingDescription
             });
             toast.success("Category updated successfully");
             setEditingId(null);
@@ -130,8 +130,8 @@ const CategoryManager = () => {
     };
 
     // Filter categories by search term
-    const filteredCategories = categories.filter(cat => 
-        cat.category_name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    const filteredCategories = categories.filter(cat =>
+        cat.category_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         (cat.description && cat.description.toLowerCase().includes(searchTerm.toLowerCase()))
     );
 
@@ -143,27 +143,27 @@ const CategoryManager = () => {
     };
 
     return (
-        <div className="category-manager-container">
-            <div className="category-header">
+        <div className="catmgr-category-manager-container">
+            <div className="catmgr-category-header">
                 <h2>Category Management</h2>
-                <div className="search-container">
+                <div className="catmgr-search-container">
                     <input
                         type="text"
                         placeholder="Search categories..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="search-input"
+                        className="catmgr-search-input"
                     />
                 </div>
             </div>
 
-            <div className="card">
-                <div className="card-header">
+            <div className="catmgr-card">
+                <div className="catmgr-card-header">
                     <h3>Add New Category</h3>
                 </div>
-                <div className="card-body">
-                    <form className="category-add-form" onSubmit={handleAddCategory}>
-                        <div className="form-group">
+                <div className="catmgr-card-body">
+                    <form className="catmgr-category-add-form" onSubmit={handleAddCategory}>
+                        <div className="catmgr-form-group">
                             <label htmlFor="categoryName">Name</label>
                             <input
                                 id="categoryName"
@@ -173,7 +173,7 @@ const CategoryManager = () => {
                                 onChange={(e) => setNewCategory(e.target.value)}
                             />
                         </div>
-                        <div className="form-group">
+                        <div className="catmgr-form-group">
                             <label htmlFor="categoryDescription">Description</label>
                             <textarea
                                 id="categoryDescription"
@@ -182,9 +182,9 @@ const CategoryManager = () => {
                                 onChange={(e) => setNewDescription(e.target.value)}
                             />
                         </div>
-                        <button 
-                            type="submit" 
-                            className="btn-primary"
+                        <button
+                            type="submit"
+                            className="catmgr-btn-primary"
                             disabled={isLoading}
                         >
                             {isLoading ? "Adding..." : "Add Category"}
@@ -193,23 +193,23 @@ const CategoryManager = () => {
                 </div>
             </div>
 
-            <div className="card mt-4">
-                <div className="card-header">
+            <div className="catmgr-card catmgr-mt-4">
+                <div className="catmgr-card-header">
                     <h3>Categories List</h3>
-                    <span className="category-count">{filteredCategories.length} categories</span>
+                    <span className="catmgr-category-count">{filteredCategories.length} categories</span>
                 </div>
-                <div className="card-body">
-                    {isLoading && <div className="loading-indicator">Loading...</div>}
-                    
+                <div className="catmgr-card-body">
+                    {isLoading && <div className="catmgr-loading-indicator">Loading...</div>}
+
                     {!isLoading && filteredCategories.length === 0 && (
-                        <div className="empty-state">
+                        <div className="catmgr-empty-state">
                             {searchTerm ? "No categories match your search" : "No categories available"}
                         </div>
                     )}
-                    
+
                     {!isLoading && filteredCategories.length > 0 && (
-                        <div className="table-responsive">
-                            <table className="category-table">
+                        <div className="catmgr-table-responsive">
+                            <table className="catmgr-category-table">
                                 <thead>
                                     <tr>
                                         <th>ID</th>
@@ -230,10 +230,10 @@ const CategoryManager = () => {
                                                         type="text"
                                                         value={editingName}
                                                         onChange={(e) => setEditingName(e.target.value)}
-                                                        className="edit-input"
+                                                        className="catmgr-edit-input"
                                                     />
                                                 ) : (
-                                                    <span className="category-name">{cat.category_name}</span>
+                                                    <span className="catmgr-category-name">{cat.category_name}</span>
                                                 )}
                                             </td>
                                             <td>
@@ -241,42 +241,42 @@ const CategoryManager = () => {
                                                     <textarea
                                                         value={editingDescription}
                                                         onChange={(e) => setEditingDescription(e.target.value)}
-                                                        className="edit-textarea"
+                                                        className="catmgr-edit-textarea"
                                                     />
                                                 ) : (
-                                                    <span className="category-description">{cat.description || "—"}</span>
+                                                    <span className="catmgr-category-description">{cat.description || "—"}</span>
                                                 )}
                                             </td>
                                             <td>{formatDate(cat.created_at)}</td>
                                             <td>{formatDate(cat.updated_at)}</td>
-                                            <td className="actions-cell">
+                                            <td className="catmgr-actions-cell">
                                                 {editingId === cat.category_id ? (
                                                     <>
-                                                        <button 
+                                                        <button
                                                             onClick={() => handleSaveEdit(cat.category_id)}
-                                                            className="btn-save"
+                                                            className="catmgr-btn-save"
                                                             disabled={isLoading}
                                                         >
                                                             Save
                                                         </button>
-                                                        <button 
+                                                        <button
                                                             onClick={handleCancelEdit}
-                                                            className="btn-cancel"
+                                                            className="catmgr-btn-cancel"
                                                         >
                                                             Cancel
                                                         </button>
                                                     </>
                                                 ) : (
                                                     <>
-                                                        <button 
+                                                        <button
                                                             onClick={() => handleEdit(cat.category_id, cat.category_name, cat.description)}
-                                                            className="btn-edit"
+                                                            className="catmgr-btn-edit"
                                                         >
                                                             Edit
                                                         </button>
-                                                        <button 
+                                                        <button
                                                             onClick={() => handleDelete(cat.category_id)}
-                                                            className="btn-delete"
+                                                            className="catmgr-btn-delete"
                                                         >
                                                             Delete
                                                         </button>

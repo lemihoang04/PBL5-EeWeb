@@ -300,7 +300,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 20px;
+    /* padding: 20px; */
     /* background-color: var(--light-bg); */
     transition: var(--transition);
 }
@@ -474,7 +474,8 @@
 }
 
 .techshop-builder-banner__image {
-    max-width: 100%;
+    max-width: 50%;
+
     height: auto;
     border-radius: var(--radius-lg);
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);

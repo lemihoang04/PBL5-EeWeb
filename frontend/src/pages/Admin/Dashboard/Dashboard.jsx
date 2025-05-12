@@ -1,27 +1,28 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./Dashboard.css";
-import { 
-  FaShoppingCart, 
-  FaDollarSign, 
-  FaCheckCircle, 
-  FaUndo, 
-  FaChartLine, 
-  FaUsers, 
+import { getDashboardStats } from "../../../services/adminService";
+import {
+  FaShoppingCart,
+  FaDollarSign,
+  FaCheckCircle,
+  FaUndo,
+  FaChartLine,
+  FaUsers,
   FaBox,
   FaCalendarAlt
 } from "react-icons/fa";
-import { 
-  Chart as ChartJS, 
-  CategoryScale, 
-  LinearScale, 
-  PointElement, 
-  LineElement, 
-  BarElement, 
-  Title, 
-  Tooltip, 
-  Legend, 
-  ArcElement 
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+  ArcElement
 } from 'chart.js';
 import { Line, Bar, Doughnut } from 'react-chartjs-2';
 
@@ -38,45 +39,60 @@ ChartJS.register(
   ArcElement
 );
 
+
 const Dashboard = ({ setActiveMenu }) => {
   // Stats for the top cards
+
+  const [dataStats, setStats] = useState([]);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const data = await getDashboardStats();
+        setStats(data.stats);
+      } catch (error) {
+        console.error("Failed to fetch dashboard stats:", error);
+      }
+    };
+
+    fetchStats();
+  }, []);
+  // Data for the sales chart
   const stats = [
-    { 
-      value: "12,432", 
-      label: "Orders", 
-      color: "primary", 
-      icon: <FaShoppingCart />, 
+    {
+      value: dataStats.totalOrders,
+      label: "Orders",
+      color: "primary",
+      icon: <FaShoppingCart />,
       growth: "+8.4%",
       period: "vs. last month"
     },
-    { 
-      value: "$324,091", 
-      label: "Revenue", 
-      color: "success", 
-      icon: <FaDollarSign />, 
+    {
+      value: dataStats.totalRevenue,
+      label: "Revenue",
+      color: "success",
+      icon: <FaDollarSign />,
       growth: "+5.3%",
       period: "vs. last month"
     },
-    { 
-      value: "4,532", 
-      label: "Customers", 
-      color: "info", 
-      icon: <FaUsers />, 
+    {
+      value: dataStats.totalUsers,
+      label: "Customers",
+      color: "info",
+      icon: <FaUsers />,
       growth: "+12.7%",
       period: "vs. last month"
     },
-    { 
-      value: "435", 
-      label: "Returns", 
-      color: "warning", 
-      icon: <FaUndo />, 
-      growth: "-2.3%", 
+    {
+      value: "435",
+      label: "Returns",
+      color: "warning",
+      icon: <FaUndo />,
+      growth: "-2.3%",
       period: "vs. last month",
       negative: true
     },
   ];
-
-  // Data for the sales chart
   const salesData = {
     labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
     datasets: [
@@ -144,14 +160,15 @@ const Dashboard = ({ setActiveMenu }) => {
   };
 
   // Data for recent orders
-  const recentOrders = [
-    { id: '#ORD-7243', customer: 'John Doe', date: 'May 6, 2025', status: 'Completed', total: '$1,240.00' },
-    { id: '#ORD-7242', customer: 'Jane Smith', date: 'May 5, 2025', status: 'Processing', total: '$857.50' },
-    { id: '#ORD-7241', customer: 'Robert Johnson', date: 'May 5, 2025', status: 'Completed', total: '$2,170.00' },
-    { id: '#ORD-7240', customer: 'Emily Davis', date: 'May 4, 2025', status: 'Shipped', total: '$990.25' },
-    { id: '#ORD-7239', customer: 'Michael Brown', date: 'May 4, 2025', status: 'Completed', total: '$1,450.75' },
-  ];
-  
+  // const recentOrders = [
+  //   { id: '#ORD-7243', customer: 'John Doe', date: 'May 6, 2025', status: 'Completed', total: '$1,240.00' },
+  //   { id: '#ORD-7242', customer: 'Jane Smith', date: 'May 5, 2025', status: 'Processing', total: '$857.50' },
+  //   { id: '#ORD-7241', customer: 'Robert Johnson', date: 'May 5, 2025', status: 'Completed', total: '$2,170.00' },
+  //   { id: '#ORD-7240', customer: 'Emily Davis', date: 'May 4, 2025', status: 'Shipped', total: '$990.25' },
+  //   { id: '#ORD-7239', customer: 'Michael Brown', date: 'May 4, 2025', status: 'Completed', total: '$1,450.75' },
+  // ];
+  const recentOrders = dataStats.recentOrders;
+
   // Data for customer activities
   const customerActivities = [
     { action: 'New account created', user: 'Thomas Wilson', time: '10 minutes ago' },
@@ -160,14 +177,18 @@ const Dashboard = ({ setActiveMenu }) => {
     { action: 'Started a return', user: 'Laura Thompson', time: '2 hours ago' },
     { action: 'Contacted support', user: 'Kevin Martin', time: '3 hours ago' },
   ];
-  
+
   const getStatusClass = (status) => {
-    switch(status) {
-      case 'Completed': return 'bg-success';
-      case 'Processing': return 'bg-warning';
-      case 'Shipped': return 'bg-info';
+    switch (status) {
+      case 'completed': return 'bg-success';
+      case 'pending': return 'bg-warning';
+      case 'canceled': return 'bg-danger';
       default: return 'bg-secondary';
     }
+  };
+
+  const capitalizeFirstLetter = (string) => {
+    return string.charAt(0).toUpperCase() + string.slice(1);
   };
 
   return (
@@ -182,7 +203,7 @@ const Dashboard = ({ setActiveMenu }) => {
         </div>
         <p className="text-muted">Welcome to your admin dashboard. Here's what's happening with your store today.</p>
       </div>
-      
+
       {/* Stat cards */}
       <div className="row g-4 mb-4">
         {stats.map((stat, index) => (
@@ -206,7 +227,7 @@ const Dashboard = ({ setActiveMenu }) => {
           </div>
         ))}
       </div>
-      
+
       {/* Charts row */}
       <div className="row g-4 mb-4">
         <div className="col-xl-8">
@@ -225,8 +246,8 @@ const Dashboard = ({ setActiveMenu }) => {
               <h5 className="card-title">Sales by Category</h5>
             </div>
             <div className="card-body d-flex align-items-center justify-content-center">
-              <Doughnut 
-                data={topProductsData} 
+              <Doughnut
+                data={topProductsData}
                 options={{
                   responsive: true,
                   maintainAspectRatio: false,
@@ -241,7 +262,7 @@ const Dashboard = ({ setActiveMenu }) => {
           </div>
         </div>
       </div>
-      
+
       {/* Activity row */}
       <div className="row g-4">
         <div className="col-xl-8">
@@ -263,17 +284,23 @@ const Dashboard = ({ setActiveMenu }) => {
                     </tr>
                   </thead>
                   <tbody>
-                    {recentOrders.map((order, index) => (
-                      <tr key={index}>
-                        <td><strong>{order.id}</strong></td>
-                        <td>{order.customer}</td>
-                        <td>{order.date}</td>
-                        <td>
-                          <span className={`badge ${getStatusClass(order.status)}`}>{order.status}</span>
-                        </td>
-                        <td className="text-end">{order.total}</td>
+                    {recentOrders && recentOrders.length > 0 ? (
+                      recentOrders.map((order, index) => (
+                        <tr key={index}>
+                          <td><strong>{order.id}</strong></td>
+                          <td>{order.user_name}</td>
+                          <td>{order.created_at}</td>
+                          <td>
+                            <span className={`badge ${getStatusClass(order.status)}`}>{capitalizeFirstLetter(order.status)}</span>
+                          </td>
+                          <td className="text-end">{order.price}</td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan="5" className="text-center py-3">No recent orders available</td>
                       </tr>
-                    ))}
+                    )}
                   </tbody>
                 </table>
               </div>
