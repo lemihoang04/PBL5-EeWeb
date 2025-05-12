@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { fetchCompatibleCpuCoolers, fetchCompatibleMainboards, fetchComponents, fetchCompatibleRam, fetchCompatibleStorage, fetchCompatibleCases } from '../../services/componentService';
+import { fetchCompatibleCpuCoolers, fetchCompatibleMainboards, fetchComponents, fetchCompatibleRam, fetchCompatibleStorage, fetchCompatibleCases, fetchCompatiblePSU } from '../../services/componentService';
 import './ComponentSearch.css';
 import { fetchComponentById } from '../../services/componentService';
 
@@ -130,7 +130,7 @@ const ComponentSearch = () => {
       let cpuSocket = null;
       let memory_type = null;
       let form_factor = null;
-      
+      let totalWattage = null;
       // Chuyển đổi query params thành bộ lọc
       for (const [key, value] of searchParams.entries()) {
         if (key === 'cpu_socket') {
@@ -141,6 +141,9 @@ const ComponentSearch = () => {
         }
         else if (key === 'form_factor') {
           form_factor = value;
+        }
+        else if (key === 'wattage') {
+          totalWattage = value;
         }
         else if (key !== 'type') { // Bỏ qua tham số 'type' nếu có
           queryFilters[key] = value;
@@ -171,6 +174,10 @@ const ComponentSearch = () => {
       else if (normalizedType === 'Case' && form_factor) {
         console.log(`Fetching compatible Cases for form factor: ${form_factor}`);
         data = await fetchCompatibleCases(form_factor);
+      }
+      else if (normalizedType === 'PSU' && totalWattage) {
+        console.log(`Fetching compatible PSU for total wattage: ${totalWattage}`);
+        data = await fetchCompatiblePSU(totalWattage);
       }
       else {
         // Sử dụng API lấy component thông thường

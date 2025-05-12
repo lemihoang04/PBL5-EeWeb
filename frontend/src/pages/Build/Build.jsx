@@ -151,22 +151,36 @@ const Build = () => {
   // Memory compatibility check state
   const [memoryCompatible, setMemoryCompatible] = useState(true);
 
+  const totalWattage = calculateWattage();
+
   // Add a state variable to track overall compatibility
   const [isCompatible, setIsCompatible] = useState(true);
 
-  const calculateTotalPrice = () => {
-    return components.reduce((sum, component) => {
-      if (!component.selected) return sum;
-
-      if (component.multiple) {
-        // If multiple type (array of products)
-        return sum + component.selected.reduce((itemSum, item) => itemSum + (item ? item.price : 0), 0);
-      } else {
-        // If single type (one product)
-        return sum + (component.selected ? component.selected.price : 0);
+  function calculateTotalPrice() {
+    // Object to store price of each component category
+    const componentTotals = {};
+    let grandTotal = 0;
+    
+    // Calculate price for each component separately
+    components.forEach(component => {
+      let categoryTotal = 0;
+      
+      if (component.multiple && component.selected && component.selected.length > 0) {
+        // For multiple components (RAM, Storage, GPU)
+        categoryTotal = component.selected.reduce((sum, item) => 
+          sum + (item && item['price'] ? Number(item['price']) : 0), 0);
+      } else if (component.selected && component.selected['price']) {
+        // For single components (CPU, Mainboard, etc.)
+        categoryTotal = Number(component.selected['price']);
       }
-    }, 0);
-  };
+      
+      // Store category total and add to grand total
+      componentTotals[component.id] = categoryTotal;
+      grandTotal += categoryTotal;
+    });
+    
+    return grandTotal; // Return the sum of all components
+  }
 
   const totalPrice = calculateTotalPrice();
 
@@ -333,6 +347,10 @@ const Build = () => {
         navigate(`/components/case`);
       }
     }
+    else if (componentId === 'psu') {
+
+      navigate(`/components/psu?wattage=${totalWattage}`);
+    }
     else {
       navigate(`/components/${componentId}`);
     }
@@ -369,24 +387,29 @@ const Build = () => {
     }
   }, [location.state]);
 
-  const handleRemoveComponent = (componentId, index = null) => {
-    setComponents((prevComponents) =>
-      prevComponents.map((comp) => {
-        if (comp.id === componentId) {
-          if (comp.multiple && index !== null) {
-            // Remove a specific item from the selected array
-            const newSelected = [...comp.selected];
-            newSelected.splice(index, 1);
-            return { ...comp, selected: newSelected };
-          } else {
-            // Remove all selected if not multiple or no index
-            return { ...comp, selected: comp.multiple ? [] : null };
-          }
+  // Hàm handleRemoveComponent - Xử lý xóa component
+const handleRemoveComponent = (componentId, index = null) => {
+  setComponents((prevComponents) => {
+    const updatedComponents = prevComponents.map((comp) => {
+      if (comp.id === componentId) {
+        if (comp.multiple && index !== null) {
+          // Xóa một mục cụ thể khỏi mảng đã chọn
+          const newSelected = [...comp.selected];
+          newSelected.splice(index, 1);
+          return { ...comp, selected: newSelected };
+        } else {
+          // Xóa tất cả các mục đã chọn nếu không phải dạng multiple hoặc không có chỉ mục
+          return { ...comp, selected: comp.multiple ? [] : null };
         }
-        return comp;
-      })
-    );
-  };
+      }
+      return comp;
+    });
+    
+    // Cập nhật ngay lập tức vào sessionStorage
+    sessionStorage.setItem('components', JSON.stringify(updatedComponents));
+    return updatedComponents;
+  });
+};
 
   return (
     <div className="build-container">
@@ -533,7 +556,7 @@ const Build = () => {
         </tbody>
       </table>
 
-      <div className="additional-components">
+      {/* <div className="additional-components">
         <div className="component-group">
           <div className="group-title">
             <span className="group-icon">🔌</span>
@@ -575,7 +598,7 @@ const Build = () => {
             ))}
           </div>
         </div>
-      </div>
+      </div> */}
 
       <div className="total-section">
         <div className="total-label">Total:</div>
@@ -632,6 +655,7 @@ const Build = () => {
 
   // Helper function to format price
   function renderPrice(price) {
+    console.log('Price:', price);
     if (!price) return '—';
     return `$${price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   }
@@ -642,25 +666,44 @@ const Build = () => {
 
     // CPU wattage (typically 65-125W)
     const cpu = components.find(c => c.id === 'cpu')?.selected;
+    const cpuCooler = components.find(c => c.id === 'cpu Cooler')?.selected;
+    const mainboard = components.find(c => c.id === 'Mainboard')?.selected;
+    const rams = components.find(c => c.id === 'ram')?.selected || [];
+    const storages = components.find(c => c.id === 'storage')?.selected || [];
+
+    // Function to calculate total price of all components
+
+    // Mainboard wattage
+    if (mainboard) {
+      totalWattage += 70;
+    }
     
+    // CPU Cooler wattage
+    if (cpuCooler) {
+      totalWattage += 15;
+    }
     
-    // console.log('CPU TDP:', cpu['attributes']['TDP']);
+    // CPU wattage
     if (cpu) {
-      totalWattage += cpu['attributes']['TDP'] || 95;
+      const tdpValue = cpu['attributes']['TDP'] ? parseInt(cpu['attributes']['TDP']) : NaN;
+      totalWattage += isNaN(tdpValue) ? 95 : tdpValue;
     }
 
-    // GPU wattage (typically 75-350W)
-    const gpus = components.find(c => c.id === 'gpu')?.selected || [];
-    gpus.forEach(gpu => {
-      totalWattage += gpu.specs?.tdp || 150;
+    // RAM wattage - 30W per RAM module
+    rams.forEach(ram => {
+      totalWattage += 30;
     });
 
-    // Other components
-    totalWattage += 40; // Motherboard
-    totalWattage += 10; // Each RAM ~2-5W
-    totalWattage += 15; // Each SSD/HDD ~5-10W
-    totalWattage += 20; // Fans and other components
+    // Storage wattage - 10W per storage device
+    storages.forEach(storage => {
+      totalWattage += 10;
+    });
 
+    // GPU wattage (using TDP values)
+    const gpus = components.find(c => c.id === 'gpu')?.selected || [];
+    gpus.forEach(gpu => {
+      totalWattage += parseInt(gpu['attributes']['TDP']) || 150;
+    });
     return totalWattage;
   }
 };

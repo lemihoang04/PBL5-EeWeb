@@ -262,6 +262,30 @@ def get_compatible_cases(form_factor):
         print(f"Error in get_compatible_cases: {e}")
         return jsonify({"error": str(e)}), 500
 
+@product_blueprint.route("/psu/compatible/<int:total_tdp>", methods=["GET"])
+def get_compatible_psu(total_tdp):
+    """
+    API route to get PSUs compatible with a system having the specified total TDP.
+    
+    Args:
+        total_tdp (int): Total power consumption (TDP) of the system in watts
+    
+    Returns:
+        JSON response with compatible PSUs or error message.
+    """
+    try:
+        # Call the DAL function to get compatible PSUs
+        psus, status = dal_PSU_vs_TotalTDP(total_tdp)
+        
+        # Return the result
+        if status == 200:
+            return jsonify(psus), 200
+        else:
+            return jsonify(psus), status
+    except Exception as e:
+        print(f"Error in get_compatible_psu: {e}")
+        return jsonify({"error": str(e)}), 500
+
 @product_blueprint.route("/product/<int:product_id>", methods=["DELETE"])
 def delete_product(product_id):
     """

@@ -578,6 +578,54 @@ def dal_Storage_vs_Mainboard():
     finally:
         db.close()
 
+
+def dal_PSU_vs_TotalTDP(total_tdp):
+    """
+    Get product IDs of PSUs compatible with a system having the specified total TDP.
+    
+    Args:
+        total_tdp (int): Total power consumption (TDP) of the system in watts
+    
+    Returns:
+        tuple: (products, status_code)
+            products: List of compatible PSUs with details or error message
+            status_code: HTTP status code
+    """
+    db = get_db_connection()
+    if not db:
+        return {'error': 'Database connection failed'}, 500
+
+    try:
+        # Add a safety margin of 20% to the total TDP
+        required_wattage = total_tdp * 1.2
+        
+        # Query to find PSUs with sufficient wattage for the system's total TDP
+        query = """
+        SELECT DISTINCT pa.product_id
+        FROM product_attributes pa
+        JOIN products p ON pa.product_id = p.product_id
+        WHERE p.category_id = 15  # Assuming 15 is the category_id for PSUs
+          AND pa.attribute_name = 'Wattage'
+          AND CAST(REGEXP_REPLACE(pa.attribute_value, '[^0-9]', '') AS UNSIGNED) >= %s
+        ORDER BY CAST(REGEXP_REPLACE(pa.attribute_value, '[^0-9]', '') AS UNSIGNED) ASC
+        """
+
+        # Use pandas to read data from database
+        df = pd.read_sql_query(query, db, params=(required_wattage,))
+
+        # Get product IDs list
+        product_ids = df['product_id'].tolist()
+
+        # Return detailed product information using existing function
+        return dal_get_products_by_ids(product_ids)
+
+    except Exception as e:
+        return {'error': str(e)}, 500
+
+    finally:
+        db.close()
+
+
 def dal_Case_vs_Mainboard(form_factor):
     """
     Get product IDs of Cases compatible with a specific Mainboard form factor.
@@ -619,6 +667,7 @@ def dal_Case_vs_Mainboard(form_factor):
 
     finally:
         db.close()
+
 
 
 def dal_get_components_by_attributes(type, attributes=None):

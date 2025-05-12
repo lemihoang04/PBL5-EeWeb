@@ -218,5 +218,33 @@ const fetchCompatibleCases = async (formFactor) => {
   }
 };
 
+const fetchCompatiblePSU = async (totalTDP) => {
+  try {
+    const response = await axios.get(`/psu/compatible/${totalTDP}`);
+    
+    // Check if we have valid data
+    if (response && Array.isArray(response)) {
+      console.log(`Received ${response.length} compatible PSUs`);
+      return response;
+    } else if (response && typeof response === 'object') {
+      console.log('Compatible PSU data:', response);
+      return response;
+    } else {
+      console.error('Invalid data format:', response);
+      return { error: 'Invalid data format from server' };
+    }
+  } catch (error) {
+    console.error(`Error fetching compatible PSUs for total TDP ${totalTDP}:`, {
+      message: error.message,
+      status: error.response?.status,
+      data: error.response?.data,
+    });
+    return { 
+      error: error.response?.data?.error || `Failed to fetch compatible PSUs for total TDP ${totalTDP}`,
+      status: error.response?.status
+    };
+  }
+};
 
-export { fetchComponents, fetchComponentById, fetchCompatibleCpuCoolers, fetchCompatibleMainboards, fetchCompatibleRam, fetchCompatibleStorage, fetchCompatibleCases };
+
+export { fetchComponents, fetchComponentById, fetchCompatibleCpuCoolers, fetchCompatibleMainboards, fetchCompatibleRam, fetchCompatibleStorage, fetchCompatibleCases, fetchCompatiblePSU };
