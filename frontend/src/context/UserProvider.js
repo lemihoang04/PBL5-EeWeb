@@ -79,18 +79,18 @@ const UserProvider = ({ children }) => {
 		setAdmin(null);
 		sessionStorage.removeItem("admin");
 	};
-	useEffect(() => {
-		if (
-			window.location.pathname !== "/login" &&
-			window.location.pathname !== "/register"
-		) {
-			fetchUser();
-		} else {
-			setUser({ ...user, isLoading: false });
-		}
-	}, []);
+	// useEffect(() => {
+	// 	if (
+	// 		window.location.pathname !== "/login" &&
+	// 		window.location.pathname !== "/register"
+	// 	) {
+	// 		fetchUser();
+	// 	} else {
+	// 		setUser({ ...user, isLoading: false });
+	// 	}
+	// }, []);
 	return (
-		<UserContext.Provider value={{ user, loginUser, updateUser, logoutUser, fetchUser }}>
+		<UserContext.Provider value={{ user, loginUser, updateUser, logoutUser, fetchUser, loginAdmin, logoutAdmin, admin }}>
 			{children}
 		</UserContext.Provider>
 	);

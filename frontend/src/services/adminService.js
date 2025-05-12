@@ -1,5 +1,16 @@
 import axios from "../setup/axios";
 
+
+const LoginAdmin = (data) => {
+    return axios
+        .post("/admin/login", data)
+        .then((response) => {
+            return response;
+        })
+        .catch((error) => {
+            console.error(error);
+        });
+};
 const getDashboardStats = async () => {
     try {
         const response = await axios.get(`/admin/dashboard/stats`);
@@ -11,5 +22,6 @@ const getDashboardStats = async () => {
 };
 
 export {
+    LoginAdmin,
     getDashboardStats,
 }
