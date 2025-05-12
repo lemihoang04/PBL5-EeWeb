@@ -536,6 +536,90 @@ def dal_RAM_vs_Mainboard(memory_type):
     finally:
         db.close()
 
+def dal_Storage_vs_Mainboard():
+    """
+    Get product IDs of Storage devices compatible with a specific Mainboard interface type.
+    
+    Args:
+        storage_interface (str): The interface type to match (e.g., 'SATA', 'M.2', 'NVMe')
+    
+    Returns:
+        tuple: (products, status_code)
+            products: List of compatible storage devices with details or error message
+            status_code: HTTP status code
+    """
+    db = get_db_connection()
+    if not db:
+        return {'error': 'Database connection failed'}, 500
+
+    try:
+        # Query to find storage devices compatible with the given interface type
+        query = """
+        SELECT DISTINCT pa.product_id
+        FROM product_attributes pa
+        JOIN products p ON pa.product_id = p.product_id
+        WHERE p.category_id = 17  # Assuming 17 is the category_id for storage devices
+          AND pa.attribute_name = 'Interface'
+         
+        """
+
+        # Use pandas to read data from database
+        df = pd.read_sql_query(query, db)
+
+        # Get product IDs list
+        product_ids = df['product_id'].tolist()
+
+        # Return detailed product information using existing function
+        return dal_get_products_by_ids(product_ids)
+
+    except Exception as e:
+        return {'error': str(e)}, 500
+
+    finally:
+        db.close()
+
+def dal_Case_vs_Mainboard(form_factor):
+    """
+    Get product IDs of Cases compatible with a specific Mainboard form factor.
+    
+    Args:
+        form_factor (str): The form factor to match (e.g., 'ATX', 'Micro-ATX', 'Mini-ITX')
+    
+    Returns:
+        tuple: (products, status_code)
+            products: List of compatible cases with details or error message
+            status_code: HTTP status code
+    """
+    db = get_db_connection()
+    if not db:
+        return {'error': 'Database connection failed'}, 500
+
+    try:
+        # Query to find cases compatible with the given form factor
+        query = """
+        SELECT DISTINCT pa.product_id
+        FROM product_attributes pa
+        JOIN products p ON pa.product_id = p.product_id
+        WHERE p.category_id = 10  # Assuming 10 is the category_id for cases
+          AND pa.attribute_name = 'Motherboard Form Factor'
+          AND pa.attribute_value LIKE %s
+        """
+
+        # Use pandas to read data from database
+        df = pd.read_sql_query(query, db, params=(f"%{form_factor}%",))
+
+        # Get product IDs list
+        product_ids = df['product_id'].tolist()
+
+        # Return detailed product information using existing function
+        return dal_get_products_by_ids(product_ids)
+
+    except Exception as e:
+        return {'error': str(e)}, 500
+
+    finally:
+        db.close()
+
 
 def dal_get_components_by_attributes(type, attributes=None):
     """

@@ -162,5 +162,61 @@ const fetchCompatibleRam = async (memory_type) => {
   }
 };
 
+const fetchCompatibleStorage = async () => {
+  try {
+    const response = await axios.get('/storage/compatible');
+    console.log('Response:', response);
+    // Check if we have valid data
+    if (response && Array.isArray(response)) {
+      console.log(`Received ${response.length} compatible storage devices`);
+      return response;
+    } else if (response && typeof response === 'object') {
+      console.log('Compatible storage data:', response);
+      return response;
+    } else {
+      console.error('Invalid data format:', response);
+      return { error: 'Invalid data format from server' };
+    }
+  } catch (error) {
+    console.error('Error fetching compatible storage devices:', {
+      message: error.message,
+      status: error.response?.status,
+      data: error.response?.data,
+    });
+    return { 
+      error: error.response?.data?.error || 'Failed to fetch compatible storage devices',
+      status: error.response?.status
+    };
+  }
+};
 
-export { fetchComponents, fetchComponentById, fetchCompatibleCpuCoolers, fetchCompatibleMainboards, fetchCompatibleRam };
+const fetchCompatibleCases = async (formFactor) => {
+  try {
+    const response = await axios.get(`/cases/compatible/${formFactor}`);
+    
+    // Check if we have valid data
+    if (response && Array.isArray(response)) {
+      console.log(`Received ${response.length} compatible cases`);
+      return response;
+    } else if (response && typeof response === 'object') {
+      console.log('Compatible cases data:', response);
+      return response;
+    } else {
+      console.error('Invalid data format:', response);
+      return { error: 'Invalid data format from server' };
+    }
+  } catch (error) {
+    console.error(`Error fetching compatible cases for form factor ${formFactor}:`, {
+      message: error.message,
+      status: error.response?.status,
+      data: error.response?.data,
+    });
+    return { 
+      error: error.response?.data?.error || `Failed to fetch compatible cases for form factor ${formFactor}`,
+      status: error.response?.status
+    };
+  }
+};
+
+
+export { fetchComponents, fetchComponentById, fetchCompatibleCpuCoolers, fetchCompatibleMainboards, fetchCompatibleRam, fetchCompatibleStorage, fetchCompatibleCases };

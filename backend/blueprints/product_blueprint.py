@@ -136,10 +136,6 @@ def get_components_by_type(type):
             print(f"Getting all components of type: {type}")
             components, status = dal_get_components_by_attributes(type)
         
-<<<<<<< HEAD
-
-=======
->>>>>>> ff8aec13d25055ea7ad855f2e62d62738a9e1452
         # Phần code sau đây sẽ chạy sau khi đã gán giá trị cho components và status
         if status == 200:
             return jsonify(components), 200
@@ -220,6 +216,52 @@ def get_compatible_Ram(memory_type):
             return jsonify(ram), status
     except Exception as e:
         print(f"Error in get_compatible_mainboards: {e}")
+
+@product_blueprint.route("/storage/compatible", methods=["GET"])
+def get_compatible_storage():
+    """
+    API route to get storage devices compatible with motherboards.
+    
+    Returns:
+        JSON response with compatible storage devices or error message.
+    """
+    try:
+        # Call the DAL function to get compatible storage devices
+        storage_devices, status = dal_Storage_vs_Mainboard()
+        
+        # Return the result
+        if status == 200:
+            return jsonify(storage_devices), 200
+        else:
+            return jsonify(storage_devices), status
+    except Exception as e:
+        print(f"Error in get_compatible_storage: {e}")
+        return jsonify({"error": str(e)}), 500
+    
+@product_blueprint.route("/cases/compatible/<string:form_factor>", methods=["GET"])
+def get_compatible_cases(form_factor):
+    """
+    API route to get Cases compatible with a specific Mainboard form factor.
+    
+    Args:
+        form_factor (str): The form factor to match (e.g., 'ATX', 'Micro-ATX', 'Mini-ITX')
+    
+    Returns:
+        JSON response with compatible cases or error message.
+    """
+    try:
+        # Call the DAL function to get compatible cases
+        cases, status = dal_Case_vs_Mainboard(form_factor)
+        
+        # Return the result
+        if status == 200:
+            return jsonify(cases), 200
+        else:
+            return jsonify(cases), status
+    except Exception as e:
+        print(f"Error in get_compatible_cases: {e}")
+        return jsonify({"error": str(e)}), 500
+
 @product_blueprint.route("/product/<int:product_id>", methods=["DELETE"])
 def delete_product(product_id):
     """

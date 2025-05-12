@@ -65,6 +65,49 @@ function getModuleCount(ram) {
   return 1; // Default to 1 if parsing fails
 }
 
+// Helper function to count M.2 slots from motherboard attribute
+function countM2Slots(motherboard) {
+  // console.log('Motherboard:', motherboard.attributes["M.2 Slots"].split(',').length);
+  if (!motherboard || !motherboard.attributes || !motherboard.attributes["M.2 Slots"]) return 0;
+  return motherboard.attributes["M.2 Slots"].split(',').length;
+}
+
+// Helper function to get number of SATA ports
+function getSataPorts(motherboard) {
+  if (!motherboard || !motherboard.attributes) return 0;
+  const sataPorts = motherboard.attributes["SATA 6.0 Gb/s"];
+  return sataPorts ? parseInt(sataPorts, 10) : 0;
+}
+
+// Function to categorize storage devices
+function categorizeStorageDevices(storages) {
+  const result = {
+    m2Devices: [],
+    sataDevices: []
+  };
+  
+  storages.forEach(storage => {
+    if (!storage || !storage.attributes) return;
+    
+    const interfaceType = storage.attributes["Interface"] || '';
+    
+    // Check if it's an M.2 NVMe device (contains M.2 but not SATA)
+    if (interfaceType.includes('M.2') && !interfaceType.includes('SATA')) {
+      result.m2Devices.push(storage);
+    }
+    // Check if it's a SATA device
+    else if (interfaceType.includes('SATA')) {
+      result.sataDevices.push(storage);
+    }
+    // Default to SATA for other storage devices
+    else {
+      result.sataDevices.push(storage);
+    }
+  });
+  
+  return result;
+}
+
 const Build = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -108,6 +151,9 @@ const Build = () => {
   // Memory compatibility check state
   const [memoryCompatible, setMemoryCompatible] = useState(true);
 
+  // Add a state variable to track overall compatibility
+  const [isCompatible, setIsCompatible] = useState(true);
+
   const calculateTotalPrice = () => {
     return components.reduce((sum, component) => {
       if (!component.selected) return sum;
@@ -143,6 +189,8 @@ const Build = () => {
     // Check RAM compatibility
     const motherboard = components.find(c => c.id === 'Mainboard')?.selected;
     const rams = components.find(c => c.id === 'ram')?.selected || [];
+    const storages = components.find(c => c.id === 'storage')?.selected || [];
+    const gpus = components.find(c => c.id === 'gpu')?.selected || [];
 
     if (motherboard && rams.length > 0) {
       // Calculate total RAM modules using getModuleCount
@@ -177,22 +225,50 @@ const Build = () => {
 
       // Set memory compatibility based on all checks above
       setMemoryCompatible(isCompatible);
-
-      // Add the standard disclaimer
-      issues.push({
-        type: 'disclaimer',
-        message: 'Some physical constraints are not checked, such as RAM clearance with CPU Coolers.'
-      });
-    } else {
-      // Default issues when components aren't selected
-      issues.push({ type: 'problem', message: 'Two additional RAM slots are needed.' });
-      issues.push({
-        type: 'disclaimer',
-        message: 'Some physical constraints are not checked, such as RAM clearance with CPU Coolers.'
-      });
-      setMemoryCompatible(true);
     }
 
+    // Check storage compatibility
+    if (motherboard && storages.length > 0) {
+      const { m2Devices, sataDevices } = categorizeStorageDevices(storages);
+      console.log('M.2 Devices:', m2Devices.length);
+      // Get available slots from motherboard
+      const availableM2Slots = countM2Slots(motherboard);
+      const availableSataPorts = getSataPorts(motherboard);
+      
+      // Check M.2 compatibility
+      if (m2Devices.length > availableM2Slots) {
+        issues.push({
+          type: 'problem',
+          message: `M.2 device count (${m2Devices.length}) exceeds available M.2 slots (${availableM2Slots}).`
+        });
+        isCompatible = false;
+      }
+      
+      // Check SATA compatibility
+      if (sataDevices.length > availableSataPorts) {
+        issues.push({
+          type: 'problem',
+          message: `SATA device count (${sataDevices.length}) exceeds available SATA ports (${availableSataPorts}).`
+        });
+        isCompatible = false;
+      }
+    }
+
+    // Check GPU compatibility
+    if (motherboard && gpus.length > 0) {
+      const availablePcieX16Slots = motherboard.attributes?.["PCIe x16 Slots"] || 0;
+      
+      if (gpus.length > availablePcieX16Slots) {
+        issues.push({
+          type: 'problem',
+          message: `The number of GPUs (${gpus.length}) exceeds the available PCIe x16 slots (${availablePcieX16Slots}).`
+        });
+        isCompatible = false;
+      }
+    }
+
+    // Update the overall compatibility state
+    setIsCompatible(isCompatible);
     setCompatibilityIssues(issues);
   }, [components]);
 
@@ -238,6 +314,23 @@ const Build = () => {
       } else {
         // Navigate to regular RAM selection
         navigate(`/components/ram`);
+      }
+    }
+    else if (componentId === 'storage') {
+      navigate(`/components/storage`);
+    }
+    else if (componentId === 'case') {
+      // Check if Mainboard has been selected
+      const selectedMainboard = components.find((component) => component.id === 'Mainboard')?.selected;
+      
+      // If Mainboard is selected, navigate to Case with form factor filter
+      if (selectedMainboard) {
+        console.log('Selected Mainboard:', selectedMainboard['attributes']['Form Factor']);
+        // Navigate to Case with Form Factor parameter
+        navigate(`/components/case?form_factor=${selectedMainboard['attributes']['Form Factor']}`);
+      } else {
+        // Navigate to regular Case selection
+        navigate(`/components/case`);
       }
     }
     else {
@@ -297,7 +390,7 @@ const Build = () => {
 
   return (
     <div className="build-container">
-      <div className={`header ${!memoryCompatible ? 'incompatible' : ''}`}>
+      <div className={`header ${!isCompatible ? 'incompatible' : ''}`}>
         <div className="compatibility">
           <span className="icon">📋</span>
           <span className="label">Compatibility:</span>
@@ -534,7 +627,6 @@ const Build = () => {
         components={components}
       />
 
-
     </div>
   );
 
@@ -550,8 +642,11 @@ const Build = () => {
 
     // CPU wattage (typically 65-125W)
     const cpu = components.find(c => c.id === 'cpu')?.selected;
+    
+    
+    // console.log('CPU TDP:', cpu['attributes']['TDP']);
     if (cpu) {
-      totalWattage += cpu.specs?.tdp || 95;
+      totalWattage += cpu['attributes']['TDP'] || 95;
     }
 
     // GPU wattage (typically 75-350W)

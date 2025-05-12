@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { fetchCompatibleCpuCoolers, fetchCompatibleMainboards, fetchComponents, fetchCompatibleRam } from '../../services/componentService';
+import { fetchCompatibleCpuCoolers, fetchCompatibleMainboards, fetchComponents, fetchCompatibleRam, fetchCompatibleStorage, fetchCompatibleCases } from '../../services/componentService';
 import './ComponentSearch.css';
 import { fetchComponentById } from '../../services/componentService';
 
@@ -128,6 +128,8 @@ const ComponentSearch = () => {
       const searchParams = new URLSearchParams(window.location.search);
       const queryFilters = {};
       let cpuSocket = null;
+      let memory_type = null;
+      let form_factor = null;
       
       // Chuyển đổi query params thành bộ lọc
       for (const [key, value] of searchParams.entries()) {
@@ -136,6 +138,9 @@ const ComponentSearch = () => {
         }
         else if (key === 'memory_type') {
           memory_type = value;
+        }
+        else if (key === 'form_factor') {
+          form_factor = value;
         }
         else if (key !== 'type') { // Bỏ qua tham số 'type' nếu có
           queryFilters[key] = value;
@@ -159,6 +164,13 @@ const ComponentSearch = () => {
       else if (normalizedType === 'RAM' && memory_type) {
         console.log(`Fetching compatible RAM for memory type: ${memory_type}`);
         data = await fetchCompatibleRam(memory_type);
+      }
+      else if (normalizedType === 'Storage') {
+        data = await fetchCompatibleStorage();
+      }
+      else if (normalizedType === 'Case' && form_factor) {
+        console.log(`Fetching compatible Cases for form factor: ${form_factor}`);
+        data = await fetchCompatibleCases(form_factor);
       }
       else {
         // Sử dụng API lấy component thông thường

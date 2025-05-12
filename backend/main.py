@@ -19,16 +19,9 @@ app.register_blueprint(service_blueprint)
 app.register_blueprint(cart_blueprint)
 app.register_blueprint(product_blueprint)
 app.register_blueprint(order_blueprint)
-<<<<<<< HEAD
-
-app.register_blueprint(chatbot_blueprint)  
-app.register_blueprint(review_blueprint)
-
-=======
 app.register_blueprint(category_blueprint)
 app.register_blueprint(chatbot_blueprint)  
 app.register_blueprint(review_blueprint)
->>>>>>> ff8aec13d25055ea7ad855f2e62d62738a9e1452
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)
