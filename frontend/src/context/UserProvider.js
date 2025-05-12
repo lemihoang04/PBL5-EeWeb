@@ -76,7 +76,7 @@ const UserProvider = ({ children }) => {
 	};
 
 	const logoutAdmin = () => {
-		setAdmin(null);
+		setAdmin(userDefault);
 		sessionStorage.removeItem("admin");
 	};
 	// useEffect(() => {
