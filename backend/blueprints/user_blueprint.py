@@ -74,8 +74,6 @@ def api_delete_user(user_id):
 
 @user_blueprint.route('/login', methods=['POST'])
 def api_login():
-    session.clear(user_id=None)
-    session.clear(email=None)
     data = request.form
     email = data.get('email')
     password = data.get('password')
@@ -111,7 +109,8 @@ def api_change_password():
 
 @user_blueprint.route('/logout', methods=['POST'])
 def api_logout():
-    session.clear()
+    session.pop('user_id', None)
+    session.pop('email', None)
     return jsonify({"errCode": 0, "message": "Logged out successfully"}), 200
 
 @user_blueprint.route('/forgotPassword', methods=['POST'])

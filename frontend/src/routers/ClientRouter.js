@@ -1,6 +1,8 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import AppContextProvider from "../services/AppContext";
 import UserLayout from "../layouts/UserLayout";
+import UserRouter from "./UserRouter";
+import AdminRouter from "./AdminRouter";
 import Home from "../pages/Home/Home";
 import ProductInfo from "../pages/ProductInfo/ProductInfo";
 import Cart from "../pages/Cart/Cart";
@@ -15,7 +17,6 @@ import ChangePassword from "../pages/ChangePass/ChangePass";
 import LaptopSearch from "../pages/laptop/LaptopSearch"
 import ComponentSearch from "../pages/Component/ComponentSearch"
 import Orders from "../pages/Order/Orders";
-import UserRouter from "./UserRouter";
 import CheckPayment from "../pages/Private/CheckPayment/CheckPayment";
 import FailPayment from "../pages/Private/failPayment/failPayment";
 import ForgetPassword from "../pages/ForgerPassword/ForgetPassword";
@@ -84,7 +85,14 @@ const AppRoutes = () => {
 
 
                     {/* Route Admin */}
-                    <Route path="/admin" element={<Admin />} />
+                    <Route
+                        path="/admin"
+                        element={
+                            <AdminRouter>
+                                <Admin />
+                            </AdminRouter>
+                        }
+                    />
                     <Route path="/admin/login" element={<LoginAdmin />} />
                     {/* Route 404 */}
                     <Route path="*" element={<NotFound />} />
