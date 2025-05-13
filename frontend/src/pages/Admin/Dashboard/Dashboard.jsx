@@ -160,13 +160,14 @@ const Dashboard = ({ setActiveMenu }) => {
   };
 
   // Data for recent orders
-  const recentOrders = [
-    { id: '#ORD-7243', customer: 'John Doe', date: 'May 6, 2025', status: 'Completed', total: '$1,240.00' },
-    { id: '#ORD-7242', customer: 'Jane Smith', date: 'May 5, 2025', status: 'Processing', total: '$857.50' },
-    { id: '#ORD-7241', customer: 'Robert Johnson', date: 'May 5, 2025', status: 'Completed', total: '$2,170.00' },
-    { id: '#ORD-7240', customer: 'Emily Davis', date: 'May 4, 2025', status: 'Shipped', total: '$990.25' },
-    { id: '#ORD-7239', customer: 'Michael Brown', date: 'May 4, 2025', status: 'Completed', total: '$1,450.75' },
-  ];
+  // const recentOrders = [
+  //   { id: '#ORD-7243', customer: 'John Doe', date: 'May 6, 2025', status: 'Completed', total: '$1,240.00' },
+  //   { id: '#ORD-7242', customer: 'Jane Smith', date: 'May 5, 2025', status: 'Processing', total: '$857.50' },
+  //   { id: '#ORD-7241', customer: 'Robert Johnson', date: 'May 5, 2025', status: 'Completed', total: '$2,170.00' },
+  //   { id: '#ORD-7240', customer: 'Emily Davis', date: 'May 4, 2025', status: 'Shipped', total: '$990.25' },
+  //   { id: '#ORD-7239', customer: 'Michael Brown', date: 'May 4, 2025', status: 'Completed', total: '$1,450.75' },
+  // ];
+  const recentOrders = dataStats.recentOrders;
 
   // Data for customer activities
   const customerActivities = [
@@ -179,11 +180,15 @@ const Dashboard = ({ setActiveMenu }) => {
 
   const getStatusClass = (status) => {
     switch (status) {
-      case 'Completed': return 'bg-success';
-      case 'Processing': return 'bg-warning';
-      case 'Shipped': return 'bg-info';
+      case 'completed': return 'bg-success';
+      case 'pending': return 'bg-warning';
+      case 'canceled': return 'bg-danger';
       default: return 'bg-secondary';
     }
+  };
+
+  const capitalizeFirstLetter = (string) => {
+    return string.charAt(0).toUpperCase() + string.slice(1);
   };
 
   return (
@@ -279,17 +284,23 @@ const Dashboard = ({ setActiveMenu }) => {
                     </tr>
                   </thead>
                   <tbody>
-                    {recentOrders.map((order, index) => (
-                      <tr key={index}>
-                        <td><strong>{order.id}</strong></td>
-                        <td>{order.customer}</td>
-                        <td>{order.date}</td>
-                        <td>
-                          <span className={`badge ${getStatusClass(order.status)}`}>{order.status}</span>
-                        </td>
-                        <td className="text-end">{order.total}</td>
+                    {recentOrders && recentOrders.length > 0 ? (
+                      recentOrders.map((order, index) => (
+                        <tr key={index}>
+                          <td><strong>{order.id}</strong></td>
+                          <td>{order.user_name}</td>
+                          <td>{order.created_at}</td>
+                          <td>
+                            <span className={`badge ${getStatusClass(order.status)}`}>{capitalizeFirstLetter(order.status)}</span>
+                          </td>
+                          <td className="text-end">{order.price}</td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan="5" className="text-center py-3">No recent orders available</td>
                       </tr>
-                    ))}
+                    )}
                   </tbody>
                 </table>
               </div>

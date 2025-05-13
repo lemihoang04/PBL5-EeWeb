@@ -3,6 +3,111 @@ import React, { useState, useEffect } from 'react';
 import './Build.css';
 import MotherboardUsage from './MotherboardUsage';
 
+// Helper function to parse memory capacity and convert to GB
+function parseMemoryToGB(memoryString) {
+  if (!memoryString) return 0;
+  
+  // Extract numeric part and unit
+  const match = memoryString.match(/(\d+)\s*([GMK]B)/i);
+  if (!match) return 0;
+  
+  const value = parseInt(match[1], 10);
+  const unit = match[2].toUpperCase();
+  
+  // Convert to GB
+  switch (unit) {
+    case 'KB': return value / (1024 * 1024);
+    case 'MB': return value / 1024;
+    case 'GB': return value;
+    default: return value;
+  }
+}
+
+// Function to calculate total RAM capacity from modules
+function calculateTotalRAMCapacity(rams) {
+  let totalGB = 0;
+  
+  rams.forEach(ram => {
+    if (!ram || !ram.attributes || !ram.attributes["Modules"]) return;
+    
+    const modulesStr = ram.attributes["Modules"];
+    // Expected format: "2 x 8GB", extract numbers
+    const match = modulesStr.match(/(\d+)\s*x\s*(\d+)\s*([GMK]B)/i);
+    if (match && match[1] && match[2] && match[3]) {
+      const moduleCount = parseInt(match[1], 10);
+      const moduleSize = parseInt(match[2], 10);
+      const unit = match[3].toUpperCase();
+      
+      // Convert to GB and add to total
+      let sizeInGB = moduleSize;
+      switch (unit) {
+        case 'KB': sizeInGB = moduleSize / (1024 * 1024); break;
+        case 'MB': sizeInGB = moduleSize / 1024; break;
+      }
+      
+      totalGB += moduleCount * sizeInGB;
+    }
+  });
+  
+  return totalGB;
+}
+
+// Function to extract module count from RAM's Modules attribute
+function getModuleCount(ram) {
+  if (!ram || !ram.attributes || !ram.attributes["Modules"]) return 1; // Default to 1 if not specified
+  
+  const modulesStr = ram.attributes["Modules"];
+  // Expected format: "2 x 8GB", extract the first number
+  const match = modulesStr.match(/^(\d+)\s*x/);
+  if (match && match[1]) {
+    return parseInt(match[1], 10);
+  }
+  return 1; // Default to 1 if parsing fails
+}
+
+// Helper function to count M.2 slots from motherboard attribute
+function countM2Slots(motherboard) {
+  // console.log('Motherboard:', motherboard.attributes["M.2 Slots"].split(',').length);
+  if (!motherboard || !motherboard.attributes || !motherboard.attributes["M.2 Slots"]) return 0;
+  return motherboard.attributes["M.2 Slots"].split(',').length;
+}
+
+// Helper function to get number of SATA ports
+function getSataPorts(motherboard) {
+  if (!motherboard || !motherboard.attributes) return 0;
+  const sataPorts = motherboard.attributes["SATA 6.0 Gb/s"];
+  return sataPorts ? parseInt(sataPorts, 10) : 0;
+}
+
+// Function to categorize storage devices
+function categorizeStorageDevices(storages) {
+  const result = {
+    m2Devices: [],
+    sataDevices: []
+  };
+  
+  storages.forEach(storage => {
+    if (!storage || !storage.attributes) return;
+    
+    const interfaceType = storage.attributes["Interface"] || '';
+    
+    // Check if it's an M.2 NVMe device (contains M.2 but not SATA)
+    if (interfaceType.includes('M.2') && !interfaceType.includes('SATA')) {
+      result.m2Devices.push(storage);
+    }
+    // Check if it's a SATA device
+    else if (interfaceType.includes('SATA')) {
+      result.sataDevices.push(storage);
+    }
+    // Default to SATA for other storage devices
+    else {
+      result.sataDevices.push(storage);
+    }
+  });
+  
+  return result;
+}
+
 const Build = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -43,19 +148,39 @@ const Build = () => {
     { type: 'disclaimer', message: 'Some physical constraints are not checked, such as RAM clearance with CPU Coolers.' }
   ]);
 
-  const calculateTotalPrice = () => {
-    return components.reduce((sum, component) => {
-      if (!component.selected) return sum;
+  // Memory compatibility check state
+  const [memoryCompatible, setMemoryCompatible] = useState(true);
 
-      if (component.multiple) {
-        // If multiple type (array of products)
-        return sum + component.selected.reduce((itemSum, item) => itemSum + (item ? item.price : 0), 0);
-      } else {
-        // If single type (one product)
-        return sum + (component.selected ? component.selected.price : 0);
+  const totalWattage = calculateWattage();
+
+  // Add a state variable to track overall compatibility
+  const [isCompatible, setIsCompatible] = useState(true);
+
+  function calculateTotalPrice() {
+    // Object to store price of each component category
+    const componentTotals = {};
+    let grandTotal = 0;
+    
+    // Calculate price for each component separately
+    components.forEach(component => {
+      let categoryTotal = 0;
+      
+      if (component.multiple && component.selected && component.selected.length > 0) {
+        // For multiple components (RAM, Storage, GPU)
+        categoryTotal = component.selected.reduce((sum, item) => 
+          sum + (item && item['price'] ? Number(item['price']) : 0), 0);
+      } else if (component.selected && component.selected['price']) {
+        // For single components (CPU, Mainboard, etc.)
+        categoryTotal = Number(component.selected['price']);
       }
-    }, 0);
-  };
+      
+      // Store category total and add to grand total
+      componentTotals[component.id] = categoryTotal;
+      grandTotal += categoryTotal;
+    });
+    
+    return grandTotal; // Return the sum of all components
+  }
 
   const totalPrice = calculateTotalPrice();
 
@@ -73,34 +198,91 @@ const Build = () => {
   // Update compatibility issues whenever components change
   useEffect(() => {
     const issues = [];
+    let isCompatible = true;
 
     // Check RAM compatibility
     const motherboard = components.find(c => c.id === 'Mainboard')?.selected;
     const rams = components.find(c => c.id === 'ram')?.selected || [];
+    const storages = components.find(c => c.id === 'storage')?.selected || [];
+    const gpus = components.find(c => c.id === 'gpu')?.selected || [];
 
     if (motherboard && rams.length > 0) {
-      const ramSlots = motherboard.specs?.memorySlots || 4;
-      if (rams.length > ramSlots) {
+      // Calculate total RAM modules using getModuleCount
+      const totalRamModules = rams.reduce((sum, ram) => {
+        return sum + getModuleCount(ram);
+      }, 0);
+      
+      // Check RAM slot count against total module count
+      const ramSlots = motherboard.specs?.memorySlots || motherboard.attributes?.["Memory Slots"] || 4;
+      if (totalRamModules > ramSlots) {
         issues.push({
           type: 'problem',
-          message: `Your motherboard only supports ${ramSlots} RAM modules, but you've selected ${rams.length}.`
+          message: `Your motherboard only supports ${ramSlots} RAM modules, but you've selected ${totalRamModules} modules in total.`
         });
+        isCompatible = false; // RAM slots exceeded, set compatibility to false
       }
 
-      // Add the standard disclaimer
-      issues.push({
-        type: 'disclaimer',
-        message: 'Some physical constraints are not checked, such as RAM clearance with CPU Coolers.'
-      });
-    } else {
-      // Default issues when components aren't selected
-      issues.push({ type: 'problem', message: 'Two additional RAM slots are needed.' });
-      issues.push({
-        type: 'disclaimer',
-        message: 'Some physical constraints are not checked, such as RAM clearance with CPU Coolers.'
-      });
+      // Check RAM capacity against motherboard max memory
+      const maxMemoryStr = motherboard.attributes?.["Memory Max"];
+      if (maxMemoryStr) {
+        const maxMemoryGB = parseMemoryToGB(maxMemoryStr);
+        const totalRAMCapacityGB = calculateTotalRAMCapacity(rams);
+        
+        if (totalRAMCapacityGB > maxMemoryGB) {
+          issues.push({
+            type: 'problem',
+            message: `Total RAM capacity (${totalRAMCapacityGB}GB) exceeds motherboard maximum (${maxMemoryGB}GB).`
+          });
+          isCompatible = false; // RAM capacity exceeded, set compatibility to false
+        }
+      }
+
+      // Set memory compatibility based on all checks above
+      setMemoryCompatible(isCompatible);
     }
 
+    // Check storage compatibility
+    if (motherboard && storages.length > 0) {
+      const { m2Devices, sataDevices } = categorizeStorageDevices(storages);
+      console.log('M.2 Devices:', m2Devices.length);
+      // Get available slots from motherboard
+      const availableM2Slots = countM2Slots(motherboard);
+      const availableSataPorts = getSataPorts(motherboard);
+      
+      // Check M.2 compatibility
+      if (m2Devices.length > availableM2Slots) {
+        issues.push({
+          type: 'problem',
+          message: `M.2 device count (${m2Devices.length}) exceeds available M.2 slots (${availableM2Slots}).`
+        });
+        isCompatible = false;
+      }
+      
+      // Check SATA compatibility
+      if (sataDevices.length > availableSataPorts) {
+        issues.push({
+          type: 'problem',
+          message: `SATA device count (${sataDevices.length}) exceeds available SATA ports (${availableSataPorts}).`
+        });
+        isCompatible = false;
+      }
+    }
+
+    // Check GPU compatibility
+    if (motherboard && gpus.length > 0) {
+      const availablePcieX16Slots = motherboard.attributes?.["PCIe x16 Slots"] || 0;
+      
+      if (gpus.length > availablePcieX16Slots) {
+        issues.push({
+          type: 'problem',
+          message: `The number of GPUs (${gpus.length}) exceeds the available PCIe x16 slots (${availablePcieX16Slots}).`
+        });
+        isCompatible = false;
+      }
+    }
+
+    // Update the overall compatibility state
+    setIsCompatible(isCompatible);
     setCompatibilityIssues(issues);
   }, [components]);
 
@@ -133,6 +315,41 @@ const Build = () => {
         // Navigate to regular Mainboard selection
         navigate(`/components/mainboard`);
       }
+    }
+    else if (componentId === 'ram') {
+      // Check if Mainboard has been selected
+      const selectedMainboard = components.find((component) => component.id === 'Mainboard')?.selected;
+      
+      // If Mainboard is selected, navigate to RAM with memory type filter
+      if (selectedMainboard) {
+        console.log('Selected Mainboard:', selectedMainboard['attributes']['Memory Type']);
+        // Navigate to RAM with Memory Type parameter
+        navigate(`/components/ram?memory_type=${selectedMainboard['attributes']['Memory Type']}`);
+      } else {
+        // Navigate to regular RAM selection
+        navigate(`/components/ram`);
+      }
+    }
+    else if (componentId === 'storage') {
+      navigate(`/components/storage`);
+    }
+    else if (componentId === 'case') {
+      // Check if Mainboard has been selected
+      const selectedMainboard = components.find((component) => component.id === 'Mainboard')?.selected;
+      
+      // If Mainboard is selected, navigate to Case with form factor filter
+      if (selectedMainboard) {
+        console.log('Selected Mainboard:', selectedMainboard['attributes']['Form Factor']);
+        // Navigate to Case with Form Factor parameter
+        navigate(`/components/case?form_factor=${selectedMainboard['attributes']['Form Factor']}`);
+      } else {
+        // Navigate to regular Case selection
+        navigate(`/components/case`);
+      }
+    }
+    else if (componentId === 'psu') {
+
+      navigate(`/components/psu?wattage=${totalWattage}`);
     }
     else {
       navigate(`/components/${componentId}`);
@@ -170,28 +387,33 @@ const Build = () => {
     }
   }, [location.state]);
 
-  const handleRemoveComponent = (componentId, index = null) => {
-    setComponents((prevComponents) =>
-      prevComponents.map((comp) => {
-        if (comp.id === componentId) {
-          if (comp.multiple && index !== null) {
-            // Remove a specific item from the selected array
-            const newSelected = [...comp.selected];
-            newSelected.splice(index, 1);
-            return { ...comp, selected: newSelected };
-          } else {
-            // Remove all selected if not multiple or no index
-            return { ...comp, selected: comp.multiple ? [] : null };
-          }
+  // Hàm handleRemoveComponent - Xử lý xóa component
+const handleRemoveComponent = (componentId, index = null) => {
+  setComponents((prevComponents) => {
+    const updatedComponents = prevComponents.map((comp) => {
+      if (comp.id === componentId) {
+        if (comp.multiple && index !== null) {
+          // Xóa một mục cụ thể khỏi mảng đã chọn
+          const newSelected = [...comp.selected];
+          newSelected.splice(index, 1);
+          return { ...comp, selected: newSelected };
+        } else {
+          // Xóa tất cả các mục đã chọn nếu không phải dạng multiple hoặc không có chỉ mục
+          return { ...comp, selected: comp.multiple ? [] : null };
         }
-        return comp;
-      })
-    );
-  };
+      }
+      return comp;
+    });
+    
+    // Cập nhật ngay lập tức vào sessionStorage
+    sessionStorage.setItem('components', JSON.stringify(updatedComponents));
+    return updatedComponents;
+  });
+};
 
   return (
     <div className="build-container">
-      <div className="header">
+      <div className={`header ${!isCompatible ? 'incompatible' : ''}`}>
         <div className="compatibility">
           <span className="icon">📋</span>
           <span className="label">Compatibility:</span>
@@ -334,7 +556,7 @@ const Build = () => {
         </tbody>
       </table>
 
-      <div className="additional-components">
+      {/* <div className="additional-components">
         <div className="component-group">
           <div className="group-title">
             <span className="group-icon">🔌</span>
@@ -376,7 +598,7 @@ const Build = () => {
             ))}
           </div>
         </div>
-      </div>
+      </div> */}
 
       <div className="total-section">
         <div className="total-label">Total:</div>
@@ -428,12 +650,12 @@ const Build = () => {
         components={components}
       />
 
-
     </div>
   );
 
   // Helper function to format price
   function renderPrice(price) {
+    console.log('Price:', price);
     if (!price) return '—';
     return `$${price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   }
@@ -444,22 +666,44 @@ const Build = () => {
 
     // CPU wattage (typically 65-125W)
     const cpu = components.find(c => c.id === 'cpu')?.selected;
+    const cpuCooler = components.find(c => c.id === 'cpu Cooler')?.selected;
+    const mainboard = components.find(c => c.id === 'Mainboard')?.selected;
+    const rams = components.find(c => c.id === 'ram')?.selected || [];
+    const storages = components.find(c => c.id === 'storage')?.selected || [];
+
+    // Function to calculate total price of all components
+
+    // Mainboard wattage
+    if (mainboard) {
+      totalWattage += 70;
+    }
+    
+    // CPU Cooler wattage
+    if (cpuCooler) {
+      totalWattage += 15;
+    }
+    
+    // CPU wattage
     if (cpu) {
-      totalWattage += cpu.specs?.tdp || 95;
+      const tdpValue = cpu['attributes']['TDP'] ? parseInt(cpu['attributes']['TDP']) : NaN;
+      totalWattage += isNaN(tdpValue) ? 95 : tdpValue;
     }
 
-    // GPU wattage (typically 75-350W)
-    const gpus = components.find(c => c.id === 'gpu')?.selected || [];
-    gpus.forEach(gpu => {
-      totalWattage += gpu.specs?.tdp || 150;
+    // RAM wattage - 30W per RAM module
+    rams.forEach(ram => {
+      totalWattage += 30;
     });
 
-    // Other components
-    totalWattage += 40; // Motherboard
-    totalWattage += 10; // Each RAM ~2-5W
-    totalWattage += 15; // Each SSD/HDD ~5-10W
-    totalWattage += 20; // Fans and other components
+    // Storage wattage - 10W per storage device
+    storages.forEach(storage => {
+      totalWattage += 10;
+    });
 
+    // GPU wattage (using TDP values)
+    const gpus = components.find(c => c.id === 'gpu')?.selected || [];
+    gpus.forEach(gpu => {
+      totalWattage += parseInt(gpu['attributes']['TDP']) || 150;
+    });
     return totalWattage;
   }
 };

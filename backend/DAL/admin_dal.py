@@ -5,7 +5,6 @@ def admin_to_json(admin_data):
     return {
         "id": admin_data['id'],
         "username": admin_data['username'],
-        "address": admin_data['address'],
         "created_at": admin_data['created_at'].isoformat(),
     }
 

@@ -2,8 +2,8 @@ import React, { useContext, useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import { UserContext } from "../context/UserProvider";
 
-const UserRouter = ({ children }) => {
-    const { user } = useContext(UserContext);
+const AdminRouter = ({ children }) => {
+    const { admin } = useContext(UserContext);
     const [isReady, setIsReady] = useState(false);
 
     useEffect(() => {
@@ -22,12 +22,11 @@ const UserRouter = ({ children }) => {
             </div>
         );
     }
-
-    if (!user.isAuthenticated) {
-        return <Navigate to="/login" replace />;
+    if (!admin.isAuthenticated) {
+        return <Navigate to="/admin/login" replace />;
     }
 
     return children;
 };
 
-export default UserRouter;
+export default AdminRouter;

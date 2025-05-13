@@ -209,6 +209,98 @@ def get_compatible_mainboards(cpu_socket):
         print(f"Error in get_compatible_mainboards: {e}")
         return jsonify({"error": str(e)}), 500
 
+@product_blueprint.route("/ram/compatible/<string:memory_type>", methods=["GET"])
+def get_compatible_Ram(memory_type):
+    """
+    API route to get Mainboards compatible with a specific CPU socket.
+    
+    Args:
+        cpu_socket (str): The CPU socket to match (e.g., 'AM4', 'LGA1700')
+    
+    Returns:
+        JSON response with compatible Mainboards or error message.
+    """
+    try:
+        # Call the DAL function to get compatible mainboards
+        ram, status = dal_RAM_vs_Mainboard(memory_type)
+        
+        # Return the result
+        if status == 200:
+            return jsonify(ram), 200
+        else:
+            return jsonify(ram), status
+    except Exception as e:
+        print(f"Error in get_compatible_mainboards: {e}")
+
+@product_blueprint.route("/storage/compatible", methods=["GET"])
+def get_compatible_storage():
+    """
+    API route to get storage devices compatible with motherboards.
+    
+    Returns:
+        JSON response with compatible storage devices or error message.
+    """
+    try:
+        # Call the DAL function to get compatible storage devices
+        storage_devices, status = dal_Storage_vs_Mainboard()
+        
+        # Return the result
+        if status == 200:
+            return jsonify(storage_devices), 200
+        else:
+            return jsonify(storage_devices), status
+    except Exception as e:
+        print(f"Error in get_compatible_storage: {e}")
+        return jsonify({"error": str(e)}), 500
+    
+@product_blueprint.route("/cases/compatible/<string:form_factor>", methods=["GET"])
+def get_compatible_cases(form_factor):
+    """
+    API route to get Cases compatible with a specific Mainboard form factor.
+    
+    Args:
+        form_factor (str): The form factor to match (e.g., 'ATX', 'Micro-ATX', 'Mini-ITX')
+    
+    Returns:
+        JSON response with compatible cases or error message.
+    """
+    try:
+        # Call the DAL function to get compatible cases
+        cases, status = dal_Case_vs_Mainboard(form_factor)
+        
+        # Return the result
+        if status == 200:
+            return jsonify(cases), 200
+        else:
+            return jsonify(cases), status
+    except Exception as e:
+        print(f"Error in get_compatible_cases: {e}")
+        return jsonify({"error": str(e)}), 500
+
+@product_blueprint.route("/psu/compatible/<int:total_tdp>", methods=["GET"])
+def get_compatible_psu(total_tdp):
+    """
+    API route to get PSUs compatible with a system having the specified total TDP.
+    
+    Args:
+        total_tdp (int): Total power consumption (TDP) of the system in watts
+    
+    Returns:
+        JSON response with compatible PSUs or error message.
+    """
+    try:
+        # Call the DAL function to get compatible PSUs
+        psus, status = dal_PSU_vs_TotalTDP(total_tdp)
+        
+        # Return the result
+        if status == 200:
+            return jsonify(psus), 200
+        else:
+            return jsonify(psus), status
+    except Exception as e:
+        print(f"Error in get_compatible_psu: {e}")
+        return jsonify({"error": str(e)}), 500
+
 @product_blueprint.route("/product/<int:product_id>", methods=["DELETE"])
 def delete_product(product_id):
     """

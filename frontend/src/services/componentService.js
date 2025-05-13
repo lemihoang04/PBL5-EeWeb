@@ -131,7 +131,120 @@ const fetchCompatibleMainboards = async (cpuSocket) => {
       status: error.response?.status
     };
   }
+
+};
+
+const fetchCompatibleRam = async (memory_type) => {
+  try {
+    const response = await axios.get(`/ram/compatible/${memory_type}`);
+    console.log('Response:', response);
+    // Check if we have valid data
+    if (response && Array.isArray(response)) {
+      console.log(`Received ${response.length} compatible RAM modules`);
+      return response;
+    } else if (response && typeof response === 'object') {
+      console.log('Compatible RAM data:', response);
+      return response;
+    } else {
+      console.error('Invalid data format:', response);
+      return { error: 'Invalid data format from server' };
+    }
+  } catch (error) {
+    console.error(`Error fetching compatible RAM for mainboard ID ${memory_type}:`, {
+      message: error.message,
+      status: error.response?.status,
+      data: error.response?.data,
+    });
+    return { 
+      error: error.response?.data?.error || `Failed to fetch compatible RAM for mainboard ID ${memory_type}`,
+      status: error.response?.status
+    };
+  }
+};
+
+const fetchCompatibleStorage = async () => {
+  try {
+    const response = await axios.get('/storage/compatible');
+    console.log('Response:', response);
+    // Check if we have valid data
+    if (response && Array.isArray(response)) {
+      console.log(`Received ${response.length} compatible storage devices`);
+      return response;
+    } else if (response && typeof response === 'object') {
+      console.log('Compatible storage data:', response);
+      return response;
+    } else {
+      console.error('Invalid data format:', response);
+      return { error: 'Invalid data format from server' };
+    }
+  } catch (error) {
+    console.error('Error fetching compatible storage devices:', {
+      message: error.message,
+      status: error.response?.status,
+      data: error.response?.data,
+    });
+    return { 
+      error: error.response?.data?.error || 'Failed to fetch compatible storage devices',
+      status: error.response?.status
+    };
+  }
+};
+
+const fetchCompatibleCases = async (formFactor) => {
+  try {
+    const response = await axios.get(`/cases/compatible/${formFactor}`);
+    
+    // Check if we have valid data
+    if (response && Array.isArray(response)) {
+      console.log(`Received ${response.length} compatible cases`);
+      return response;
+    } else if (response && typeof response === 'object') {
+      console.log('Compatible cases data:', response);
+      return response;
+    } else {
+      console.error('Invalid data format:', response);
+      return { error: 'Invalid data format from server' };
+    }
+  } catch (error) {
+    console.error(`Error fetching compatible cases for form factor ${formFactor}:`, {
+      message: error.message,
+      status: error.response?.status,
+      data: error.response?.data,
+    });
+    return { 
+      error: error.response?.data?.error || `Failed to fetch compatible cases for form factor ${formFactor}`,
+      status: error.response?.status
+    };
+  }
+};
+
+const fetchCompatiblePSU = async (totalTDP) => {
+  try {
+    const response = await axios.get(`/psu/compatible/${totalTDP}`);
+    
+    // Check if we have valid data
+    if (response && Array.isArray(response)) {
+      console.log(`Received ${response.length} compatible PSUs`);
+      return response;
+    } else if (response && typeof response === 'object') {
+      console.log('Compatible PSU data:', response);
+      return response;
+    } else {
+      console.error('Invalid data format:', response);
+      return { error: 'Invalid data format from server' };
+    }
+  } catch (error) {
+    console.error(`Error fetching compatible PSUs for total TDP ${totalTDP}:`, {
+      message: error.message,
+      status: error.response?.status,
+      data: error.response?.data,
+    });
+    return { 
+      error: error.response?.data?.error || `Failed to fetch compatible PSUs for total TDP ${totalTDP}`,
+      status: error.response?.status
+    };
+  }
 };
 
 
-export { fetchComponents, fetchComponentById, fetchCompatibleCpuCoolers, fetchCompatibleMainboards };
+export { fetchComponents, fetchComponentById, fetchCompatibleCpuCoolers, fetchCompatibleMainboards, fetchCompatibleRam, fetchCompatibleStorage, fetchCompatibleCases, fetchCompatiblePSU };

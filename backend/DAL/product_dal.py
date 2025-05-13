@@ -566,6 +566,186 @@ def dal_Mainboard_vs_CPU(cpu_socket):
 
     finally:
         db.close()
+<<<<<<< HEAD
+=======
+
+def dal_RAM_vs_Mainboard(memory_type):
+    """
+    Get product IDs of RAMs compatible with a specific Mainboard memory type.
+    
+    Args:
+        memory_type (str): The memory type to match (e.g., 'DDR4', 'DDR5')
+    
+    Returns:
+        tuple: (products, status_code)
+            products: List of compatible RAMs with details or error message
+            status_code: HTTP status code
+    """
+    db = get_db_connection()
+    if not db:
+        return {'error': 'Database connection failed'}, 500
+
+    try:
+        # Query to find RAMs compatible with the given memory type
+        query = """
+        SELECT DISTINCT pa.product_id
+        FROM product_attributes pa
+        JOIN products p ON pa.product_id = p.product_id
+        WHERE p.category_id = 16  
+          AND pa.attribute_name = 'Speed'
+          AND pa.attribute_value LIKE %s
+        """
+
+        # Use pandas to read data from database
+        df = pd.read_sql_query(query, db, params=(f"%{memory_type}%",))
+
+        # Get product IDs list
+        product_ids = df['product_id'].tolist()
+
+        # Return detailed product information using existing function
+        return dal_get_products_by_ids(product_ids)
+
+    except Exception as e:
+        return {'error': str(e)}, 500
+
+    finally:
+        db.close()
+
+def dal_Storage_vs_Mainboard():
+    """
+    Get product IDs of Storage devices compatible with a specific Mainboard interface type.
+    
+    Args:
+        storage_interface (str): The interface type to match (e.g., 'SATA', 'M.2', 'NVMe')
+    
+    Returns:
+        tuple: (products, status_code)
+            products: List of compatible storage devices with details or error message
+            status_code: HTTP status code
+    """
+    db = get_db_connection()
+    if not db:
+        return {'error': 'Database connection failed'}, 500
+
+    try:
+        # Query to find storage devices compatible with the given interface type
+        query = """
+        SELECT DISTINCT pa.product_id
+        FROM product_attributes pa
+        JOIN products p ON pa.product_id = p.product_id
+        WHERE p.category_id = 17  # Assuming 17 is the category_id for storage devices
+          AND pa.attribute_name = 'Interface'
+         
+        """
+
+        # Use pandas to read data from database
+        df = pd.read_sql_query(query, db)
+
+        # Get product IDs list
+        product_ids = df['product_id'].tolist()
+
+        # Return detailed product information using existing function
+        return dal_get_products_by_ids(product_ids)
+
+    except Exception as e:
+        return {'error': str(e)}, 500
+
+    finally:
+        db.close()
+
+
+def dal_PSU_vs_TotalTDP(total_tdp):
+    """
+    Get product IDs of PSUs compatible with a system having the specified total TDP.
+    
+    Args:
+        total_tdp (int): Total power consumption (TDP) of the system in watts
+    
+    Returns:
+        tuple: (products, status_code)
+            products: List of compatible PSUs with details or error message
+            status_code: HTTP status code
+    """
+    db = get_db_connection()
+    if not db:
+        return {'error': 'Database connection failed'}, 500
+
+    try:
+        # Add a safety margin of 20% to the total TDP
+        required_wattage = total_tdp * 1.2
+        
+        # Query to find PSUs with sufficient wattage for the system's total TDP
+        query = """
+        SELECT DISTINCT pa.product_id
+        FROM product_attributes pa
+        JOIN products p ON pa.product_id = p.product_id
+        WHERE p.category_id = 15  # Assuming 15 is the category_id for PSUs
+          AND pa.attribute_name = 'Wattage'
+          AND CAST(REGEXP_REPLACE(pa.attribute_value, '[^0-9]', '') AS UNSIGNED) >= %s
+        ORDER BY CAST(REGEXP_REPLACE(pa.attribute_value, '[^0-9]', '') AS UNSIGNED) ASC
+        """
+
+        # Use pandas to read data from database
+        df = pd.read_sql_query(query, db, params=(required_wattage,))
+
+        # Get product IDs list
+        product_ids = df['product_id'].tolist()
+
+        # Return detailed product information using existing function
+        return dal_get_products_by_ids(product_ids)
+
+    except Exception as e:
+        return {'error': str(e)}, 500
+
+    finally:
+        db.close()
+
+
+def dal_Case_vs_Mainboard(form_factor):
+    """
+    Get product IDs of Cases compatible with a specific Mainboard form factor.
+    
+    Args:
+        form_factor (str): The form factor to match (e.g., 'ATX', 'Micro-ATX', 'Mini-ITX')
+    
+    Returns:
+        tuple: (products, status_code)
+            products: List of compatible cases with details or error message
+            status_code: HTTP status code
+    """
+    db = get_db_connection()
+    if not db:
+        return {'error': 'Database connection failed'}, 500
+
+    try:
+        # Query to find cases compatible with the given form factor
+        query = """
+        SELECT DISTINCT pa.product_id
+        FROM product_attributes pa
+        JOIN products p ON pa.product_id = p.product_id
+        WHERE p.category_id = 10  # Assuming 10 is the category_id for cases
+          AND pa.attribute_name = 'Motherboard Form Factor'
+          AND pa.attribute_value LIKE %s
+        """
+
+        # Use pandas to read data from database
+        df = pd.read_sql_query(query, db, params=(f"%{form_factor}%",))
+
+        # Get product IDs list
+        product_ids = df['product_id'].tolist()
+
+        # Return detailed product information using existing function
+        return dal_get_products_by_ids(product_ids)
+
+    except Exception as e:
+        return {'error': str(e)}, 500
+
+    finally:
+        db.close()
+
+
+
+>>>>>>> 286af348fd1ed2f8c4449dcf29620c8aa4dfd90f
 def dal_get_components_by_attributes(type, attributes=None):
     """
     Get components by type and optionally filter by specific attributes.

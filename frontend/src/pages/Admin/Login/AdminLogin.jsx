@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { LoginAdmin } from '../../../services/adminService';
 import './AdminLogin.css';
+import { UserContext } from '../../../context/UserProvider';
 
 const AdminLogin = () => {
     const [formData, setFormData] = useState({
@@ -13,15 +15,12 @@ const AdminLogin = () => {
     const [loginError, setLoginError] = useState('');
     const navigate = useNavigate();
 
+    const { admin, loginAdmin } = useContext(UserContext);
     useEffect(() => {
-        document.title = 'Admin Login | Dashboard';
-
-        // Check if user is already logged in
-        const adminToken = localStorage.getItem('adminToken');
-        if (adminToken) {
-            navigate('/admin/dashboard');
+        if (admin && admin.isAuthenticated) {
+            navigate("/admin");
         }
-    }, [navigate]);
+    }, [admin, navigate]);
 
     const validateForm = () => {
         const newErrors = {};
@@ -63,16 +62,17 @@ const AdminLogin = () => {
             setIsLoading(true);
 
             try {
-                // Simulate API call - Replace with your actual login API
-                await new Promise(resolve => setTimeout(resolve, 1500));
-
+                const response = await LoginAdmin(formData);
+                console.log("Login response:", response);
                 // For demo purposes - in real app, validate with backend
-                if (formData.username === 'admin' && formData.password === 'admin123') {
+                if (response && response.errCode === 0) {
                     // Store token and redirect
-                    localStorage.setItem('adminToken', 'sample-token-123');
-                    if (formData.rememberMe) {
-                        localStorage.setItem('adminRemember', 'true');
-                    }
+                    let data = {
+                        isAuthenticated: true,
+                        account: response.admin,
+                        isLoading: false,
+                    };
+                    loginAdmin(data);
                     navigate('/admin/dashboard');
                 } else {
                     setLoginError('Invalid username or password');
