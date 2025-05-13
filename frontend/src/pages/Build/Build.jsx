@@ -302,6 +302,18 @@ const Build = () => {
         navigate(`/components/cpu%20cooler`);
       }
     }
+    else if (componentId === 'cpu') {
+      // Check if CPU Cooler has been selected
+      const selectedMainboard = components.find((component) => component.id === 'Mainboard')?.selected;
+      
+      if (selectedMainboard) {
+        
+        navigate(`/components/cpu?cpu_socket=${selectedMainboard['attributes']['Socket/CPU']}`);
+      } else {
+        // Navigate to regular CPU selection
+        navigate(`/components/cpu`);
+      }
+    }
     else if (componentId === 'Mainboard') {
       // Check if CPU has been selected
       const selectedCpu = components.find((component) => component.id === 'cpu')?.selected;
@@ -608,7 +620,7 @@ const handleRemoveComponent = (componentId, index = null) => {
       <div className="checkout-section">
         <button className="amazon-buy-btn">
           <span className="checkout-icon">🛒</span>
-          Buy from Amazon
+          Buy 
         </button>
       </div>
 
