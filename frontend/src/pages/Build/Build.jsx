@@ -423,6 +423,55 @@ const handleRemoveComponent = (componentId, index = null) => {
   });
 };
 
+const handleBuyNow = () => {
+  // Check if there are any components selected
+  const hasSelectedComponents = components.some(component => 
+    component.multiple 
+      ? (component.selected && component.selected.length > 0)
+      : component.selected !== null
+  );
+  
+  if (!hasSelectedComponents) {
+    alert("Please select at least one component before proceeding to checkout.");
+    return;
+  }
+  
+  // Create items array from the selected components
+  const items = [];
+  
+  components.forEach(component => {
+    if (component.multiple && component.selected && component.selected.length > 0) {
+      // For components with multiple selections (RAM, Storage, GPU)
+      component.selected.forEach(item => {
+        items.push({
+          product_id: item.product_id || item.id,
+          price: item.price || 0,
+          title: item.title || item.name,
+          quantity: 1,
+          image: item.image
+        });
+      });
+    } else if (!component.multiple && component.selected) {
+      // For components with single selection (CPU, Mainboard, etc.)
+      items.push({
+        product_id: component.selected.product_id || component.selected.id,
+        price: component.selected.price || 0,
+        title: component.selected.title || component.selected.name,
+        quantity: 1,
+        image: component.selected.image
+      });
+    }
+  });
+  
+  const amount = totalPrice;
+  const isBuyNow = true;
+  const formValue = { items, amount, isBuyNow };
+  
+  console.log("PC Build items to buy:", items);
+  navigate("/checkout", {
+    state: { formValue }
+  });
+};
   return (
     <div className="build-container">
       <div className={`header ${!isCompatible ? 'incompatible' : ''}`}>
@@ -618,9 +667,9 @@ const handleRemoveComponent = (componentId, index = null) => {
       </div>
 
       <div className="checkout-section">
-        <button className="amazon-buy-btn">
+        <button className="amazon-buy-btn" onClick={handleBuyNow}>
           <span className="checkout-icon">🛒</span>
-          Buy 
+          Buy Now
         </button>
       </div>
 
