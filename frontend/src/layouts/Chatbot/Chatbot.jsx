@@ -17,10 +17,11 @@ const Chatbot = () => {
 
     const toggleChat = () => {
         setIsOpen(!isOpen);
-        // Add focus to input when chat opens
+        // Add focus to input when chat opens and scroll to bottom
         if (!isOpen) {
             setTimeout(() => {
                 document.querySelector('.ts-chatbot-input input')?.focus();
+                messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
             }, 300);
         }
     };
@@ -65,8 +66,14 @@ const Chatbot = () => {
         const savedMessages = sessionStorage.getItem('chatMessages');
         if (savedMessages) {
             setMessages(JSON.parse(savedMessages));
+            // Add a small delay then scroll to bottom when messages are loaded
+            if (isOpen) {
+                setTimeout(() => {
+                    messagesEndRef.current?.scrollIntoView({ behavior: 'auto' });
+                }, 100);
+            }
         }
-    }, []);
+    }, [isOpen]);
 
     // Save messages to sessionStorage whenever they change
     useEffect(() => {
