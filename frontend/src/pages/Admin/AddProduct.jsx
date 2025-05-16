@@ -71,14 +71,21 @@ const AddProduct = () => {
         
         // Update form data
         formData.set(`${fieldType}_${fieldName}`, value);
-    };
-
-    const handleImageChange = (e) => {
+    };    const handleImageChange = (e) => {
         const files = Array.from(e.target.files);
         
         // Clear previous images from formData
         if (formData.has('images')) {
             formData.delete('images');
+        }
+        
+        // Validate image sizes (limit to 10MB per image)
+        const maxSize = 10 * 1024 * 1024; // 10MB
+        const invalidFiles = files.filter(file => file.size > maxSize);
+        
+        if (invalidFiles.length > 0) {
+            setError(`Một số ảnh quá lớn (giới hạn 10MB mỗi ảnh): ${invalidFiles.map(f => f.name).join(', ')}`);
+            return;
         }
         
         // Add each file to formData

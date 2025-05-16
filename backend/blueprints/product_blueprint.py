@@ -1,9 +1,16 @@
-from flask import Blueprint, request, jsonify, session, current_app
+from flask import Blueprint, request, jsonify, session, current_app, Response
 from DAL.product_dal import *
 import os
 import json
+import logging
+import requests
 from werkzeug.utils import secure_filename
-# from DAL.gdrive_utils_new import upload_image_to_drive
+from DAL.gdrive_utils import upload_image_to_drive
+import traceback
+import re
+
+# Thiết lập logging
+logger = logging.getLogger(__name__)
 
 try:
     from DAL.component_patch import dal_get_components_by_attributes as patched_dal_get_components_by_attributes
@@ -13,6 +20,80 @@ except ImportError as e:
     patched_dal_get_components_by_attributes = None
 
 product_blueprint = Blueprint('product', __name__)
+
+def convert_drive_url_to_proxy(url):
+    """
+    Chuyển đổi Google Drive URL thành proxy URL.
+    
+    Args:
+        url (str): URL Google Drive dạng https://drive.google.com/uc?export=view&id=FILE_ID 
+                  hoặc https://drive.google.com/thumbnail?id=FILE_ID...
+        
+    Returns:
+        str: Proxy URL dạng /api/product/p/FILE_ID
+    """
+    try:
+        if not url or not isinstance(url, str):
+            return url
+            
+        # Kiểm tra xem URL có phải Google Drive không
+        if not ('drive.google.com' in url):
+            return url
+            
+        # Tìm file ID trong URL
+        file_id_match = re.search(r'[?&]id=([^&]+)', url)
+        if file_id_match:
+            file_id = file_id_match.group(1)
+            return f"/api/product/p/{file_id}"
+        
+        return url
+    except:
+        # Nếu có lỗi xử lý, trả lại URL gốc
+        return url
+
+def convert_image_urls_in_product(product):
+    """
+    Chuyển đổi tất cả URL ảnh trong một sản phẩm thành proxy URL.
+    
+    Args:
+        product (dict): Thông tin sản phẩm
+    
+    Returns:
+        dict: Sản phẩm với URL ảnh đã được cập nhật
+    """
+    if not product:
+        return product
+        
+    # Xử lý trường hợp là một danh sách sản phẩm
+    if isinstance(product, list):
+        for item in product:
+            convert_image_urls_in_product(item)
+        return product
+        
+    # Xử lý trường image, image_url, thumbnail
+    for field in ['image', 'image_url', 'thumbnail']:
+        if field in product and product[field]:
+            # Trường hợp multiple images được phân tách bằng dấu ";"
+            if ';' in product[field]:
+                urls = product[field].split(';')
+                converted_urls = [convert_drive_url_to_proxy(url.strip()) for url in urls]
+                product[field] = '; '.join(converted_urls)
+            else:
+                product[field] = convert_drive_url_to_proxy(product[field])
+    
+    # Xử lý trường images nếu là một list
+    if 'images' in product and isinstance(product['images'], list):
+        product['images'] = [convert_drive_url_to_proxy(url) for url in product['images']]
+        
+    # Đệ quy xử lý các trường nested
+    for key, value in product.items():
+        if isinstance(value, dict):
+            convert_image_urls_in_product(value)
+        elif isinstance(value, list) and len(value) > 0 and isinstance(value[0], dict):
+            for item in value:
+                convert_image_urls_in_product(item)
+                
+    return product
 
 @product_blueprint.route("/products", methods=["GET"])
 def get_all_products():
@@ -74,7 +155,7 @@ def get_component_by_id(product_id):
         else:
             return jsonify(component), status
     except Exception as e:
-        return jsonify({"error": str(e)}), 500  
+        return jsonify({"error": str(e)}), 500
     
 @product_blueprint.route("/components/<string:type>", methods=["GET"])
 def get_components_by_type(type):
@@ -146,9 +227,7 @@ def get_components_by_type(type):
             except Exception as e:
                 print(f"Error in dal_get_components_by_attributes: {e}")
                 # Fallback to simpler method if attribute filtering fails
-                components, status = dal_get_components_by_type(type_to_use)
-        
-        # Phần code sau đây sẽ chạy sau khi đã gán giá trị cho components và status
+                components, status = dal_get_components_by_type(type_to_use)        # Phần code sau đây sẽ chạy sau khi đã gán giá trị cho components và status
         if status == 200:
             return jsonify(components), 200
         else:
@@ -322,6 +401,7 @@ def get_product_by_id(product_id):
     try:
         product, status = dal_get_product_by_id(product_id)
         if status == 200:
+            # Trả về trực tiếp vì URL đã là URL hình ảnh đầy đủ
             return jsonify(product), 200
         else:
             return jsonify({"error": "Product not found"}), status
@@ -405,38 +485,77 @@ def add_product():
         for key in request.form:
             if key.startswith('common_'):
                 field_name = key.replace('common_', '')
-                common_fields[field_name] = request.form.get(key)
-          # Handle images
+                common_fields[field_name] = request.form.get(key)        # Handle images
         image_urls = []
         if 'images' in request.files:
             image_files = request.files.getlist('images')
+            logger.info(f"Processing {len(image_files)} images")
+            
             for image in image_files:
                 if image and image.filename:
                     try:
                         # Generate a unique filename to prevent overwriting
                         from datetime import datetime
-                        timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
-                        filename = f"{timestamp}_{secure_filename(image.filename)}"
+                        import traceback
                         
-                        # Save to temp path
-                        temp_path = os.path.join(current_app.config.get('UPLOAD_FOLDER', '/tmp'), filename)
-                        image.save(temp_path)
-                          # Upload to Google Drive with automatic local fallback
-                        image_url = upload_image_to_drive(temp_path)
-                                
+                        timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
+                        original_filename = image.filename
+                        filename = f"{timestamp}_{secure_filename(original_filename)}"
+                        
+                        logger.info(f"Processing image: {original_filename}, content type: {image.content_type}, size: {image.content_length if hasattr(image, 'content_length') else 'unknown'}")
+                        
+                        # Phương thức 1: Tải trực tiếp từ file object (không cần lưu vào thư mục tạm)
+                        logger.info(f"Uploading image {filename} to Google Drive...")
+                        
+                        # Đảm bảo file pointer ở vị trí đầu
+                        image.stream.seek(0)
+                        
+                        image_url = upload_image_to_drive(filename, file_object=image)
+                        
                         # Add the URL to our list if it was successfully created
                         if image_url:
+                            logger.info(f"Successfully uploaded image: {image_url}")
                             image_urls.append(image_url)
-                    except Exception as e:
-                        print(f"Error processing image {image.filename}: {str(e)}")
-                        # Continue processing other images
-                    finally:
-                        # Clean up temp file
-                        if 'temp_path' in locals() and os.path.exists(temp_path):
+                        else:
+                            # Phương thức 2: Nếu tải trực tiếp thất bại, thử phương thức lưu tạm và tải lên
+                            logger.warning(f"Direct upload failed, trying with temp file for {filename}")
+                            
+                            # Create temp directory if it doesn't exist
+                            temp_folder = current_app.config.get('UPLOAD_FOLDER', os.path.join(
+                                os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'temp_uploads'))
+                            os.makedirs(temp_folder, exist_ok=True)
+                            
+                            # Reset file pointer
+                            image.stream.seek(0)
+                            
+                            # Save to temp path
+                            temp_path = os.path.join(temp_folder, filename)
+                            image.save(temp_path)
+                            
+                            # Log file info
+                            if os.path.exists(temp_path):
+                                logger.info(f"Saved temp file: {temp_path}, size: {os.path.getsize(temp_path)} bytes")
+                            else:
+                                logger.error(f"Failed to save temp file: {temp_path}")
+                            
                             try:
-                                os.remove(temp_path)
-                            except:
-                                pass
+                                # Upload from temp file
+                                image_url = upload_image_to_drive(temp_path)
+                                if image_url:
+                                    logger.info(f"Successfully uploaded image from temp file: {image_url}")
+                                    image_urls.append(image_url)
+                                else:
+                                    logger.error(f"Failed to upload image {filename} to Google Drive")
+                            finally:
+                                # Clean up temp file
+                                if os.path.exists(temp_path):
+                                    try:
+                                        os.remove(temp_path)
+                                        logger.info(f"Removed temporary file: {temp_path}")
+                                    except Exception as clean_err:
+                                        logger.error(f"Failed to remove temporary file: {clean_err}")
+                    except Exception as e:
+                        logger.error(f"Error processing image {image.filename}: {str(e)}")
         # Nếu có ảnh thì mới thêm vào common_fields
         if image_urls:
             common_fields['image'] = "; ".join(image_urls)
@@ -561,4 +680,95 @@ def test_static_file(filename):
             }), 404
             
     except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@product_blueprint.route("/image-proxy", methods=["GET"])
+def image_proxy():
+    """
+    Proxy endpoint để lấy hình ảnh từ Google Drive, giúp tránh các giới hạn của Drive.
+    
+    Query parameters:
+        url: URL của hình ảnh cần proxy
+        id: Google Drive file ID (thay thế cho url)
+    
+    Returns:
+        Binary image data với content-type phù hợp.
+    """
+    try:
+        # Lấy URL từ query parameter
+        image_url = request.args.get('url')
+        file_id = request.args.get('id')
+        
+        if not image_url and not file_id:
+            return jsonify({"error": "Missing 'url' or 'id' parameter"}), 400
+            
+        # Nếu cung cấp file_id, tạo URL
+        if file_id and not image_url:
+            image_url = f"https://drive.google.com/uc?export=view&id={file_id}"
+          # Kiểm tra nếu URL là từ Google Drive (có thể mở rộng hỗ trợ thêm các nguồn khác)
+        if not image_url.startswith('https://drive.google.com/') and not image_url.startswith('https://'):
+            return jsonify({"error": "Only valid HTTPS URLs are supported"}), 400
+            
+        logger.info(f"Proxying image from: {image_url}")
+        
+        # Thực hiện request để lấy hình ảnh
+        response = requests.get(image_url, stream=True, timeout=10)
+        
+        if response.status_code != 200:
+            logger.error(f"Failed to fetch image: HTTP {response.status_code}")
+            return jsonify({"error": f"Failed to fetch image: HTTP {response.status_code}"}), 502
+            
+        # Xác định content-type
+        content_type = response.headers.get('Content-Type', 'image/jpeg')
+        
+        # Trả về response sử dụng Flask Response object
+        return Response(
+            response.iter_content(chunk_size=10*1024),
+            content_type=content_type,
+            headers={
+                'Cache-Control': 'public, max-age=86400',  # Cache 1 ngày
+                'Access-Control-Allow-Origin': '*'
+            }
+        )
+        
+    except Exception as e:
+        logger.error(f"Error in image_proxy: {str(e)}")
+        logger.error(traceback.format_exc())
+        return jsonify({"error": str(e)}), 500
+
+@product_blueprint.route("/p/<file_id>", methods=["GET"])
+def proxy_by_id(file_id):
+    """
+    Phiên bản ngắn gọn của proxy chỉ sử dụng Google Drive file ID.
+    URL sẽ trông giống: /api/product/p/1a2b3c4d5e
+    """
+    try:
+        if not file_id:
+            return jsonify({"error": "Missing file ID"}), 400
+            
+        image_url = f"https://drive.google.com/uc?export=view&id={file_id}"
+        logger.info(f"Proxying image by ID from: {image_url}")
+        
+        # Thực hiện request để lấy hình ảnh
+        response = requests.get(image_url, stream=True, timeout=10)
+        
+        if response.status_code != 200:
+            logger.error(f"Failed to fetch image: HTTP {response.status_code}")
+            return jsonify({"error": f"Failed to fetch image: HTTP {response.status_code}"}), 502
+            
+        # Xác định content-type
+        content_type = response.headers.get('Content-Type', 'image/jpeg')
+        
+        # Trả về response sử dụng Flask Response object
+        return Response(
+            response.iter_content(chunk_size=10*1024),
+            content_type=content_type,
+            headers={
+                'Cache-Control': 'public, max-age=86400',  # Cache 1 ngày
+                'Access-Control-Allow-Origin': '*'
+            }
+        )
+        
+    except Exception as e:
+        logger.error(f"Error in proxy_by_id: {str(e)}")
         return jsonify({"error": str(e)}), 500
