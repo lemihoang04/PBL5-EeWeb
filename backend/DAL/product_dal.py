@@ -566,8 +566,6 @@ def dal_Mainboard_vs_CPU(cpu_socket):
 
     finally:
         db.close()
-<<<<<<< HEAD
-=======
 
 def dal_RAM_vs_Mainboard(memory_type):
     """
@@ -745,7 +743,6 @@ def dal_Case_vs_Mainboard(form_factor):
 
 
 
->>>>>>> 286af348fd1ed2f8c4449dcf29620c8aa4dfd90f
 def dal_get_components_by_attributes(type, attributes=None):
     """
     Get components by type and optionally filter by specific attributes.

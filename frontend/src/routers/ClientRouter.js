@@ -82,10 +82,6 @@ const AppRoutes = () => {
                         <Route path="/checkPayment" element={<CheckPayment />} />
                         <Route path="/failPayment" element={<FailPayment />} />
                         <Route path="/forgot-password" element={<ForgetPassword />} /> {/* Added route for ForgetPassword */}
-<<<<<<< HEAD
-                    </Route>                    {/* Route Admin */}
-                    <Route path="/admin" element={<Admin />} />
-=======
                     </Route>
 
 
@@ -98,7 +94,6 @@ const AppRoutes = () => {
                             </AdminRouter>
                         }
                     />
->>>>>>> 286af348fd1ed2f8c4449dcf29620c8aa4dfd90f
                     <Route path="/admin/login" element={<LoginAdmin />} />
                     <Route path="/admin/add-product" element={<AddProduct />} />
                     {/* Route 404 */}

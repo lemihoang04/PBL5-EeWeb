@@ -5,7 +5,6 @@ import json
 from werkzeug.utils import secure_filename
 # from DAL.gdrive_utils_new import upload_image_to_drive
 
-# Import patched version of component functions
 try:
     from DAL.component_patch import dal_get_components_by_attributes as patched_dal_get_components_by_attributes
     print("Successfully imported patched dal_get_components_by_attributes function")
