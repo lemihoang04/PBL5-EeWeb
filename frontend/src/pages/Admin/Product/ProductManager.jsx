@@ -5,10 +5,12 @@ import { faTrash, faSearch, faPlus, faFilter, faSort, faTags } from "@fortawesom
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./ProductManager.css";
 import { fetchAllProducts, deleteProduct } from "../../../services/productService";
+import { useNavigate } from "react-router-dom";
 
 const PAGE_SIZE = 8; // Products per page for the card layout
 
 const ProductManager = () => {
+  const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
@@ -213,10 +215,12 @@ const ProductManager = () => {
           <div className="dashboard-title">
             <h1>Product Management</h1>
             <p>Manage your product inventory, prices, and categories</p>
-          </div>
-          <div className="dashboard-actions">
+          </div>          <div className="dashboard-actions">
+            <Button variant="outline-primary" className="advanced-add-btn me-2" onClick={() => navigate("/admin/add-product")}>
+              <FontAwesomeIcon icon={faPlus} /> Advanced Add Product
+            </Button>
             <Button variant="success" className="add-product-btn" onClick={() => handleShowModal()}>
-              <FontAwesomeIcon icon={faPlus} /> Add New Product
+              <FontAwesomeIcon icon={faPlus} /> Quick Add
             </Button>
           </div>
         </div>

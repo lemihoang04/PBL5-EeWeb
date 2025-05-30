@@ -1,4 +1,5 @@
 import mysql.connector
+import os
 
 DATABASE_CONFIG = {
     'user': 'root',
@@ -14,6 +15,12 @@ ZALOPAY_CONFIG = {
     "create_order_endpoint": "https://sb-openapi.zalopay.vn/v2/create",
     "query_order_endpoint": "https://sb-openapi.zalopay.vn/v2/query",
 }
+
+# File upload configuration
+UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'temp_uploads')
+# Create the folder if it doesn't exist
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
 def get_db_connection():
     connection = mysql.connector.connect(**DATABASE_CONFIG)
     return connection

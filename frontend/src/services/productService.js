@@ -33,6 +33,7 @@ const deleteProduct = async (productId) => {
         };
     }
 };
+
 const fetchProductById = async (productId) => {
     try {
         const product = await axios.get(`/product/${productId}`);
@@ -43,6 +44,7 @@ const fetchProductById = async (productId) => {
         return null;
     }
 };
+
 const fetchProductsByCategoryId = async (categoryId) => {
     try {
         const products = await axios.get(`/category/${categoryId}/products`); // Fetch products by category ID
@@ -53,6 +55,7 @@ const fetchProductsByCategoryId = async (categoryId) => {
         return [];
     }
 };
+
 const fetchFeaturedProducts = async () => {
     try {
         const response = await axios.get("/featured-categories");
@@ -62,6 +65,61 @@ const fetchFeaturedProducts = async () => {
         console.error("Error fetching featured products:", error);
         return [];
     }
-}
+};
 
-export { fetchAllProducts, deleteProduct, fetchProductById, fetchProductsByCategoryId, fetchFeaturedProducts };
+// Fetch product categories
+const fetchProductCategories = async () => {
+    try {
+        const response = await axios.get("/product-categories");
+        return response;
+    } catch (error) {
+        console.error("Error fetching product categories:", error);
+        return [];
+    }
+};
+
+// Fetch product schema based on category
+const fetchProductSchema = async (categoryName) => {
+    try {
+        const response = await axios.get(`/product-schema/${categoryName}`);
+        return response;
+    } catch (error) {
+        console.error(`Error fetching schema for ${categoryName}:`, error);
+        return null;
+    }
+};
+
+// Add a new product
+const addProduct = async (formData) => {
+    try {
+        const response = await axios.post("/products", formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+        
+        return {
+            success: true,
+            message: response.message || "Sản phẩm đã được thêm thành công",
+            data: response
+        };
+    } catch (error) {
+        console.error("Error adding product:", error);
+        return {
+            success: false,
+            message: error.response?.data?.error || "Không thể thêm sản phẩm. Vui lòng thử lại sau.",
+            error
+        };
+    }
+};
+
+export { 
+    fetchAllProducts, 
+    deleteProduct, 
+    fetchProductById, 
+    fetchProductsByCategoryId, 
+    fetchFeaturedProducts,
+    fetchProductCategories,
+    fetchProductSchema,
+    addProduct
+};

@@ -48,9 +48,7 @@ const LaptopSearch = () => {
 
   // Apply all filters to laptops
   useEffect(() => {
-    let results = [...laptops];
-
-    // Apply search term filter
+    let results = [...laptops];    // Apply search term filter
     if (searchTerm) {
       results = results.filter(laptop =>
         laptop.title.toLowerCase().includes(searchTerm.toLowerCase())
@@ -58,9 +56,16 @@ const LaptopSearch = () => {
     }
 
     // Apply price range filter
-    results = results.filter(laptop =>
-      laptop.price >= priceRange[0] && laptop.price <= priceRange[1]
-    );
+    results = results.filter(laptop => {
+      // If price is missing or invalid, show the laptop anyway (don't filter it out)
+      if (laptop.price === undefined || laptop.price === null || isNaN(laptop.price)) {
+        // Keep laptops with missing price info (just for display purposes)
+        console.log('Laptop with missing price:', laptop);
+        return true;
+      }
+      // Otherwise filter by price range as normal
+      return laptop.price >= priceRange[0] && laptop.price <= priceRange[1];
+    });
 
     // Apply screen size filter
     if (filters.screenSize.length > 0) {
@@ -87,16 +92,17 @@ const LaptopSearch = () => {
       results = results.filter(laptop =>
         filters.ramSize.some(size => laptop.ram && laptop.ram.includes(size))
       );
-    }
-
-    // Apply storage type filter
+    }    // Apply storage type filter
     if (filters.storageType.length > 0) {
       results = results.filter(laptop => {
-        if (!laptop.hard_drive) return false;
+        // Check both old property (hard_drive) and new property (storage_type)
+        const storageInfo = laptop.storage_type || laptop.hard_drive || '';
+        if (!storageInfo) return false;
+
         return filters.storageType.some(type =>
-          (type === "SSD" && laptop.hard_drive.includes("SSD")) ||
-          (type === "HDD" && laptop.hard_drive.includes("HDD")) ||
-          (type === "eMMC" && laptop.hard_drive.toLowerCase().includes("emmc"))
+          (type === "SSD" && storageInfo.toUpperCase().includes("SSD")) ||
+          (type === "HDD" && storageInfo.toUpperCase().includes("HDD")) ||
+          (type === "eMMC" && storageInfo.toLowerCase().includes("emmc"))
         );
       });
     }
@@ -104,10 +110,12 @@ const LaptopSearch = () => {
     // Apply storage capacity filter
     if (filters.storageCapacity.length > 0) {
       results = results.filter(laptop => {
-        if (!laptop.hard_drive) return false;
+        // Check both old property (hard_drive) and new property (storage_capacity)
+        const capacityInfo = laptop.storage_capacity || laptop.hard_drive || '';
+        if (!capacityInfo) return false;
 
         // Extract the capacity part (e.g. "128 GB" from "128 GB SSD")
-        const capacityMatch = laptop.hard_drive.match(/(\d+)\s*(TB|GB|MB)/i);
+        const capacityMatch = capacityInfo.match(/(\d+)\s*(TB|GB|MB)/i);
         if (!capacityMatch) return false;
 
         const capacity = capacityMatch[0].trim();
@@ -120,13 +128,13 @@ const LaptopSearch = () => {
       results = results.filter(laptop =>
         filters.brand.includes(laptop.brand)
       );
-    }
-
-    // Apply CPU manufacturer filter
+    }    // Apply CPU manufacturer filter
     if (filters.cpuManufacturer.length > 0) {
       results = results.filter(laptop => {
+        // Check both old and new property names
+        const cpuInfo = laptop.cpuManufacturer || laptop.chipset_brand || laptop.processor_type || '';
         return filters.cpuManufacturer.some(manufacturer =>
-          laptop.chipset_brand && laptop.chipset_brand.includes(manufacturer)
+          cpuInfo.includes(manufacturer)
         );
       });
     }
@@ -134,8 +142,15 @@ const LaptopSearch = () => {
     // Apply weight filter
     if (filters.weight.length > 0) {
       results = results.filter(laptop => {
-        if (!laptop.item_weight) return false;
-        const weight = parseFloat(laptop.item_weight);
+        // Check both old and new property names
+        const weightInfo = laptop.weight || laptop.item_weight || '';
+        if (!weightInfo) return false;
+
+        // Try to extract a number from the weight string
+        const weightMatch = weightInfo.match(/(\d+(\.\d+)?)/);
+        if (!weightMatch) return false;
+
+        const weight = parseFloat(weightMatch[0]);
 
         return filters.weight.some(weightRange => {
           if (weightRange === "Up to 3 Pounds" && weight <= 3) return true;
@@ -161,9 +176,7 @@ const LaptopSearch = () => {
       results = results.filter(laptop =>
         filters.processorType.some(processor => laptop.processor_type && laptop.processor_type.includes(processor))
       );
-    }
-
-    // Apply graphics filter
+    }    // Apply graphics filter
     if (filters.graphicsCoprocessor.length > 0) {
       results = results.filter(laptop =>
         filters.graphicsCoprocessor.some(gpu => laptop.graphics_coprocessor && laptop.graphics_coprocessor.includes(gpu))
@@ -174,6 +187,7 @@ const LaptopSearch = () => {
     results = applySorting(results);
 
     setFilteredLaptops(results);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [laptops, filters, priceRange, searchTerm, sortOption]);
 
   // Extract the sorting logic into a separate function
@@ -218,11 +232,10 @@ const LaptopSearch = () => {
     });
     setCurrentPage(1); // Reset to first page when filter changes
   };
-
-  // Apply price filter
-  const applyPriceFilter = () => {
-    setCurrentPage(1); // Reset to first page when price filter is applied
-  };
+  // Apply price filter - Not currently used
+  // const applyPriceFilter = () => {
+  //   setCurrentPage(1); // Reset to first page when price filter is applied
+  // };
 
   const handleSearch = (e) => {
     const term = e.target.value.toLowerCase();
@@ -292,8 +305,25 @@ const LaptopSearch = () => {
       const data = await fetchLaptops();
       console.log('Fetched laptops data:', data);
       if (data && Array.isArray(data)) {
-        setLaptops(data);
-        setFilteredLaptops(data);
+        // Add a format step to ensure all laptops have consistent data structure
+        const formattedLaptops = data.map(laptop => ({
+          ...laptop,
+          // Ensure these fields exist even if backend didn't provide them
+          brand: laptop.brand || '',
+          screen_size: laptop.screen_size || '',
+          ram: laptop.ram || '',
+          processor_type: laptop.processor_type || '',
+          storage_type: laptop.storage_type || '',
+          storage_capacity: laptop.storage_capacity || '',
+          // Set price to null if it's invalid so our filter can identify it
+          price: laptop.price !== undefined ?
+            (isNaN(parseFloat(laptop.price)) ? null : parseFloat(laptop.price)) :
+            null
+        }));
+
+        setLaptops(formattedLaptops);
+        setFilteredLaptops(formattedLaptops);
+        console.log('Formatted laptops data:', formattedLaptops);
       }
     };
     loadLaptops();
