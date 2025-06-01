@@ -2,18 +2,30 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import './Build.css';
 import MotherboardUsage from './MotherboardUsage';
+import {
+  FaMicrochip,
+  FaMemory,
+  FaHdd,
+  FaFan,
+  FaCheck,
+  FaCube,
+  FaBolt,
+  FaDesktop,
+  FaShoppingCart,
+  FaVideo
+} from 'react-icons/fa';
 
 // Helper function to parse memory capacity and convert to GB
 function parseMemoryToGB(memoryString) {
   if (!memoryString) return 0;
-  
+
   // Extract numeric part and unit
   const match = memoryString.match(/(\d+)\s*([GMK]B)/i);
   if (!match) return 0;
-  
+
   const value = parseInt(match[1], 10);
   const unit = match[2].toUpperCase();
-  
+
   // Convert to GB
   switch (unit) {
     case 'KB': return value / (1024 * 1024);
@@ -26,10 +38,10 @@ function parseMemoryToGB(memoryString) {
 // Function to calculate total RAM capacity from modules
 function calculateTotalRAMCapacity(rams) {
   let totalGB = 0;
-  
+
   rams.forEach(ram => {
     if (!ram || !ram.attributes || !ram.attributes["Modules"]) return;
-    
+
     const modulesStr = ram.attributes["Modules"];
     // Expected format: "2 x 8GB", extract numbers
     const match = modulesStr.match(/(\d+)\s*x\s*(\d+)\s*([GMK]B)/i);
@@ -37,25 +49,25 @@ function calculateTotalRAMCapacity(rams) {
       const moduleCount = parseInt(match[1], 10);
       const moduleSize = parseInt(match[2], 10);
       const unit = match[3].toUpperCase();
-      
       // Convert to GB and add to total
       let sizeInGB = moduleSize;
       switch (unit) {
         case 'KB': sizeInGB = moduleSize / (1024 * 1024); break;
         case 'MB': sizeInGB = moduleSize / 1024; break;
+        default: break; // GB or unknown units, keep as is
       }
-      
+
       totalGB += moduleCount * sizeInGB;
     }
   });
-  
+
   return totalGB;
 }
 
 // Function to extract module count from RAM's Modules attribute
 function getModuleCount(ram) {
   if (!ram || !ram.attributes || !ram.attributes["Modules"]) return 1; // Default to 1 if not specified
-  
+
   const modulesStr = ram.attributes["Modules"];
   // Expected format: "2 x 8GB", extract the first number
   const match = modulesStr.match(/^(\d+)\s*x/);
@@ -85,12 +97,12 @@ function categorizeStorageDevices(storages) {
     m2Devices: [],
     sataDevices: []
   };
-  
+
   storages.forEach(storage => {
     if (!storage || !storage.attributes) return;
-    
+
     const interfaceType = storage.attributes["Interface"] || '';
-    
+
     // Check if it's an M.2 NVMe device (contains M.2 but not SATA)
     if (interfaceType.includes('M.2') && !interfaceType.includes('SATA')) {
       result.m2Devices.push(storage);
@@ -104,29 +116,64 @@ function categorizeStorageDevices(storages) {
       result.sataDevices.push(storage);
     }
   });
-  
+
   return result;
 }
 
 const Build = () => {
   const navigate = useNavigate();
   const location = useLocation();
-
   const [components, setComponents] = useState(() => {
     // Restore state from sessionStorage if available
-    const savedComponents = sessionStorage.getItem('components');
-    return savedComponents
-      ? JSON.parse(savedComponents)
-      : [
-        { id: 'cpu', name: 'CPU', selected: null, multiple: false, icon: '🧠' },
-        { id: 'cpu Cooler', name: 'CPU Cooler', selected: null, multiple: false, icon: '❄️' },
-        { id: 'Mainboard', name: 'Mainboard', selected: null, multiple: false, icon: '🔄' },
-        { id: 'ram', name: 'RAM', selected: [], multiple: true, icon: '🧮' },
-        { id: 'storage', name: 'Storage', selected: [], multiple: true, icon: '💾' },
-        { id: 'gpu', name: 'GPU', selected: [], multiple: true, icon: '🎮' },
-        { id: 'case', name: 'Case', selected: null, multiple: false, icon: '🏠' },
-        { id: 'psu', name: 'PSU', selected: null, multiple: false, icon: '⚡' },
-      ];
+    try {
+      const savedComponents = sessionStorage.getItem('components');
+      if (savedComponents) {
+        const parsed = JSON.parse(savedComponents);
+        console.log('Restored components from sessionStorage:', parsed);
+
+        // Merge saved data with default component structure (including icons)
+        const defaultComponents = [
+          { id: 'cpu', name: 'CPU', selected: null, multiple: false, icon: <FaMicrochip /> },
+          { id: 'cpu Cooler', name: 'CPU Cooler', selected: null, multiple: false, icon: <FaFan /> },
+          { id: 'Mainboard', name: 'Mainboard', selected: null, multiple: false, icon: <FaDesktop /> },
+          { id: 'ram', name: 'RAM', selected: [], multiple: true, icon: <FaMemory /> },
+          { id: 'storage', name: 'Storage', selected: [], multiple: true, icon: <FaHdd /> },
+          { id: 'gpu', name: 'GPU', selected: [], multiple: true, icon: <FaVideo /> },
+          { id: 'case', name: 'Case', selected: null, multiple: false, icon: <FaCube /> },
+          { id: 'psu', name: 'PSU', selected: null, multiple: false, icon: <FaBolt /> },
+        ];
+
+        // Merge saved selections with default structure
+        const restoredComponents = defaultComponents.map(defaultComponent => {
+          const savedComponent = parsed.find(saved => saved.id === defaultComponent.id);
+          return savedComponent ? {
+            ...defaultComponent,
+            selected: savedComponent.selected
+          } : defaultComponent;
+        });
+
+        return restoredComponents;
+      }
+    } catch (error) {
+      console.error('Error parsing components from sessionStorage:', error);
+      // Clear corrupted data
+      sessionStorage.removeItem('components');
+    }
+
+    // Default components structure
+    const defaultComponents = [
+      { id: 'cpu', name: 'CPU', selected: null, multiple: false, icon: <FaMicrochip /> },
+      { id: 'cpu Cooler', name: 'CPU Cooler', selected: null, multiple: false, icon: <FaFan /> },
+      { id: 'Mainboard', name: 'Mainboard', selected: null, multiple: false, icon: <FaDesktop /> },
+      { id: 'ram', name: 'RAM', selected: [], multiple: true, icon: <FaMemory /> },
+      { id: 'storage', name: 'Storage', selected: [], multiple: true, icon: <FaHdd /> },
+      { id: 'gpu', name: 'GPU', selected: [], multiple: true, icon: <FaVideo /> },
+      { id: 'case', name: 'Case', selected: null, multiple: false, icon: <FaCube /> },
+      { id: 'psu', name: 'PSU', selected: null, multiple: false, icon: <FaBolt /> },
+    ];
+
+    console.log('Using default components structure');
+    return defaultComponents;
   });
 
   const [expansionItems] = useState([
@@ -160,25 +207,25 @@ const Build = () => {
     // Object to store price of each component category
     const componentTotals = {};
     let grandTotal = 0;
-    
+
     // Calculate price for each component separately
     components.forEach(component => {
       let categoryTotal = 0;
-      
+
       if (component.multiple && component.selected && component.selected.length > 0) {
         // For multiple components (RAM, Storage, GPU)
-        categoryTotal = component.selected.reduce((sum, item) => 
+        categoryTotal = component.selected.reduce((sum, item) =>
           sum + (item && item['price'] ? Number(item['price']) : 0), 0);
       } else if (component.selected && component.selected['price']) {
         // For single components (CPU, Mainboard, etc.)
         categoryTotal = Number(component.selected['price']);
       }
-      
+
       // Store category total and add to grand total
       componentTotals[component.id] = categoryTotal;
       grandTotal += categoryTotal;
     });
-    
+
     return grandTotal; // Return the sum of all components
   }
 
@@ -194,6 +241,40 @@ const Build = () => {
   const selectedCpu = components.find(component => component.id === 'cpu')?.selected || null;
   const selectedStorages = components.find(component => component.id === 'storage')?.selected || [];
   const selectedGpus = components.find(component => component.id === 'gpu')?.selected || [];
+  // Component mount effect - verify sessionStorage sync
+  useEffect(() => {
+    console.log('Build component mounted, current components:', components);
+
+    // Force a sessionStorage sync on mount
+    try {
+      const currentSessionData = sessionStorage.getItem('components');
+      if (currentSessionData) {
+        const parsed = JSON.parse(currentSessionData);
+        console.log('Current sessionStorage data:', parsed);
+      }
+    } catch (error) {
+      console.error('Error reading sessionStorage on mount:', error);
+    }
+
+    // Listen for storage events (when sessionStorage changes in other tabs)
+    const handleStorageChange = (e) => {
+      if (e.key === 'components' && e.newValue) {
+        try {
+          const updatedComponents = JSON.parse(e.newValue);
+          console.log('SessionStorage updated from another tab:', updatedComponents);
+          setComponents(updatedComponents);
+        } catch (error) {
+          console.error('Error parsing storage event data:', error);
+        }
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []); // Empty dependency array means this runs once on mount
 
   // Update compatibility issues whenever components change
   useEffect(() => {
@@ -211,7 +292,7 @@ const Build = () => {
       const totalRamModules = rams.reduce((sum, ram) => {
         return sum + getModuleCount(ram);
       }, 0);
-      
+
       // Check RAM slot count against total module count
       const ramSlots = motherboard.specs?.memorySlots || motherboard.attributes?.["Memory Slots"] || 4;
       if (totalRamModules > ramSlots) {
@@ -227,7 +308,7 @@ const Build = () => {
       if (maxMemoryStr) {
         const maxMemoryGB = parseMemoryToGB(maxMemoryStr);
         const totalRAMCapacityGB = calculateTotalRAMCapacity(rams);
-        
+
         if (totalRAMCapacityGB > maxMemoryGB) {
           issues.push({
             type: 'problem',
@@ -248,7 +329,7 @@ const Build = () => {
       // Get available slots from motherboard
       const availableM2Slots = countM2Slots(motherboard);
       const availableSataPorts = getSataPorts(motherboard);
-      
+
       // Check M.2 compatibility
       if (m2Devices.length > availableM2Slots) {
         issues.push({
@@ -257,7 +338,7 @@ const Build = () => {
         });
         isCompatible = false;
       }
-      
+
       // Check SATA compatibility
       if (sataDevices.length > availableSataPorts) {
         issues.push({
@@ -271,7 +352,7 @@ const Build = () => {
     // Check GPU compatibility
     if (motherboard && gpus.length > 0) {
       const availablePcieX16Slots = motherboard.attributes?.["PCIe x16 Slots"] || 0;
-      
+
       if (gpus.length > availablePcieX16Slots) {
         issues.push({
           type: 'problem',
@@ -287,11 +368,11 @@ const Build = () => {
   }, [components]);
 
   const handleCategoryClick = (componentId) => {
-  // Navigate to ComponentSearch with component type
+    // Navigate to ComponentSearch with component type
     if (componentId === 'cpu Cooler') {
       // Kiểm tra nếu CPU đã được chọn
       const selectedCpu = components.find((component) => component.id === 'cpu')?.selected;
-      
+
       // Nếu CPU đã được chọn, điều hướng đến CPU Cooler với brand AMD
       if (selectedCpu) {
         console.log('Selected CPU:', selectedCpu['attributes']['Socket']);
@@ -305,9 +386,9 @@ const Build = () => {
     else if (componentId === 'cpu') {
       // Check if CPU Cooler has been selected
       const selectedMainboard = components.find((component) => component.id === 'Mainboard')?.selected;
-      
+
       if (selectedMainboard) {
-        
+
         navigate(`/components/cpu?cpu_socket=${selectedMainboard['attributes']['Socket/CPU']}`);
       } else {
         // Navigate to regular CPU selection
@@ -317,7 +398,7 @@ const Build = () => {
     else if (componentId === 'Mainboard') {
       // Check if CPU has been selected
       const selectedCpu = components.find((component) => component.id === 'cpu')?.selected;
-      
+
       // If CPU is selected, navigate to Mainboard with socket filter
       if (selectedCpu) {
         console.log('Selected CPU:', selectedCpu['attributes']['Socket']);
@@ -331,7 +412,7 @@ const Build = () => {
     else if (componentId === 'ram') {
       // Check if Mainboard has been selected
       const selectedMainboard = components.find((component) => component.id === 'Mainboard')?.selected;
-      
+
       // If Mainboard is selected, navigate to RAM with memory type filter
       if (selectedMainboard) {
         console.log('Selected Mainboard:', selectedMainboard['attributes']['Memory Type']);
@@ -348,7 +429,7 @@ const Build = () => {
     else if (componentId === 'case') {
       // Check if Mainboard has been selected
       const selectedMainboard = components.find((component) => component.id === 'Mainboard')?.selected;
-      
+
       // If Mainboard is selected, navigate to Case with form factor filter
       if (selectedMainboard) {
         console.log('Selected Mainboard:', selectedMainboard['attributes']['Form Factor']);
@@ -367,122 +448,158 @@ const Build = () => {
       navigate(`/components/${componentId}`);
     }
   };
-
   // Save state to sessionStorage each time components change
   useEffect(() => {
-    sessionStorage.setItem('components', JSON.stringify(components));
-  }, [components]);
+    try {
+      // Create a serializable version of components by excluding React icons and other non-serializable properties
+      const serializableComponents = components.map(component => ({
+        id: component.id,
+        name: component.name,
+        selected: component.selected,
+        multiple: component.multiple
+        // Exclude 'icon' property as it contains React elements which cause circular references
+      }));
 
+      const componentsToSave = JSON.stringify(serializableComponents);
+      sessionStorage.setItem('components', componentsToSave);
+      console.log('Components saved to sessionStorage:', serializableComponents);
+    } catch (error) {
+      console.error('Error saving components to sessionStorage:', error);
+    }
+  }, [components]);
   // Handle data sent from ComponentSearch.jsx
   useEffect(() => {
     if (location.state?.addedComponent) {
       const componentDetail = location.state.addedComponent;
-      setComponents((prevComponents) =>
-        prevComponents.map((component) => {
+      console.log('Adding component from ComponentSearch:', componentDetail);
+
+      setComponents((prevComponents) => {
+        const updatedComponents = prevComponents.map((component) => {
           if (component.name === componentDetail.category_name) {
             if (component.multiple) {
               // If component supports multiple selections
+              const currentSelected = component.selected || [];
+              const newSelected = [...currentSelected, componentDetail];
+              console.log(`Added to ${component.name}, new count: ${newSelected.length}`);
               return {
                 ...component,
-                selected: [...(component.selected || []), componentDetail],
+                selected: newSelected,
               };
             } else {
               // If component only supports one selection
+              console.log(`Replaced ${component.name} selection`);
               return { ...component, selected: componentDetail };
             }
           }
           return component;
-        })
-      );
-  
-      console.log('Added component:', componentDetail);
-    }
-  }, [location.state]);
-
-  // Hàm handleRemoveComponent - Xử lý xóa component
-const handleRemoveComponent = (componentId, index = null) => {
-  setComponents((prevComponents) => {
-    const updatedComponents = prevComponents.map((comp) => {
-      if (comp.id === componentId) {
-        if (comp.multiple && index !== null) {
-          // Xóa một mục cụ thể khỏi mảng đã chọn
-          const newSelected = [...comp.selected];
-          newSelected.splice(index, 1);
-          return { ...comp, selected: newSelected };
-        } else {
-          // Xóa tất cả các mục đã chọn nếu không phải dạng multiple hoặc không có chỉ mục
-          return { ...comp, selected: comp.multiple ? [] : null };
-        }
-      }
-      return comp;
-    });
-    
-    // Cập nhật ngay lập tức vào sessionStorage
-    sessionStorage.setItem('components', JSON.stringify(updatedComponents));
-    return updatedComponents;
-  });
-};
-
-const handleBuyNow = () => {
-  // Check if there are any components selected
-  const hasSelectedComponents = components.some(component => 
-    component.multiple 
-      ? (component.selected && component.selected.length > 0)
-      : component.selected !== null
-  );
-  
-  if (!hasSelectedComponents) {
-    alert("Please select at least one component before proceeding to checkout.");
-    return;
-  }
-  
-  // Create items array from the selected components
-  const items = [];
-  
-  components.forEach(component => {
-    if (component.multiple && component.selected && component.selected.length > 0) {
-      // For components with multiple selections (RAM, Storage, GPU)
-      component.selected.forEach(item => {
-        items.push({
-          product_id: item.product_id || item.id,
-          price: item.price || 0,
-          title: item.title || item.name,
-          quantity: 1,
-          image: item.image
         });
+
+        return updatedComponents;
       });
-    } else if (!component.multiple && component.selected) {
-      // For components with single selection (CPU, Mainboard, etc.)
-      items.push({
-        product_id: component.selected.product_id || component.selected.id,
-        price: component.selected.price || 0,
-        title: component.selected.title || component.selected.name,
-        quantity: 1,
-        image: component.selected.image
-      });
+
+      // Clear the location state to prevent re-adding on refresh
+      window.history.replaceState({}, document.title);
     }
-  });
-  
-  const amount = totalPrice;
-  const isBuyNow = true;
-  const formValue = { items, amount, isBuyNow };
-  
-  console.log("PC Build items to buy:", items);
-  navigate("/checkout", {
-    state: { formValue }
-  });
-};
+  }, [location.state]);  // Hàm handleRemoveComponent - Xử lý xóa component
+  const handleRemoveComponent = (componentId, index = null) => {
+    console.log(`Removing component: ${componentId}, index: ${index}`);
+
+    setComponents((prevComponents) => {
+      const updatedComponents = prevComponents.map((comp) => {
+        if (comp.id === componentId) {
+          if (comp.multiple && index !== null) {
+            // Xóa một mục cụ thể khỏi mảng đã chọn
+            const newSelected = [...comp.selected];
+            newSelected.splice(index, 1);
+            console.log(`Removed item at index ${index} from ${componentId}, remaining: ${newSelected.length}`);
+            return { ...comp, selected: newSelected };
+          } else {
+            // Xóa tất cả các mục đã chọn nếu không phải dạng multiple hoặc không có chỉ mục
+            console.log(`Cleared all selections for ${componentId}`);
+            return { ...comp, selected: comp.multiple ? [] : null };
+          }
+        }
+        return comp;
+      });
+
+      // Remove manual sessionStorage update here since useEffect handles it
+      console.log('Component removal completed, useEffect will handle sessionStorage update');
+
+      return updatedComponents;
+    });
+  };
+
+  // Function to clear all components (for debugging)
+  const clearAllComponents = () => {
+    console.log('Clearing all components');
+    setComponents(prevComponents =>
+      prevComponents.map(comp => ({
+        ...comp,
+        selected: comp.multiple ? [] : null
+      }))
+    );
+  };
+
+  const handleBuyNow = () => {
+    // Check if there are any components selected
+    const hasSelectedComponents = components.some(component =>
+      component.multiple
+        ? (component.selected && component.selected.length > 0)
+        : component.selected !== null
+    );
+
+    if (!hasSelectedComponents) {
+      alert("Please select at least one component before proceeding to checkout.");
+      return;
+    }
+
+    // Create items array from the selected components
+    const items = [];
+
+    components.forEach(component => {
+      if (component.multiple && component.selected && component.selected.length > 0) {
+        // For components with multiple selections (RAM, Storage, GPU)
+        component.selected.forEach(item => {
+          items.push({
+            product_id: item.product_id || item.id,
+            price: item.price || 0,
+            title: item.title || item.name,
+            quantity: 1,
+            image: item.image
+          });
+        });
+      } else if (!component.multiple && component.selected) {
+        // For components with single selection (CPU, Mainboard, etc.)
+        items.push({
+          product_id: component.selected.product_id || component.selected.id,
+          price: component.selected.price || 0,
+          title: component.selected.title || component.selected.name,
+          quantity: 1,
+          image: component.selected.image
+        });
+      }
+    });
+
+    const amount = totalPrice;
+    const isBuyNow = true;
+    const formValue = { items, amount, isBuyNow };
+
+    console.log("PC Build items to buy:", items);
+    navigate("/checkout", {
+      state: { formValue }
+    });
+  };
   return (
     <div className="build-container">
       <div className={`header ${!isCompatible ? 'incompatible' : ''}`}>
         <div className="compatibility">
-          <span className="icon">📋</span>
-          <span className="label">Compatibility:</span>
-          <span className="notes">See <a href="#notes">notes</a> below.</span>
+          <span className="icon"><FaCheck /></span>
+          <span className="label">Compatibility Check:</span>
+          <span className="notes">See <a href="#notes">details</a> below.</span>
         </div>
         <div className="wattage">
-          <span className="icon">⚡</span>
-          <span>Estimated Wattage: {calculateWattage()}W</span>
+          <span className="icon"><FaBolt /></span>
+          <span>Power Required: {calculateWattage()}W</span>
         </div>
       </div>
 
@@ -492,7 +609,7 @@ const handleBuyNow = () => {
             <th className="component-col">Component</th>
             <th className="selection-col">Selection</th>
             <th className="price-col">Price</th>
-            <th className="action-col"></th>
+            <th className="action-col">Action</th>
           </tr>
         </thead>
         <tbody>
@@ -505,10 +622,10 @@ const handleBuyNow = () => {
                   {component.selected.length === 0 && (
                     <tr className="component-row">
                       <td className="component-name">
-                        <a href={`#${component.id}`}>
+                        <div>
                           <span className="component-icon">{component.icon}</span>
                           {component.name}
-                        </a>
+                        </div>
                       </td>
                       <td className="selection">
                         <button
@@ -529,16 +646,18 @@ const handleBuyNow = () => {
                       {/* Only show component name in first row */}
                       {index === 0 && (
                         <td className="component-name" rowSpan={component.selected.length}>
-                          <a href={`#${component.id}`}>
+                          <div>
                             <span className="component-icon">{component.icon}</span>
                             {component.name}
-                          </a>
+                          </div>
                         </td>
                       )}
                       <td className="selection">
                         <div className="selected-component">
                           <img src={item.image} alt={item.name} />
-                          <span>{item.title}</span>
+                          <span>
+                            {component.id === 'ram' ? formatRAMDisplayText(item) : item.title}
+                          </span>
                         </div>
                       </td>
                       <td className="price">{renderPrice(item.price)}</td>
@@ -574,10 +693,10 @@ const handleBuyNow = () => {
                 // Handling for components that can only be selected once (CPU, Mainboard, etc.)
                 <tr className="component-row">
                   <td className="component-name">
-                    <a href={`#${component.id}`}>
+                    <div>
                       <span className="component-icon">{component.icon}</span>
                       {component.name}
-                    </a>
+                    </div>
                   </td>
                   <td className="selection">
                     {component.selected ? (
@@ -664,13 +783,21 @@ const handleBuyNow = () => {
       <div className="total-section">
         <div className="total-label">Total:</div>
         <div className="total-price">{renderPrice(totalPrice)}</div>
-      </div>
-
-      <div className="checkout-section">
+      </div>      <div className="checkout-section">
         <button className="amazon-buy-btn" onClick={handleBuyNow}>
-          <span className="checkout-icon">🛒</span>
-          Buy Now
+          <span className="checkout-icon"><FaShoppingCart /></span>
+          Buy Complete Build
         </button>
+        {/* Debug button - only show in development */}
+        {process.env.NODE_ENV === 'development' && (
+          <button
+            className="amazon-buy-btn"
+            onClick={clearAllComponents}
+            style={{ marginLeft: '10px', backgroundColor: '#ff6b6b' }}
+          >
+            🗑️ Clear All
+          </button>
+        )}
       </div>
 
       {/* Compatibility issues section */}
@@ -694,7 +821,7 @@ const handleBuyNow = () => {
 
           {compatibilityIssues.length === 0 && (
             <div className="no-issues">
-              <div className="success-icon">✓</div>
+              <div className="success-icon"><FaCheck /></div>
               <p>No compatibility issues detected!</p>
             </div>
           )}
@@ -738,12 +865,12 @@ const handleBuyNow = () => {
     if (mainboard) {
       totalWattage += 70;
     }
-    
+
     // CPU Cooler wattage
     if (cpuCooler) {
       totalWattage += 15;
     }
-    
+
     // CPU wattage
     if (cpu) {
       const tdpValue = cpu['attributes']['TDP'] ? parseInt(cpu['attributes']['TDP']) : NaN;
@@ -766,6 +893,20 @@ const handleBuyNow = () => {
       totalWattage += parseInt(gpu['attributes']['TDP']) || 150;
     });
     return totalWattage;
+  }
+
+  // Helper function to format RAM display text with modules
+  function formatRAMDisplayText(ram) {
+    if (!ram) return '';
+    
+    const baseTitle = ram.title || ram.name || '';
+    const modules = ram.attributes?.["Modules"];
+    
+    if (modules) {
+      return `${baseTitle} (${modules})`;
+    }
+    
+    return baseTitle;
   }
 };
 

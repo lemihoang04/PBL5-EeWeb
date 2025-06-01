@@ -110,7 +110,7 @@ def dal_get_components_by_attributes(type, attributes=None):
     except Exception as e:
         import traceback
         print(f"Error in dal_get_components_by_attributes: {e}")
-        print(traceback.format_exc())
+        # print(traceback.format_exc())
         return {"error": str(e)}, 500
         
     finally:
