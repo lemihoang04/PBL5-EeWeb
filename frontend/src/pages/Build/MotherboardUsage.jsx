@@ -1,5 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import './MotherboardUsage.css';
+import {
+  FaMicrochip,
+  FaMemory,
+  FaHdd,
+  FaDatabase,
+  FaTv,
+  FaPlug,
+  FaLightbulb,
+  FaCheck
+} from 'react-icons/fa';
 
 // Enhance function to count M.2 slots
 function countM2slot(input) {
@@ -20,12 +30,12 @@ function categorizeStorageDevices(storages) {
     m2Devices: [],
     sataDevices: []
   };
-  
+
   storages.forEach(storage => {
     if (!storage || !storage.attributes) return;
-    
+
     const interfaceType = storage.attributes["Interface"] || '';
-    
+
     // Check if it's an M.2 NVMe device (contains M.2 but not SATA)
     if (interfaceType.includes('M.2') && !interfaceType.includes('SATA')) {
       result.m2Devices.push(storage);
@@ -39,14 +49,14 @@ function categorizeStorageDevices(storages) {
       result.sataDevices.push(storage);
     }
   });
-  
+
   return result;
 }
 
 // Function to extract module count from RAM's Modules attribute
 function getModuleCount(ram) {
   if (!ram || !ram.attributes || !ram.attributes["Modules"]) return 1; // Default to 1 if not specified
-  
+
   const modulesStr = ram.attributes["Modules"];
   // Expected format: "2 x 8GB", extract the first number
   const match = modulesStr.match(/^(\d+)\s*x/);
@@ -95,15 +105,23 @@ const MotherboardUsage = ({ motherboard, rams, cpu, storages, gpus }) => {
   const pcieX16Slots = motherboard.attributes?.["PCIe x16 Slots"] || 2;
   const pcieX1Slots = motherboard.attributes?.["PCIe x1 Slots"] || 0;
   const socketType = motherboard.attributes?.["Socket/CPU"] || "Unknown";
+  const memoryType = motherboard.attributes?.["Memory Type"] || "DDR4";
   const sataPorts = getSataPorts(motherboard);
+  
+  // Extract M.2 slot specifications
+  const m2SlotSpecs = motherboard.attributes?.["M.2 Slots"] || "M";
+  const m2SlotTypes = m2SlotSpecs.split(',').map(slot => slot.trim());
+  
+  // Extract SATA version
+  const sataVersion = motherboard.attributes?.["SATA 6.0 Gb/s"] ? "6.0 Gb/s" : "3.0 Gb/s";
 
   // Generate RAM modules array based on Modules attribute in each RAM
   const ramModules = [];
   let currentSlotIndex = 0;
-  
+
   for (const ram of rams) {
     const moduleCount = getModuleCount(ram);
-    
+
     // Add this RAM's modules to our tracking array
     for (let i = 0; i < moduleCount; i++) {
       if (currentSlotIndex < ramSlots) {
@@ -112,7 +130,7 @@ const MotherboardUsage = ({ motherboard, rams, cpu, storages, gpus }) => {
       }
     }
   }
-  
+
   // Fill remaining slots with null
   while (currentSlotIndex < ramSlots) {
     ramModules[currentSlotIndex] = null;
@@ -182,7 +200,7 @@ const MotherboardUsage = ({ motherboard, rams, cpu, storages, gpus }) => {
       <div className={`mb-layout ${animateSection === 'cpu' || animateSection === 'ram' ? 'highlight-section' : ''}`}>
         <div className="mb-section">
           <div className="section-header">
-            <span className="section-icon">🧠</span> CPU Sockets
+            <FaMicrochip className="section-icon" /> CPU Socket
           </div>
           <div className="section-content">
             <div className="socket-item">
@@ -212,13 +230,13 @@ const MotherboardUsage = ({ motherboard, rams, cpu, storages, gpus }) => {
 
         <div className="mb-section">
           <div className="section-header">
-            <span className="section-icon">🧮</span> Memory Slots ({ramSlots} slots)
+            <FaMemory className="section-icon" /> Memory Slots ({ramSlots} slots)
           </div>
           <div className="section-content">
             {/* Dynamically generate RAM slots based on motherboard specs */}
             {Array.from({ length: ramSlots }, (_, index) => (
               <div className="memory-item" key={`ram-${index}`}>
-                <div className="memory-label">RAM_{index + 1} (DDR4)</div>
+                <div className="memory-label">RAM_{index + 1} ({memoryType})</div>
                 <div className="memory-connection"></div>
                 {ramModules && index < ramModules.length && ramModules[index] ? (
                   <div className="component-item">
@@ -248,14 +266,15 @@ const MotherboardUsage = ({ motherboard, rams, cpu, storages, gpus }) => {
       </div>
 
       <div className="mb-note">
-        <span className="note-icon">ℹ️</span> The number of RAM slots may vary depending on the motherboard. Please refer to the motherboard manual for optimal RAM installation.
+        <FaLightbulb className="note-icon" />
+        The number of RAM slots may vary depending on the motherboard. Please refer to the motherboard manual for optimal RAM installation.
       </div>
 
       {/* Storage section */}
       <div className={`mb-layout ${animateSection === 'storage' ? 'highlight-section' : ''}`}>
         <div className="mb-section">
           <div className="section-header">
-            <span className="section-icon">💾</span> M.2 Slots ({m2Slots} slots)
+            <FaHdd className="section-icon" /> M.2 NVMe Slots ({m2Slots} slots)
           </div>
           <div className="section-content">
             {/* Dynamically generate M.2 slots based on motherboard specs */}
@@ -264,7 +283,7 @@ const MotherboardUsage = ({ motherboard, rams, cpu, storages, gpus }) => {
 
               return (
                 <div className="slot-item" key={`m2-${index}`}>
-                  <div className="slot-label">M2_{index + 1} (M)</div>
+                  <div className="slot-label">M2_{index + 1} ({m2SlotTypes[index] || 'M'})</div>
                   <div className="slot-connection"></div>
                   {m2Storage ? (
                     <div className="component-item">
@@ -295,16 +314,16 @@ const MotherboardUsage = ({ motherboard, rams, cpu, storages, gpus }) => {
 
         <div className="mb-section">
           <div className="section-header">
-            <span className="section-icon">💿</span> SATA Port ({sataPorts} ports)
+            <FaDatabase className="section-icon" /> SATA Ports ({sataPorts} ports)
           </div>
           <div className="section-content">
             {/* Dynamically generate SATA ports based on motherboard specs */}
             {Array.from({ length: sataPorts }, (_, index) => {
               const sataStorage = index < sataDevices.length ? sataDevices[index] : null;
-              
+
               return (
                 <div className="memory-item" key={`sata${index}`}>
-                  <div className="memory-label">SATA_{index + 1} (6.0 Gb/s)</div>
+                  <div className="memory-label">SATA_{index + 1} ({sataVersion})</div>
                   <div className="memory-connection"></div>
                   {sataStorage ? (
                     <div className="component-item">
@@ -338,7 +357,7 @@ const MotherboardUsage = ({ motherboard, rams, cpu, storages, gpus }) => {
       <div className={`mb-layout ${animateSection === 'expansion' ? 'highlight-section' : ''}`}>
         <div className="mb-section">
           <div className="section-header">
-            <span className="section-icon">🎮</span> PCIe x16 Slots ({pcieX16Slots} slots)
+            <FaTv className="section-icon" /> PCIe x16 Slots ({pcieX16Slots} slots)
           </div>
           <div className="section-content">
             {/* PCIe x16 slots */}
@@ -376,7 +395,7 @@ const MotherboardUsage = ({ motherboard, rams, cpu, storages, gpus }) => {
 
         <div className="mb-section">
           <div className="section-header">
-            <span className="section-icon">🔌</span> PCIe x1/x4 Slots
+            <FaPlug className="section-icon" /> PCIe x1/x4 Slots
           </div>
           <div className="section-content">
             {/* PCIe x1 slots */}
@@ -410,15 +429,21 @@ const MotherboardUsage = ({ motherboard, rams, cpu, storages, gpus }) => {
 
         <div className="compatibility-details">
           <div className="detail-item">
-            <div className="detail-icon">✓</div>
+            <div className="detail-icon">
+              <FaCheck />
+            </div>
             <div className="detail-text">CPU compatible with socket {socketType}</div>
           </div>
           <div className="detail-item">
-            <div className="detail-icon">✓</div>
+            <div className="detail-icon">
+              <FaCheck />
+            </div>
             <div className="detail-text">RAM does not exceed slot count ({rams.length}/{ramSlots})</div>
           </div>
           <div className="detail-item">
-            <div className="detail-icon">✓</div>
+            <div className="detail-icon">
+              <FaCheck />
+            </div>
             <div className="detail-text">GPU does not exceed PCIe x16 slot count ({gpus.length}/{pcieX16Slots})</div>
           </div>
         </div>
