@@ -9,7 +9,7 @@ import OrderManager from "./Order/OrderManager.jsx";
 import CategoryManager from "./Category/CategoryManager.jsx";
 import ProductManager from "./Product/ProductManager.jsx";
 import adminAvatar from "./assets/images/admin-icon.svg"; // Make sure this path is correct
-import Settings from "./Settings/Settings.jsx";
+// import Settings from "./Settings/Settings.jsx";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../../context/UserProvider";
 import { toast } from "react-toastify";
@@ -36,8 +36,8 @@ const Admin = () => {
                 return <UserManager />;
             case "Product":
                 return <ProductManager />;
-            case "Settings":
-                return <Settings />;
+            // case "Settings":
+            //     return <Settings />;
             default:
                 return <Dashboard />;
         }
@@ -102,7 +102,7 @@ const Admin = () => {
                         { name: "Order", icon: "bi-cart" },
                         { name: "Customers", icon: "bi-people" },
                         { name: "Reports", icon: "bi-bar-chart" },
-                        { name: "Settings", icon: "bi-gear" },
+                        // { name: "Settings", icon: "bi-gear" },
                     ].map((item) => (
                         <button
                             key={item.name}
@@ -138,12 +138,12 @@ const Admin = () => {
                         </nav>
                     </div>
                     <div className="d-flex align-items-center">
-                        <div className="admin-notification-bell me-4">
+                        {/* <div className="admin-notification-bell me-4">
                             <i className="bi bi-bell fs-4"></i>
                             {notifications > 0 && (
                                 <span className="admin-notification-badge">{notifications}</span>
                             )}
-                        </div>
+                        </div> */}
                         <div className="admin-user-profile">
                             <img
                                 src={adminAvatar || "https://via.placeholder.com/40"}

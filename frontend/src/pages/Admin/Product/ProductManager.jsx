@@ -4,8 +4,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash, faSearch, faPlus, faFilter, faSort, faTags } from "@fortawesome/free-solid-svg-icons";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./ProductManager.css";
-import { fetchAllProducts, deleteProduct } from "../../../services/productService";
+import { fetchAllProducts, deleteProduct, addProduct, updateProduct } from "../../../services/productService";
 import { useNavigate } from "react-router-dom";
+import { toast } from 'react-toastify';
 
 const PAGE_SIZE = 8; // Products per page for the card layout
 
@@ -14,7 +15,15 @@ const ProductManager = () => {
   const [products, setProducts] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
-  const [form, setForm] = useState({ name: "", category: "", price: "", stock: "" });
+  const [form, setForm] = useState({
+    name: "",
+    category: "",
+    price: "",
+    stock: "",
+    image: "",
+    description: "",
+    imageFiles: []
+  });
   const [currentPage, setCurrentPage] = useState(1);
   const [categoryFilter, setCategoryFilter] = useState("All");
   const [loading, setLoading] = useState(true);
@@ -112,7 +121,6 @@ const ProductManager = () => {
   useEffect(() => {
     setCurrentPage(1);
   }, [categoryFilter, searchQuery]);
-
   const handleShowModal = (product = null) => {
     if (product) {
       setEditingProduct(product);
@@ -120,25 +128,33 @@ const ProductManager = () => {
         name: product.title || "",
         category: product.category_name || "",
         price: product.price || "",
-        stock: product.stock || ""
+        stock: product.stock || "",
+        image: product.image || "",
+        description: product.description || ""
       });
     } else {
       setEditingProduct(null);
-      setForm({ name: "", category: "", price: "", stock: "" });
+      setForm({ name: "", category: "", price: "", stock: "", image: "", description: "" });
     }
     setShowModal(true);
   };
-
   const handleCloseModal = () => {
     setShowModal(false);
     setEditingProduct(null);
-    setForm({ name: "", category: "", price: "", stock: "" });
+    setForm({ name: "", category: "", price: "", stock: "", image: "", description: "" });
   };
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value, files } = e.target;
+    
+    // Handle file uploads
+    if (name === 'imageFiles' && files && files.length > 0) {
+      setForm({ ...form, imageFiles: Array.from(files) });
+    } else {
+      setForm({ ...form, [name]: value });
+    }
   };
-
+  
   const handlePageChange = (page) => {
     setCurrentPage(page);
   };
@@ -195,6 +211,56 @@ const ProductManager = () => {
     }
   };
 
+  // Function to handle save product (add or edit)
+  const handleSaveProduct = async () => {
+    try {
+      // Create FormData object for API request
+      const formData = new FormData();
+      
+      // Add form fields to FormData
+      formData.append('common_title', form.name);
+      formData.append('common_price', form.price);
+      formData.append('common_stock', form.stock);
+      formData.append('category_name', form.category);
+      
+      if (form.image) {
+        formData.append('common_image', form.image);
+      }
+      
+      if (form.description) {
+        formData.append('common_description', form.description);
+      }
+      
+      // Add image files if any are selected
+      if (form.imageFiles && form.imageFiles.length > 0) {
+        form.imageFiles.forEach((file) => {
+          formData.append('images', file);
+        });
+      }
+      
+      let result;
+      
+      if (editingProduct) {
+        // Update existing product
+        result = await updateProduct(editingProduct.product_id, formData);
+      } else {
+        // Add new product
+        result = await addProduct(formData);
+      }
+      
+      if (result.success) {
+        toast.success(result.message || 'Đã lưu sản phẩm thành công');
+        handleCloseModal();
+        loadProducts(); // Refresh product list
+      } else {
+        toast.error(result.message || 'Có lỗi xảy ra khi lưu sản phẩm');
+      }
+    } catch (error) {
+      console.error("Error saving product:", error);
+      toast.error("Có lỗi xảy ra khi lưu sản phẩm");
+    }
+  };
+
   const getImageUrl = (product) => {
     if (product.image) {
       const images = product.image.split('; ');
@@ -217,11 +283,11 @@ const ProductManager = () => {
             <p>Manage your product inventory, prices, and categories</p>
           </div>          <div className="dashboard-actions">
             <Button variant="outline-primary" className="advanced-add-btn me-2" onClick={() => navigate("/admin/add-product")}>
-              <FontAwesomeIcon icon={faPlus} /> Advanced Add Product
+              <FontAwesomeIcon icon={faPlus} /> Add Product
             </Button>
-            <Button variant="success" className="add-product-btn" onClick={() => handleShowModal()}>
+            {/* <Button variant="success" className="add-product-btn" onClick={() => handleShowModal()}>
               <FontAwesomeIcon icon={faPlus} /> Quick Add
-            </Button>
+            </Button> */}
           </div>
         </div>
 
@@ -482,35 +548,49 @@ const ProductManager = () => {
                     placeholder="Enter stock quantity"
                   />
                 </Form.Group>
-              </Col>
-              <Col md={6}>
+              </Col>              <Col md={6}>
                 <Form.Group className="mb-3">
                   <Form.Label>Image URL</Form.Label>
                   <Form.Control
                     type="text"
                     name="image"
+                    value={form.image}
+                    onChange={handleChange}
                     placeholder="Enter image URL"
                   />
+                </Form.Group>                <Form.Group className="mb-3">
+                  <Form.Label>Or Upload New Images</Form.Label>
+                  <Form.Control
+                    type="file"
+                    name="imageFiles"
+                    onChange={handleChange}
+                    accept="image/*"
+                    multiple
+                  />
+                  <Form.Text className="text-muted">
+                    You can upload multiple images. Max size: 2MB each.
+                  </Form.Text>
                 </Form.Group>
               </Col>
             </Row>
 
             <Form.Group className="mb-3">
               <Form.Label>Description</Form.Label>
-              <Form.Control
-                as="textarea"
+              <Form.Control                as="textarea"
                 rows={3}
                 name="description"
+                value={form.description}
+                onChange={handleChange}
                 placeholder="Enter product description"
               />
-            </Form.Group>
+            </Form.Group>            {/* File upload is handled in the image section above */}
           </Form>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleCloseModal}>
             Cancel
           </Button>
-          <Button variant="primary">
+          <Button variant="primary" onClick={handleSaveProduct}>
             {editingProduct ? "Save Changes" : "Add Product"}
           </Button>
         </Modal.Footer>

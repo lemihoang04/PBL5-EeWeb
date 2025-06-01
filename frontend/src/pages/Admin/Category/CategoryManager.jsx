@@ -47,30 +47,30 @@ const CategoryManager = () => {
     }, []);
 
     // Add new category
-    const handleAddCategory = async (e) => {
-        e.preventDefault();
-        if (!newCategory.trim()) {
-            toast.warning("Category name cannot be empty");
-            return;
-        }
+    // const handleAddCategory = async (e) => {
+    //     e.preventDefault();
+    //     if (!newCategory.trim()) {
+    //         toast.warning("Category name cannot be empty");
+    //         return;
+    //     }
 
-        setIsLoading(true);
-        try {
-            await axios.post("/categories", {
-                name: newCategory,
-                description: newDescription
-            });
-            toast.success("Category added successfully");
-            setNewCategory("");
-            setNewDescription("");
-            fetchCategories();
-        } catch (error) {
-            toast.error("Error adding category");
-            console.error(error);
-        } finally {
-            setIsLoading(false);
-        }
-    };
+    //     setIsLoading(true);
+    //     try {
+    //         await axios.post("/categories", {
+    //             name: newCategory,
+    //             description: newDescription
+    //         });
+    //         toast.success("Category added successfully");
+    //         setNewCategory("");
+    //         setNewDescription("");
+    //         fetchCategories();
+    //     } catch (error) {
+    //         toast.error("Error adding category");
+    //         console.error(error);
+    //     } finally {
+    //         setIsLoading(false);
+    //     }
+    // };
 
     // Delete category
     const handleDelete = async (id) => {
@@ -157,7 +157,7 @@ const CategoryManager = () => {
                 </div>
             </div>
 
-            <div className="catmgr-card">
+            {/* <div className="catmgr-card">
                 <div className="catmgr-card-header">
                     <h3>Add New Category</h3>
                 </div>
@@ -191,7 +191,7 @@ const CategoryManager = () => {
                         </button>
                     </form>
                 </div>
-            </div>
+            </div> */}
 
             <div className="catmgr-card catmgr-mt-4">
                 <div className="catmgr-card-header">
@@ -217,7 +217,7 @@ const CategoryManager = () => {
                                         <th>Description</th>
                                         <th>Created</th>
                                         <th>Updated</th>
-                                        <th>Actions</th>
+                                        {/* <th>Actions</th> */}
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -249,7 +249,7 @@ const CategoryManager = () => {
                                             </td>
                                             <td>{formatDate(cat.created_at)}</td>
                                             <td>{formatDate(cat.updated_at)}</td>
-                                            <td className="catmgr-actions-cell">
+                                            {/* <td className="catmgr-actions-cell">
                                                 {editingId === cat.category_id ? (
                                                     <>
                                                         <button
@@ -282,7 +282,7 @@ const CategoryManager = () => {
                                                         </button>
                                                     </>
                                                 )}
-                                            </td>
+                                            </td> */}
                                         </tr>
                                     ))}
                                 </tbody>

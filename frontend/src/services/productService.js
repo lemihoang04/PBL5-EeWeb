@@ -113,6 +113,30 @@ const addProduct = async (formData) => {
     }
 };
 
+// Cập nhật sản phẩm theo ID
+const updateProduct = async (productId, formData) => {
+    try {
+        const response = await axios.put(`/product/${productId}`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+        
+        return {
+            success: true,
+            message: response.message || "Sản phẩm đã được cập nhật thành công",
+            data: response
+        };
+    } catch (error) {
+        console.error("Error updating product:", error);
+        return {
+            success: false,
+            message: error.response?.data?.error || "Không thể cập nhật sản phẩm. Vui lòng thử lại sau.",
+            error
+        };
+    }
+};
+
 export { 
     fetchAllProducts, 
     deleteProduct, 
@@ -121,5 +145,6 @@ export {
     fetchFeaturedProducts,
     fetchProductCategories,
     fetchProductSchema,
-    addProduct
+    addProduct,
+    updateProduct
 };
