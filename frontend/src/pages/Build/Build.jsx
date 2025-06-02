@@ -863,7 +863,7 @@ const Build = () => {
 
     // Mainboard wattage
     if (mainboard) {
-      totalWattage += 70;
+      totalWattage += 50;
     }
 
     // CPU Cooler wattage
@@ -898,14 +898,14 @@ const Build = () => {
   // Helper function to format RAM display text with modules
   function formatRAMDisplayText(ram) {
     if (!ram) return '';
-    
+
     const baseTitle = ram.title || ram.name || '';
     const modules = ram.attributes?.["Modules"];
-    
+
     if (modules) {
       return `${baseTitle} (${modules})`;
     }
-    
+
     return baseTitle;
   }
 };

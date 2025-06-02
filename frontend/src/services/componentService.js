@@ -7,55 +7,55 @@ import axios from '../setup/axios';
  * @returns {Promise<Array|Object>} - Components array or error object
  */
 const fetchComponents = async (type, filters = {}) => {
-  
-    // Create URL and query params
-    let url = `/components/${type}`;
-    
-    // Add filters as query parameters if provided
-    const params = new URLSearchParams();
-    if (Object.keys(filters).length > 0) {
-      Object.entries(filters).forEach(([key, value]) => {
-        if (value !== null && value !== undefined && value !== '') {
-          params.append(key, value);
-        }
-      });
-    }
-    
-    // Append query string to URL if params exist
-    const queryString = params.toString();
-    if (queryString) {
-      url += `?${queryString}`;
-    }
-    
-    
-    console.log(`Fetching components from: ${url}`);
-    const response = await axios.get(url);
-    // console.log('Response status:', response.status);
-    // Process the response
-   
-    const data = response;
-    console.log('Response data:', data);
-      
-      // Ensure data is an array
-      if (Array.isArray(data)) {
-        console.log(`Received ${data.length} components`);
-        return data;
-      } else {
-        console.error('Expected array but got:', typeof data);
-        return { error: 'Invalid data format from server' };
+
+  // Create URL and query params
+  let url = `/components/${type}`;
+
+  // Add filters as query parameters if provided
+  const params = new URLSearchParams();
+  if (Object.keys(filters).length > 0) {
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value !== null && value !== undefined && value !== '') {
+        params.append(key, value);
       }
-    
-    
-    // Handle 404 specifically
-    
-  
+    });
+  }
+
+  // Append query string to URL if params exist
+  const queryString = params.toString();
+  if (queryString) {
+    url += `?${queryString}`;
+  }
+
+
+  console.log(`Fetching components from: ${url}`);
+  const response = await axios.get(url);
+  // console.log('Response status:', response.status);
+  // Process the response
+
+  const data = response;
+  console.log('Response data:', data);
+
+  // Ensure data is an array
+  if (Array.isArray(data)) {
+    console.log(`Received ${data.length} components`);
+    return data;
+  } else {
+    console.error('Expected array but got:', typeof data);
+    return { error: 'Invalid data format from server' };
+  }
+
+
+  // Handle 404 specifically
+
+
 };
 
 const fetchComponentById = async (componentId) => {
   try {
     const response = await axios.get(`/components/${componentId}`);
-    
-    
+
+
     // Check if we have valid data
     if (response && typeof response === 'object') {
       console.log('Component data:', response);
@@ -70,8 +70,34 @@ const fetchComponentById = async (componentId) => {
       status: error.response?.status,
       data: error.response?.data,
     });
-    return { 
+    return {
       error: error.response?.data?.error || `Failed to fetch component with ID ${componentId}`,
+      status: error.response?.status
+    };
+  }
+};
+const fetchCompatibleCPUs = async (cpuSocket) => {
+  try {
+    const response = await axios.get(`/cpu/compatible/${cpuSocket}`);
+    // Check if we have valid data
+    if (response && Array.isArray(response)) {
+      console.log(`Received ${response.length} compatible CPUs`);
+      return response;
+    } else if (response && typeof response === 'object') {
+      console.log('Compatible CPU data:', response);
+      return response;
+    } else {
+      console.error('Invalid data format:', response);
+      return { error: 'Invalid data format from server' };
+    }
+  } catch (error) {
+    console.error(`Error fetching compatible CPUs for socket ${cpuSocket}:`, {
+      message: error.message,
+      status: error.response?.status,
+      data: error.response?.data,
+    });
+    return {
+      error: error.response?.data?.error || `Failed to fetch compatible CPUs for socket ${cpuSocket}`,
       status: error.response?.status
     };
   }
@@ -80,7 +106,7 @@ const fetchComponentById = async (componentId) => {
 const fetchCompatibleCpuCoolers = async (cpuSocket) => {
   try {
     const response = await axios.get(`/cpu-coolers/compatible/${cpuSocket}`);
-    
+
     // Check if we have valid data
     if (response && Array.isArray(response)) {
       console.log(`Received ${response.length} compatible CPU coolers`);
@@ -98,7 +124,7 @@ const fetchCompatibleCpuCoolers = async (cpuSocket) => {
       status: error.response?.status,
       data: error.response?.data,
     });
-    return { 
+    return {
       error: error.response?.data?.error || `Failed to fetch compatible CPU coolers for socket ${cpuSocket}`,
       status: error.response?.status
     };
@@ -108,7 +134,7 @@ const fetchCompatibleCpuCoolers = async (cpuSocket) => {
 const fetchCompatibleMainboards = async (cpuSocket) => {
   try {
     const response = await axios.get(`/mainboards/compatible/${cpuSocket}`);
-    
+
     // Check if we have valid data
     if (response && Array.isArray(response)) {
       console.log(`Received ${response.length} compatible Mainboards`);
@@ -126,7 +152,7 @@ const fetchCompatibleMainboards = async (cpuSocket) => {
       status: error.response?.status,
       data: error.response?.data,
     });
-    return { 
+    return {
       error: error.response?.data?.error || `Failed to fetch compatible Mainboards for socket ${cpuSocket}`,
       status: error.response?.status
     };
@@ -155,7 +181,7 @@ const fetchCompatibleRam = async (memory_type) => {
       status: error.response?.status,
       data: error.response?.data,
     });
-    return { 
+    return {
       error: error.response?.data?.error || `Failed to fetch compatible RAM for mainboard ID ${memory_type}`,
       status: error.response?.status
     };
@@ -183,7 +209,7 @@ const fetchCompatibleStorage = async () => {
       status: error.response?.status,
       data: error.response?.data,
     });
-    return { 
+    return {
       error: error.response?.data?.error || 'Failed to fetch compatible storage devices',
       status: error.response?.status
     };
@@ -193,7 +219,7 @@ const fetchCompatibleStorage = async () => {
 const fetchCompatibleCases = async (formFactor) => {
   try {
     const response = await axios.get(`/cases/compatible/${formFactor}`);
-    
+
     // Check if we have valid data
     if (response && Array.isArray(response)) {
       console.log(`Received ${response.length} compatible cases`);
@@ -211,7 +237,7 @@ const fetchCompatibleCases = async (formFactor) => {
       status: error.response?.status,
       data: error.response?.data,
     });
-    return { 
+    return {
       error: error.response?.data?.error || `Failed to fetch compatible cases for form factor ${formFactor}`,
       status: error.response?.status
     };
@@ -221,7 +247,7 @@ const fetchCompatibleCases = async (formFactor) => {
 const fetchCompatiblePSU = async (totalTDP) => {
   try {
     const response = await axios.get(`/psu/compatible/${totalTDP}`);
-    
+
     // Check if we have valid data
     if (response && Array.isArray(response)) {
       console.log(`Received ${response.length} compatible PSUs`);
@@ -239,7 +265,7 @@ const fetchCompatiblePSU = async (totalTDP) => {
       status: error.response?.status,
       data: error.response?.data,
     });
-    return { 
+    return {
       error: error.response?.data?.error || `Failed to fetch compatible PSUs for total TDP ${totalTDP}`,
       status: error.response?.status
     };
@@ -247,4 +273,4 @@ const fetchCompatiblePSU = async (totalTDP) => {
 };
 
 
-export { fetchComponents, fetchComponentById, fetchCompatibleCpuCoolers, fetchCompatibleMainboards, fetchCompatibleRam, fetchCompatibleStorage, fetchCompatibleCases, fetchCompatiblePSU };
+export { fetchComponents, fetchComponentById, fetchCompatibleCPUs, fetchCompatibleCpuCoolers, fetchCompatibleMainboards, fetchCompatibleRam, fetchCompatibleStorage, fetchCompatibleCases, fetchCompatiblePSU };

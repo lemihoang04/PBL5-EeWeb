@@ -384,6 +384,36 @@
   transform: translateX(4px);
 }
 
+.detail-item.compatible {
+  border-left: 4px solid #22c55e;
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+}
+
+.detail-item.incompatible {
+  border-left: 4px solid #ef4444;
+  background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+}
+
+.detail-item.warning {
+  border-left: 4px solid #f59e0b;
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+}
+
+.detail-item.compatible:hover {
+  background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+  border-color: #22c55e;
+}
+
+.detail-item.incompatible:hover {
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+  border-color: #ef4444;
+}
+
+.detail-item.warning:hover {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border-color: #f59e0b;
+}
+
 .detail-icon {
   width: 28px;
   height: 28px;
@@ -399,128 +429,262 @@
   box-shadow: 0 3px 10px rgba(34, 197, 94, 0.3);
 }
 
+.detail-item.incompatible .detail-icon {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  box-shadow: 0 3px 10px rgba(239, 68, 68, 0.3);
+}
+
+.detail-item.warning .detail-icon {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  box-shadow: 0 3px 10px rgba(245, 158, 11, 0.3);
+}
+
 .detail-icon svg {
   font-size: 12px;
   color: white;
 }
 
-/* Highlight section animation */
-.highlight-section {
-  animation: pulse 0.8s ease-in-out;
+.detail-icon span {
+  font-size: 14px;
+  font-weight: bold;
+  color: white;
 }
 
-@keyframes pulse {
-  0% {
-    transform: scale(1);
-    box-shadow: 0 0 0 rgba(59, 130, 246, 0);
-  }
-
-  50% {
-    transform: scale(1.02);
-    box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
-  }
-
-  100% {
-    transform: scale(1);
-    box-shadow: 0 0 0 rgba(59, 130, 246, 0);
-  }
+/* Rating text styling */
+.rating-text {
+  font-weight: 700;
+  font-size: 16px;
+  transition: all 0.3s ease;
 }
 
-/* Success message styling */
-.no-issues {
-  display: flex;
-  align-items: center;
-  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
-  padding: 20px 25px;
-  border-radius: 12px;
-  border: 2px solid #bbf7d0;
-  position: relative;
+.rating-text.excellent {
+  color: #059669;
+  text-shadow: 0 0 8px rgba(5, 150, 105, 0.3);
 }
 
-.no-issues::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 5px;
-  background: linear-gradient(to bottom, #22c55e, #16a34a);
-  border-radius: 0 3px 3px 0;
+.rating-text.very-good {
+  color: #3b82f6;
+  text-shadow: 0 0 8px rgba(59, 130, 246, 0.3);
 }
 
-.success-icon {
-  font-size: 28px;
-  color: #16a34a;
-  margin-right: 16px;
-  background: white;
-  width: 50px;
-  height: 50px;
-  border-radius: 12px;
+.rating-text.good {
+  color: #8b5cf6;
+  text-shadow: 0 0 8px rgba(139, 92, 246, 0.3);
+}
+
+.rating-text.fair {
+  color: #f59e0b;
+  text-shadow: 0 0 8px rgba(245, 158, 11, 0.3);
+}
+
+.rating-text.poor {
+  color: #ef4444;
+  text-shadow: 0 0 8px rgba(239, 68, 68, 0.3);
+}
+
+/* Enhanced star styling */
+.star {
+  font-size: 24px;
+  color: #e2e8f0;
+  transition: all 0.2s;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+  cursor: pointer;
+}
+
+.star.filled {
+  color: #f59e0b;
+  text-shadow: 0 0 8px rgba(245, 158, 11, 0.4);
+  transform: scale(1.1);
+}
+
+.star:hover {
+  transform: scale(1.2);
+}
+
+/* Compatibility rating enhancements */
+.compatibility-rating {
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 6px 20px rgba(34, 197, 94, 0.2);
-  border: 2px solid #bbf7d0;
+  margin-bottom: 25px;
+  gap: 16px;
+  padding: 20px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
 }
 
-.success-icon svg {
-  font-size: 24px;
-  color: #16a34a;
+.compatibility-rating:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
 }
 
-/* Responsive design */
+/* Power Summary Styling */
+.power-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 25px;
+  padding: 20px;
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  border-radius: 12px;
+  border: 2px solid #bae6fd;
+}
+
+.power-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 16px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.power-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  border-color: #3b82f6;
+}
+
+.power-label {
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.power-value {
+  font-size: 20px;
+  font-weight: 800;
+  color: #1e40af;
+  text-shadow: 0 1px 2px rgba(30, 64, 175, 0.2);
+}
+
+.power-value.low-load {
+  color: #059669;
+}
+
+.power-value.medium-load {
+  color: #d97706;
+}
+
+.power-value.high-load {
+  color: #dc2626;
+}
+
+/* Enhanced detail-item for power-related issues */
+.detail-item .detail-icon span[style*="⚡"] {
+  color: #f59e0b;
+}
+
+/* Power consumption indicator in detail items */
+.detail-item.power-related {
+  border-left: 4px solid #f59e0b;
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+}
+
+.detail-item.power-related .detail-icon {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  box-shadow: 0 3px 10px rgba(245, 158, 11, 0.3);
+}
+
+.detail-item.power-related:hover {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border-color: #f59e0b;
+}
+
+/* Enhanced detail-item for cooler-related issues */
+.detail-item .detail-icon span[style*="❄"] {
+  color: #06b6d4;
+}
+
+/* Cooler compatibility indicator in detail items */
+.detail-item.cooler-related {
+  border-left: 4px solid #06b6d4;
+  background: linear-gradient(135deg, #f0fdff 0%, #e0f7fa 100%);
+}
+
+.detail-item.cooler-related .detail-icon {
+  background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+  box-shadow: 0 3px 10px rgba(6, 182, 212, 0.3);
+}
+
+.detail-item.cooler-related:hover {
+  background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%);
+  border-color: #06b6d4;
+}
+
+/* Thermal rating color indicators */
+.power-value.thermal-excellent {
+  color: #059669;
+}
+
+.power-value.thermal-good {
+  color: #3b82f6;
+}
+
+.power-value.thermal-adequate {
+  color: #d97706;
+}
+
+.power-value.thermal-marginal {
+  color: #f59e0b;
+}
+
+.power-value.thermal-insufficient {
+  color: #dc2626;
+}
+
+/* CPU cooler specific power item styling */
+.power-item.cooler-item {
+  border: 2px solid #e0f7fa;
+  background: linear-gradient(135deg, #f0fdff 0%, #e0f7fa 100%);
+}
+
+.power-item.cooler-item:hover {
+  border-color: #06b6d4;
+  transform: translateY(-3px);
+}
+
+.power-item.cooler-item .power-label {
+  color: #0891b2;
+}
+
+.power-item.cooler-item .power-value {
+  color: #0e7490;
+}
+
+/* Responsive design for power summary */
 @media (max-width: 768px) {
-  .mb-layout {
-    flex-direction: column;
-    gap: 16px;
-  }
-
-  .mb-section {
-    min-width: 100%;
-  }
-
-  .motherboard-header {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
+  .power-summary {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
     padding: 16px;
   }
 
-  .mb-image-container {
-    margin-bottom: 16px;
-    margin-right: 0;
-    width: 80px;
-    height: 80px;
+  .power-item {
+    padding: 12px;
   }
 
-  .mb-image {
-    max-width: 70px;
-    max-height: 70px;
+  .power-value {
+    font-size: 18px;
   }
 
-  .compatibility-rating {
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .socket-label,
-  .memory-label,
-  .slot-label {
-    width: 120px;
+  .power-label {
     font-size: 11px;
-    padding: 8px 12px;
   }
+}
 
-  .socket-connection,
-  .memory-connection,
-  .slot-connection {
-    width: 35px;
-    margin: 0 12px;
-  }
-
-  .component-image {
-    width: 32px;
-    height: 32px;
-    margin-right: 10px;
+@media (max-width: 480px) {
+  .power-summary {
+    grid-template-columns: 1fr;
   }
 }

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { fetchCompatibleCpuCoolers, fetchCompatibleMainboards, fetchComponents, fetchCompatibleRam, fetchCompatibleStorage, fetchCompatibleCases, fetchCompatiblePSU } from '../../services/componentService';
+import { fetchCompatibleCPUs, fetchCompatibleCpuCoolers, fetchCompatibleMainboards, fetchComponents, fetchCompatibleRam, fetchCompatibleStorage, fetchCompatibleCases, fetchCompatiblePSU } from '../../services/componentService';
 import './ComponentSearch.css';
 import { fetchComponentById } from '../../services/componentService';
 
@@ -134,7 +134,9 @@ const ComponentSearch = () => {
       // Chuyển đổi query params thành bộ lọc
       for (const [key, value] of searchParams.entries()) {
         if (key === 'cpu_socket') {
+
           cpuSocket = value;
+          console.log(`CPU Socket filter applied: ${cpuSocket}`);
         }
         else if (key === 'memory_type') {
           memory_type = value;
@@ -148,16 +150,19 @@ const ComponentSearch = () => {
         else if (key !== 'type') { // Bỏ qua tham số 'type' nếu có
           queryFilters[key] = value;
         }
-        
+
       }
-      
+
       console.log('Filtering components with:', queryFilters);
-      
+
       let data;
 
       // Sử dụng API phù hợp dựa trên loại component và socket CPU
-      if (normalizedType === 'CPU Cooler' && cpuSocket) {
-        console.log(`Fetching compatible CPU coolers for socketss: ${cpuSocket}`);
+      if (normalizedType === 'CPU' && cpuSocket) {
+        console.log(`Fetching compatible CPUs for socket: ${cpuSocket}`);
+        data = await fetchCompatibleCPUs(cpuSocket);
+      }
+      else if (normalizedType === 'CPU Cooler' && cpuSocket) {
         data = await fetchCompatibleCpuCoolers(cpuSocket);
       }
       else if (normalizedType === 'Mainboard' && cpuSocket) {
@@ -345,7 +350,7 @@ const ComponentSearch = () => {
         'Core Count',
         'Performance Core Clock',
         'Performance Core Boost Clock',
-        'Microarchitecture',
+        'Socket',
         'TDP',
         'Integrated Graphics',
         'Rating',
@@ -393,6 +398,7 @@ const ComponentSearch = () => {
         'Boost Clock',
         'TDP',
         'Cooling',
+        'Interface',
         'Price',
         'Action'
       ],
@@ -448,7 +454,7 @@ const ComponentSearch = () => {
           component.attributes?.['Core Count'] || 'N/A',
           component.attributes?.['Performance Core Clock'] || 'N/A',
           component.attributes?.['Performance Core Boost Clock'] || 'N/A',
-          component.attributes?.['Microarchitecture'] || 'N/A',
+          component.attributes?.['Socket'] || 'N/A',
           component.attributes?.['TDP'] || 'N/A',
           component.attributes?.['Integrated Graphics'] || 'None',
           ratingStars(4, component.attributes?.['Rating Count']),
@@ -496,6 +502,7 @@ const ComponentSearch = () => {
           component.attributes?.['Boost Clock'] || 'N/A',
           component.attributes?.['TDP'] || 'N/A',
           component.attributes?.['Cooling'] || 'N/A',
+          component.attributes?.['Interface'] || 'N/A',
           `$${component.price.toFixed(2)}`,
         ];
       case 'Mainboard':
