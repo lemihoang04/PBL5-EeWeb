@@ -474,13 +474,16 @@ def add_product():
     try:
         # Extract form data
         product_data = {}
-        
-        # Get category name
+          # Get category details - prefer ID if available, otherwise use name
+        category_id = request.form.get('category_id')
         category_name = request.form.get('category_name')
-        if not category_name:
-            return jsonify({"error": "Category name is required"}), 400
         
-        product_data['category_name'] = category_name
+        if category_id:
+            product_data['category_id'] = category_id
+        elif category_name:
+            product_data['category_name'] = category_name
+        else:
+            return jsonify({"error": "Category ID or name is required"}), 400
         
         # Extract common fields
         common_fields = {}
@@ -773,4 +776,118 @@ def proxy_by_id(file_id):
         
     except Exception as e:
         logger.error(f"Error in proxy_by_id: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+@product_blueprint.route("/product/<int:product_id>", methods=["PUT"])
+def update_product(product_id):
+    """
+    API endpoint to update an existing product by ID.
+    
+    Args:
+        product_id (int): The ID of the product to update
+        
+    Request:
+        multipart/form-data with:
+        - category_name: The product category name (optional)
+        - common_fields: Fields for the products table
+        - specific_fields: Fields for the category-specific table (optional)
+        - attributes: Additional product attributes (optional)
+        - images: Product images (optional)
+        
+    Returns:
+        JSON response with success message or error.
+    """
+    try:
+        # Extract form data
+        product_data = {}
+        
+        # Get category name if provided
+        category_name = request.form.get('category_name')
+        if category_name:
+            product_data['category_name'] = category_name
+        
+        # Extract common fields
+        common_fields = {}
+        for key in request.form:
+            if key.startswith('common_'):
+                field_name = key.replace('common_', '')
+                common_fields[field_name] = request.form.get(key)
+        
+        # Handle images
+        image_urls = []
+        if 'images' in request.files:
+            image_files = request.files.getlist('images')
+            logger.info(f"Processing {len(image_files)} images for product update")
+            
+            for image in image_files:
+                if image and image.filename:
+                    try:
+                        # Generate a unique filename to prevent overwriting
+                        from datetime import datetime
+                        
+                        timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
+                        original_filename = image.filename
+                        filename = f"{timestamp}_{secure_filename(original_filename)}"
+                        
+                        logger.info(f"Processing image: {original_filename}")
+                        
+                        # Upload to Google Drive
+                        image.stream.seek(0)
+                        image_url = upload_image_to_drive(filename, file_object=image)
+                        
+                        # Add the URL to our list if it was successfully created
+                        if image_url:
+                            logger.info(f"Successfully uploaded image: {image_url}")
+                            image_urls.append(image_url)
+                        else:
+                            logger.error(f"Failed to upload image {filename}")
+                    except Exception as e:
+                        logger.error(f"Error processing image {image.filename}: {str(e)}")
+        
+        # Add image URLs to common_fields if new images were uploaded
+        if image_urls:
+            common_fields['image'] = "; ".join(image_urls)
+        
+        product_data['common_fields'] = common_fields
+        
+        # Extract specific fields
+        specific_fields = {}
+        # First check if specific_fields was sent as JSON string
+        if 'specific_fields' in request.form:
+            try:
+                specific_fields = json.loads(request.form.get('specific_fields'))
+            except json.JSONDecodeError:
+                pass
+                
+        # Also check for individual specific_ fields
+        for key in request.form:
+            if key.startswith('specific_') and key != 'specific_fields':
+                field_name = key.replace('specific_', '')
+                specific_fields[field_name] = request.form.get(key)
+        
+        product_data['specific_fields'] = specific_fields
+        
+        # Extract attributes
+        attributes = {}
+        # First check if attributes was sent as JSON string
+        if 'attributes' in request.form:
+            try:
+                attributes = json.loads(request.form.get('attributes'))
+            except json.JSONDecodeError:
+                pass
+                
+        # Also check for individual attr_ fields
+        for key in request.form:
+            if key.startswith('attr_'):
+                attr_name = key.replace('attr_', '')
+                attributes[attr_name] = request.form.get(key)
+        
+        product_data['attributes'] = attributes
+        
+        # Update the product
+        result, status = dal_update_product(product_id, product_data)
+        
+        return jsonify(result), status
+    except Exception as e:
+        logger.error(f"Error updating product: {str(e)}")
         return jsonify({"error": str(e)}), 500

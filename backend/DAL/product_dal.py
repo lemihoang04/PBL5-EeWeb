@@ -1076,9 +1076,9 @@ def dal_get_product_schema(category_name):
         # Get products table structure for common fields
         cursor.execute("DESCRIBE products")
         products_structure = cursor.fetchall()
-        
-        # Initialize schema with common fields
+          # Initialize schema with common fields and category_id
         schema = {
+            "category_id": category[0],  # Include the category_id in the schema
             "common_fields": _format_field_info(products_structure),
             "specific_fields": {}
         }        # Get specific fields from product_attributes table
@@ -1172,17 +1172,22 @@ def dal_add_product(product_data):
     
     cursor = db.cursor()
     try:
-        category_name = product_data.get('category_name')
-        if not category_name:
-            return {"error": "Category name is required"}, 400
-            
-        # Get the category ID
-        cursor.execute("SELECT category_id FROM categories WHERE category_name = %s", (category_name,))
-        category_result = cursor.fetchone()
-        if not category_result:
-            return {"error": f"Category '{category_name}' not found"}, 404
+        # Check if category_id is directly provided
+        category_id = product_data.get('category_id')
         
-        category_id = category_result[0]
+        # If not, look it up using category_name
+        if not category_id:
+            category_name = product_data.get('category_name')
+            if not category_name:
+                return {"error": "Category name or ID is required"}, 400
+                
+            # Get the category ID
+            cursor.execute("SELECT category_id FROM categories WHERE category_name = %s", (category_name,))
+            category_result = cursor.fetchone()
+            if not category_result:
+                return {"error": f"Category '{category_name}' not found"}, 404
+            
+            category_id = category_result[0]
         
         # Extract common fields for products table
         common_fields = product_data.get('common_fields', {})
@@ -1241,6 +1246,124 @@ def dal_add_product(product_data):
         
         db.commit()
         return {"message": "Product added successfully", "product_id": product_id}, 201
+        
+    except Exception as e:
+        db.rollback()
+        return {"error": str(e)}, 500
+        
+    finally:
+        cursor.close()
+        db.close()
+
+def dal_update_product(product_id, product_data):
+    """
+    Update an existing product in the database.
+    
+    Args:
+        product_id (int): The ID of the product to update
+        product_data (dict): The product data including category, common fields and specific fields
+        
+    Returns:
+        tuple: (result, status_code)
+            result: Dict with success message or error
+            status_code: HTTP status code
+    """
+    import json # Ensure json module is available
+    db = get_db_connection()
+    if not db:
+        return {"error": "Database connection failed"}, 500
+    
+    cursor = db.cursor()
+    try:
+        # Check if product exists
+        cursor.execute("SELECT product_id, category_id FROM products WHERE product_id = %s", (product_id,))
+        product_result = cursor.fetchone()
+        if not product_result:
+            return {"error": f"Product with ID {product_id} not found"}, 404
+        
+        current_category_id = product_result[0] if product_result else None
+          # Check if category_id is directly provided
+        provided_category_id = product_data.get('category_id')
+        
+        if provided_category_id:
+            # Use directly provided category ID
+            category_id = provided_category_id
+        else:
+            # Try to get category ID from name
+            category_name = product_data.get('category_name')
+            if category_name:
+                cursor.execute("SELECT category_id FROM categories WHERE category_name = %s", (category_name,))
+                category_result = cursor.fetchone()
+                if not category_result:
+                    return {"error": f"Category '{category_name}' not found"}, 404
+                
+                category_id = category_result[0]
+            else:
+                # Keep the current category
+                category_id = current_category_id
+        
+        # Extract common fields for products table
+        common_fields = product_data.get('common_fields', {})
+        common_fields['category_id'] = category_id
+        
+        # Parse specific_fields if it's a string (JSON)
+        specific_fields = product_data.get('specific_fields', {})
+        if isinstance(specific_fields, str):
+            try:
+                specific_fields = json.loads(specific_fields)
+            except Exception:
+                specific_fields = {}
+
+        # Parse attributes if it's a string (JSON)
+        attributes = product_data.get('attributes', {})
+        if isinstance(attributes, str):
+            try:
+                attributes = json.loads(attributes)
+            except Exception:
+                attributes = {}
+
+        # Update products table
+        if common_fields:
+            set_clause = ', '.join([f"{field} = %s" for field in common_fields.keys()])
+            update_values = list(common_fields.values())
+            update_values.append(product_id)  # Add product_id for WHERE clause
+            
+            update_product_query = f"UPDATE products SET {set_clause} WHERE product_id = %s"
+            cursor.execute(update_product_query, update_values)
+        
+        # Update specific fields (by deleting old ones and inserting new ones)
+        if specific_fields:
+            # Delete existing specific attributes
+            cursor.execute(
+                "DELETE FROM product_attributes WHERE product_id = %s AND attribute_name IN (%s)",
+                (product_id, ', '.join(['%s' for _ in specific_fields.keys()]), *specific_fields.keys())
+            )
+            
+            # Insert new specific attributes
+            for field_name, field_value in specific_fields.items():
+                if field_name != 'product_id' and field_value:  # Skip product_id and empty values
+                    cursor.execute(
+                        "INSERT INTO product_attributes (product_id, category_id, attribute_name, attribute_value) VALUES (%s, %s, %s, %s)",
+                        (product_id, category_id, field_name, field_value)
+                    )
+        
+        # Update any product attributes
+        if attributes:
+            # Similar approach as specific_fields
+            cursor.execute(
+                "DELETE FROM product_attributes WHERE product_id = %s AND attribute_name IN (%s)",
+                (product_id, ', '.join(['%s' for _ in attributes.keys()]), *attributes.keys())
+            )
+            
+            for attr_name, attr_value in attributes.items():
+                if attr_value:  # Skip empty values
+                    cursor.execute(
+                        "INSERT INTO product_attributes (product_id, category_id, attribute_name, attribute_value) VALUES (%s, %s, %s, %s)",
+                        (product_id, category_id, attr_name, attr_value)
+                    )
+        
+        db.commit()
+        return {"message": "Product updated successfully"}, 200
         
     except Exception as e:
         db.rollback()
