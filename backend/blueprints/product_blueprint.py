@@ -233,18 +233,24 @@ def get_components_by_type(type):
         print(f"Error in get_components_by_type: {e}")
         print(traceback.format_exc())
         return jsonify({"error": f"An error occurred while processing your request: {str(e)}"}), 500
-    
+
+@product_blueprint.route("/cpu/compatible/<string:cpu_socket>", methods=["GET"])
+def get_compatible_cpus(cpu_socket):
+    try:
+        # Gọi hàm DAL để lấy danh sách CPU tương thích
+        cpus, status = dal_CPU_vs_Mainboard(cpu_socket)
+
+        # Trả về kết quả
+        if status == 200:
+            return jsonify(cpus), 200
+        else:
+            return jsonify(cpus), status
+    except Exception as e:
+        print(f"Error in get_compatible_cpus: {e}")
+        return jsonify({"error": str(e)}), 500
+
 @product_blueprint.route("/cpu-coolers/compatible/<string:cpu_socket>", methods=["GET"])
 def get_compatible_cpu_coolers(cpu_socket):
-    """
-    API route to get CPU Coolers compatible with a specific CPU socket.
-    
-    Args:
-        cpu_socket (str): The CPU socket to match (e.g., 'AM4', 'LGA1700')
-    
-    Returns:
-        JSON response with compatible CPU Coolers or error message.
-    """
     try:
         # Gọi hàm DAL để lấy danh sách CPU Cooler tương thích
         coolers, status = dal_CPU_Cooler_vs_CPU(cpu_socket)

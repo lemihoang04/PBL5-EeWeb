@@ -117,7 +117,7 @@ def dal_get_laptops():
             FROM Products p
             LEFT JOIN Product_Attributes pa ON p.product_id = pa.product_id
             WHERE p.category_id = 4
-            ORDER BY p.product_id DESC
+            ORDER BY p.product_id ASC
         """)
         rows = cursor.fetchall()
 
@@ -441,18 +441,37 @@ def dal_get_products_by_ids(product_ids):
         cursor.close()
         db.close()
 
+def dal_CPU_vs_Mainboard(cpu_socket):
+    db = get_db_connection()
+    if not db:
+        return {'error': 'Database connection failed'}, 500
+
+    try:
+        # Query to find mainboards compatible with the given CPU socket
+        query = """
+        SELECT DISTINCT pa.product_id
+        FROM product_attributes pa
+        JOIN products p ON pa.product_id = p.product_id
+        WHERE p.category_id = 12  
+          AND pa.attribute_name = 'Socket'
+          AND pa.attribute_value LIKE %s
+        """
+
+        # Use pandas to read data from database
+        df = pd.read_sql_query(query, db, params=(f"%{cpu_socket}%",))
+
+        # Get product IDs list
+        product_ids = df['product_id'].tolist()
+
+        # Return detailed product information using existing function
+        return dal_get_products_by_ids(product_ids)
+
+    except Exception as e:
+        return {'error': str(e)}, 500
+
+    finally:
+        db.close()
 def dal_CPU_Cooler_vs_CPU(cpu_socket):
-    """
-    Get product IDs of CPU Coolers compatible with a specific CPU socket.
-    
-    Args:
-        cpu_socket (str): The CPU socket to match (e.g., 'AM5', 'LGA1700')
-    
-    Returns:
-        tuple: (product_ids, status_code)
-            product_ids: List of product IDs or error message
-            status_code: HTTP status code
-    """
     db = get_db_connection()
     if not db:
         return {'error': 'Database connection failed'}, 500
