@@ -101,7 +101,7 @@ const Admin = () => {
                         { name: "Product", icon: "bi-box" },
                         { name: "Order", icon: "bi-cart" },
                         { name: "Customers", icon: "bi-people" },
-                        { name: "Reports", icon: "bi-bar-chart" },
+                        // { name: "Reports", icon: "bi-bar-chart" },
                         // { name: "Settings", icon: "bi-gear" },
                     ].map((item) => (
                         <button
