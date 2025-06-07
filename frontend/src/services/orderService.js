@@ -19,3 +19,13 @@ export const CancelOrder = async (orderId) => {
         return { errCode: -1, message: error.message };
     }
 };
+
+// Duyệt đơn hàng theo orderId
+export const ApproveOrder = async (orderId) => {
+    try {
+        const response = await axios.post(`/orders/approve/${orderId}`);
+        return response;
+    } catch (error) {
+        return { errCode: -1, message: error.message };
+    }
+};

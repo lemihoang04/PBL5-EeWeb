@@ -30,6 +30,19 @@ def api_get_order_by_id(order_id):
     except Exception as e:
         return jsonify({"errCode": 1, "message": str(e)}), 500
     
+@order_blueprint.route('/orders/approve/<order_id>', methods=['POST'])
+def api_approve_order(order_id):
+    try:
+        if not order_id:
+            return jsonify({"errCode": 1, "message": "Missing order_id"}), 400
+        affected = approve_order(order_id)
+        if affected > 0:
+            return jsonify({"errCode": 0, "message": "Order approved successfully"}), 200
+        else:
+            return jsonify({"errCode": 1, "message": "Order not found or not in pending status"}), 404
+    except Exception as e:
+        return jsonify({"errCode": 1, "message": str(e)}), 500
+
 @order_blueprint.route('/orders/cancel/<order_id>', methods=['POST'])
 def api_cancel_order(order_id):
     try:

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { GetOrdersData, CancelOrder } from "../../../services/orderService";
-import { FaEye, FaTimes } from "react-icons/fa";
+import { GetOrdersData, CancelOrder, ApproveOrder } from "../../../services/orderService";
+import { FaEye, FaTimes, FaCheck } from "react-icons/fa";
 import "./OrderManager.css";
 
 const OrderManager = () => {
@@ -61,6 +61,21 @@ const OrderManager = () => {
             }
         } catch (error) {
             toast.error("Error cancelling order.");
+        }
+    };
+
+    const handleApproveOrder = async (orderId) => {
+        if (!window.confirm("Are you sure you want to approve this order?")) return;
+        try {
+            const response = await ApproveOrder(orderId);
+            if (response && response.errCode === 0) {
+                toast.success("Order approved successfully.");
+                fetchOrders();
+            } else {
+                toast.error("Failed to approve order.");
+            }
+        } catch (error) {
+            toast.error("Error approving order.");
         }
     };
 
@@ -138,20 +153,29 @@ const OrderManager = () => {
                                     <span className={`order-status ${getStatusClass(order.status)}`}>
                                         {order.status}
                                     </span>
-                                </td>
-                                <td>{formatMoney(order.total || order.price * order.quantity)}</td>
-                                <td>
-                                    <button className="action-btn view-btn" onClick={() => handleViewDetails(order)}>
-                                        <FaEye /> Details
-                                    </button>
-                                    {order.status !== "cancelled" && (
-                                        <button
-                                            className="action-btn cancel-btn"
-                                            onClick={() => handleCancelOrder(order.order_id || order.id)}
-                                        >
-                                            <FaTimes /> Cancel
+                                </td>                                <td>{formatMoney(order.total || order.price * order.quantity)}</td>
+                                <td className="action-cell">
+                                    <div className="action-buttons">
+                                        <button className="action-btn view-btn" onClick={() => handleViewDetails(order)}>
+                                            <FaEye /> Details
                                         </button>
-                                    )}
+                                        {order.status === "pending" && (
+                                            <>
+                                                <button
+                                                    className="action-btn approve-btn"
+                                                    onClick={() => handleApproveOrder(order.order_id || order.id)}
+                                                >
+                                                    <FaCheck /> Approve
+                                                </button>
+                                                <button
+                                                    className="action-btn cancel-btn"
+                                                    onClick={() => handleCancelOrder(order.order_id || order.id)}
+                                                >
+                                                    <FaTimes /> Cancel
+                                                </button>
+                                            </>
+                                        )}
+                                    </div>
                                 </td>
                             </tr>
                         ))}

@@ -94,18 +94,41 @@
     color: #1976d2;
 }
 
+.action-cell {
+    min-width: 250px;
+}
+
+.action-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
 .action-btn {
     border: none;
     outline: none;
-    padding: 6px 14px;
-    margin-right: 8px;
+    padding: 8px 15px;
     border-radius: 6px;
     font-size: 14px;
+    font-weight: 500;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    transition: background 0.2s;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    min-width: 100px;
+    justify-content: center;
+}
+
+.action-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+}
+
+.action-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .view-btn {
@@ -113,9 +136,26 @@
     color: #1976d2;
 }
 
+.view-btn:hover {
+    background: #d1e1fc;
+}
+
 .cancel-btn {
     background: #ffeaea;
     color: #d32f2f;
+}
+
+.cancel-btn:hover {
+    background: #ffdbdb;
+}
+
+.approve-btn {
+    background: #e6f4ea;
+    color: #1d8e32;
+}
+
+.approve-btn:hover {
+    background: #d5eedd;
 }
 
 .order-modal {

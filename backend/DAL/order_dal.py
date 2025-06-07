@@ -33,6 +33,32 @@ def get_order_by_id(order_id):
         cursor.close()
         connection.close()
 
+def approve_order(order_id):
+    connection = get_db_connection()
+    if not connection:
+        raise Exception("Database connection failed")
+    cursor = connection.cursor()
+    try:
+        # First try to update using the id column
+        cursor.execute("""
+            UPDATE `Order` SET status = %s WHERE id = %s AND status = 'pending'
+        """, ('completed', order_id))
+        
+        # If no rows were updated, try with order_id instead
+        if cursor.rowcount == 0:
+            cursor.execute("""
+                UPDATE `Order` SET status = %s WHERE order_id = %s AND status = 'pending'
+            """, ('completed', order_id))
+            
+        connection.commit()
+        return cursor.rowcount  
+    except Error as e:
+        connection.rollback()
+        raise Exception(f"Database error: {str(e)}")
+    finally:
+        cursor.close()
+        connection.close()
+
 def get_orders_by_user_id(user_id):
     connection = get_db_connection()
     if not connection:
