@@ -42,8 +42,7 @@ ChartJS.register(
 
 const Dashboard = ({ setActiveMenu }) => {
   // Stats for the top cards
-
-  const [dataStats, setStats] = useState([]);
+  const [dataStats, setStats] = useState({});
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -191,6 +190,59 @@ const Dashboard = ({ setActiveMenu }) => {
     return string.charAt(0).toUpperCase() + string.slice(1);
   };
 
+  // Data for the daily revenue chart
+  const dailyRevenueData = {
+    labels: dataStats.dailyRevenue?.labels || [],
+    datasets: [
+      {
+        label: 'Daily Revenue',
+        data: dataStats.dailyRevenue?.values || [],
+        backgroundColor: 'rgba(54, 162, 235, 0.7)',
+        borderColor: 'rgba(54, 162, 235, 1)',
+        borderWidth: 1,
+        borderRadius: 4,
+        borderSkipped: false,
+      }
+    ],
+  };
+
+  const dailyRevenueOptions = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'top',
+      },
+      title: {
+        display: true,
+        text: 'Daily Revenue Overview (Last 7 Days)'
+      },
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        grid: {
+          color: 'rgba(0, 0, 0, 0.05)'
+        },
+        ticks: {
+          callback: function (value) {
+            return '$' + value.toLocaleString();
+          }
+        }
+      },
+      x: {
+        grid: {
+          display: false
+        },
+        ticks: {
+          callback: function (value, index) {
+            const date = new Date(this.getLabelForValue(value));
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+          }
+        }
+      }
+    }
+  };
+
   return (
     <div className="dashboard-container">
       <div className="dashboard-header mb-4">
@@ -233,10 +285,10 @@ const Dashboard = ({ setActiveMenu }) => {
         <div className="col-xl-8">
           <div className="card border-0 shadow-sm h-100">
             <div className="card-header bg-transparent border-0">
-              <h5 className="card-title">Revenue Overview</h5>
+              <h5 className="card-title">Daily Revenue Overview</h5>
             </div>
             <div className="card-body">
-              <Line data={salesData} options={salesOptions} />
+              <Bar data={dailyRevenueData} options={dailyRevenueOptions} />
             </div>
           </div>
         </div>

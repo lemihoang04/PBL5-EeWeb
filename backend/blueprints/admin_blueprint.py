@@ -3,7 +3,8 @@ from DAL.user_dal import get_user_by_id, get_all_users
 from DAL.admin_dal import login_admin 
 # from DAL.product_dal import get_all_products
 from DAL.order_dal import get_all_orders
-from datetime import datetime
+from datetime import datetime, timedelta
+from collections import defaultdict
 
 admin_blueprint = Blueprint('admin', __name__)
 
@@ -63,6 +64,45 @@ def get_dashboard_stats():
         sorted_orders = sorted(orders, key=lambda x: x.get('created_at', ''), reverse=True)
         recent_orders = sorted_orders[:5]
     
+    # Calculate daily revenue for the last 7 days
+    daily_revenue = defaultdict(float)
+    today = datetime.now().date()
+    
+    # Initialize last 7 days with 0 revenue
+    for i in range(6, -1, -1):
+        date = today - timedelta(days=i)
+        daily_revenue[date.strftime('%Y-%m-%d')] = 0
+    
+    # Calculate actual daily revenue from orders
+    if orders:
+        for order in orders:
+            if order.get('created_at') and order.get('price'):
+                try:
+                    created_at = order['created_at']
+                    
+                    # Convert to string if it's a datetime object
+                    if isinstance(created_at, datetime):
+                        created_at_str = created_at.strftime('%Y-%m-%d %H:%M:%S')
+                        order_date = created_at.date()
+                    else:
+                        # Handle string format: "2025-06-03 12:58:02"
+                        created_at_str = str(created_at)
+                        # Parse just the date part (first 10 characters: YYYY-MM-DD)
+                        order_date = datetime.strptime(created_at_str[:10], '%Y-%m-%d').date()
+                    
+                    # Check if within last 7 days
+                    days_diff = (today - order_date).days
+                    if 0 <= days_diff <= 6:
+                        daily_revenue[order_date.strftime('%Y-%m-%d')] += float(order.get('price', 0))
+                        
+                except (ValueError, TypeError) as e:
+                    print(f"Error parsing date: {created_at}, error: {e}")
+                    continue
+    
+    # Convert to lists for frontend
+    daily_labels = list(daily_revenue.keys())
+    daily_values = [round(daily_revenue[date], 2) for date in daily_labels]
+    
     # Create stats for dashboard
     return jsonify({
         "errCode": 0,
@@ -71,7 +111,11 @@ def get_dashboard_stats():
             # "totalProducts": total_products,
             "totalOrders": total_orders,
             "totalRevenue": round(total_revenue, 2),
-            "recentOrders": recent_orders
+            "recentOrders": recent_orders,
+            "dailyRevenue": {
+                "labels": daily_labels,
+                "values": daily_values
+            }
         }
     })
 

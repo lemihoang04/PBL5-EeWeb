@@ -884,7 +884,18 @@ const Build = () => {
 
     // Storage wattage - 10W per storage device
     storages.forEach(storage => {
-      totalWattage += 10;
+      const interfaceType = storage.attributes?.["Interface"] || '';
+      if (interfaceType.includes('M.2')) {
+        totalWattage += 8; // M.2 NVMe SSD
+      } else if (interfaceType.includes('SATA')) {
+        if (storage.attributes?.["Type"]?.includes('SSD')) {
+          totalWattage += 5; // SATA SSD
+        } else {
+          totalWattage += 10; // SATA HDD
+        }
+      } else {
+        totalWattage += 8; // Default storage power
+      }
     });
 
     // GPU wattage (using TDP values)
