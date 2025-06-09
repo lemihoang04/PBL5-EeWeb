@@ -255,7 +255,7 @@ const Orders = () => {
                             <p>You haven't placed any orders yet. Start shopping to see your orders here!</p>
                             <button
                                 className="odrs__button odrs__primary-button"
-                                onClick={() => navigate('/products')}
+                                onClick={() => navigate('/laptops')}
                             >
                                 Shop Now
                             </button>

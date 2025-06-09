@@ -92,7 +92,7 @@ const Header = () => {
             <i className="nav-icon fas fa-laptop"></i>
             <span>Laptops</span>
           </div>
-          <div className="nav-item" onClick={() => navigate('/support')}>
+          <div className="nav-item">
             <i className="nav-icon fas fa-headset"></i>
             <span>Support</span>
           </div>
@@ -130,10 +130,10 @@ const Header = () => {
                       <i className="fas fa-box"></i>
                       <span>My Orders</span>
                     </div>
-                    <div className="menu-item" onClick={() => navigate('/wishlist')}>
+                    {/* <div className="menu-item" onClick={() => navigate('/wishlist')}>
                       <i className="fas fa-heart"></i>
                       <span>Wishlist</span>
-                    </div>
+                    </div> */}
                     <div className="menu-divider"></div>
                     <div className="menu-item logout" onClick={handleLogout}>
                       <i className="fas fa-sign-out-alt"></i>
@@ -213,18 +213,18 @@ const Header = () => {
               <div className="category-list">
                 <h3 className="list-title">Peripherals</h3>
                 <ul>
-                  <li onClick={() => { navigate('/components/headphones'); setIsProductsOpen(false); }}>Headphones</li>
-                  <li onClick={() => { navigate('/components/keyboards'); setIsProductsOpen(false); }}>Keyboards</li>
-                  <li onClick={() => { navigate('/components/mice'); setIsProductsOpen(false); }}>Mice</li>
-                  <li onClick={() => { navigate('/components/speakers'); setIsProductsOpen(false); }}>Speakers</li>
-                  <li onClick={() => { navigate('/components/webcams'); setIsProductsOpen(false); }}>Webcams</li>
+                  <li >Headphones</li>
+                  <li >Keyboards</li>
+                  <li >Mice</li>
+                  <li >Speakers</li>
+                  <li >Webcams</li>
                 </ul>
               </div>
 
               <div className="category-list">
                 <h3 className="list-title">Displays</h3>
                 <ul>
-                  <li onClick={() => { navigate('/components/monitors'); setIsProductsOpen(false); }}>Monitors</li>
+                  <li >Monitors</li>
                 </ul>
               </div>
             </div>
@@ -233,26 +233,26 @@ const Header = () => {
               <div className="category-list">
                 <h3 className="list-title">Expansion</h3>
                 <ul>
-                  <li onClick={() => { navigate('/components/sound-cards'); setIsProductsOpen(false); }}>Sound Cards</li>
-                  <li onClick={() => { navigate('/components/networking'); setIsProductsOpen(false); }}>Wired Networking</li>
-                  <li onClick={() => { navigate('/components/wireless'); setIsProductsOpen(false); }}>Wireless Networking</li>
+                  <li >Sound Cards</li>
+                  <li >Wired Networking</li>
+                  <li >Wireless Networking</li>
                 </ul>
               </div>
 
               <div className="category-list">
                 <h3 className="list-title">Accessories</h3>
                 <ul>
-                  <li onClick={() => { navigate('/components/fans'); setIsProductsOpen(false); }}>Case Fans</li>
-                  <li onClick={() => { navigate('/components/controllers'); setIsProductsOpen(false); }}>Fan Controllers</li>
-                  <li onClick={() => { navigate('/components/thermal'); setIsProductsOpen(false); }}>Thermal Compound</li>
-                  <li onClick={() => { navigate('/components/external'); setIsProductsOpen(false); }}>External Drives</li>
+                  <li >Case Fans</li>
+                  <li >Fan Controllers</li>
+                  <li >Thermal Compound</li>
+                  <li >External Drives</li>
                 </ul>
               </div>
 
               <div className="category-list">
                 <h3 className="list-title">Software</h3>
                 <ul>
-                  <li onClick={() => { navigate('/components/os'); setIsProductsOpen(false); }}>Operating Systems</li>
+                  <li >Operating Systems</li>
                 </ul>
               </div>
             </div>
