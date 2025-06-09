@@ -5,7 +5,7 @@ import json
 import logging
 import requests
 from werkzeug.utils import secure_filename
-from DAL.gdrive_utils import upload_image_to_drive
+from DAL.cloudinary_utils import upload_image_to_cloudinary, create_thumbnail_url
 import traceback
 import re
 
@@ -21,31 +21,22 @@ except ImportError as e:
 
 product_blueprint = Blueprint('product', __name__)
 
-def convert_drive_url_to_proxy(url):
+def convert_cloudinary_url_to_proxy(url):
     """
-    Chuyển đổi Google Drive URL thành proxy URL.
+    Use Cloudinary URL as is or convert if needed.
     
     Args:
-        url (str): URL Google Drive dạng https://drive.google.com/uc?export=view&id=FILE_ID 
-                  hoặc https://drive.google.com/thumbnail?id=FILE_ID...
+        url (str): Cloudinary URL
         
     Returns:
-        str: Proxy URL dạng /api/product/p/FILE_ID
+        str: Original URL or transformed URL
     """
     try:
         if not url or not isinstance(url, str):
             return url
             
-        # Kiểm tra xem URL có phải Google Drive không
-        if not ('drive.google.com' in url):
-            return url
-            
-        # Tìm file ID trong URL
-        file_id_match = re.search(r'[?&]id=([^&]+)', url)
-        if file_id_match:
-            file_id = file_id_match.group(1)
-            return f"/api/product/p/{file_id}"
-        
+        # For now, we're just returning the Cloudinary URL as is
+        # as Cloudinary already provides CDN capabilities
         return url
     except:
         # Nếu có lỗi xử lý, trả lại URL gốc
@@ -76,14 +67,14 @@ def convert_image_urls_in_product(product):
             # Trường hợp multiple images được phân tách bằng dấu ";"
             if ';' in product[field]:
                 urls = product[field].split(';')
-                converted_urls = [convert_drive_url_to_proxy(url.strip()) for url in urls]
+                converted_urls = [convert_cloudinary_url_to_proxy(url.strip()) for url in urls]
                 product[field] = '; '.join(converted_urls)
             else:
-                product[field] = convert_drive_url_to_proxy(product[field])
+                product[field] = convert_cloudinary_url_to_proxy(product[field])
     
     # Xử lý trường images nếu là một list
     if 'images' in product and isinstance(product['images'], list):
-        product['images'] = [convert_drive_url_to_proxy(url) for url in product['images']]
+        product['images'] = [convert_cloudinary_url_to_proxy(url) for url in product['images']]
         
     # Đệ quy xử lý các trường nested
     for key, value in product.items():
@@ -490,7 +481,21 @@ def add_product():
         for key in request.form:
             if key.startswith('common_'):
                 field_name = key.replace('common_', '')
-                common_fields[field_name] = request.form.get(key)        # Handle images
+                common_fields[field_name] = request.form.get(key)
+                
+        # Handle Cloudinary uploaded image URLs (if present)
+        if 'cloudinary_image_url' in request.form:
+            cloudinary_url = request.form.get('cloudinary_image_url')
+            if cloudinary_url:
+                if 'image' in common_fields:
+                    # If we already have images, append this one
+                    common_fields['image'] = common_fields['image'] + '; ' + cloudinary_url
+                else:
+                    # Otherwise create a new field
+                    common_fields['image'] = cloudinary_url
+                logger.info(f"Using Cloudinary image URL: {cloudinary_url}")
+                
+        # Handle traditional file uploads (for backwards compatibility)
         image_urls = []
         if 'images' in request.files:
             image_files = request.files.getlist('images')
@@ -510,12 +515,12 @@ def add_product():
                         logger.info(f"Processing image: {original_filename}, content type: {image.content_type}, size: {image.content_length if hasattr(image, 'content_length') else 'unknown'}")
                         
                         # Phương thức 1: Tải trực tiếp từ file object (không cần lưu vào thư mục tạm)
-                        logger.info(f"Uploading image {filename} to Google Drive...")
+                        logger.info(f"Uploading image {filename} to Cloudinary...")
                         
                         # Đảm bảo file pointer ở vị trí đầu
                         image.stream.seek(0)
                         
-                        image_url = upload_image_to_drive(filename, file_object=image)
+                        image_url = upload_image_to_cloudinary(filename, file_object=image)
                         
                         # Add the URL to our list if it was successfully created
                         if image_url:
@@ -545,12 +550,12 @@ def add_product():
                             
                             try:
                                 # Upload from temp file
-                                image_url = upload_image_to_drive(temp_path)
+                                image_url = upload_image_to_cloudinary(temp_path)
                                 if image_url:
                                     logger.info(f"Successfully uploaded image from temp file: {image_url}")
                                     image_urls.append(image_url)
                                 else:
-                                    logger.error(f"Failed to upload image {filename} to Google Drive")
+                                    logger.error(f"Failed to upload image {filename} to Cloudinary")
                             finally:
                                 # Clean up temp file
                                 if os.path.exists(temp_path):
@@ -813,7 +818,19 @@ def update_product(product_id):
                 field_name = key.replace('common_', '')
                 common_fields[field_name] = request.form.get(key)
         
-        # Handle images
+        # Handle Cloudinary uploaded image URLs (if present)
+        if 'cloudinary_image_url' in request.form:
+            cloudinary_url = request.form.get('cloudinary_image_url')
+            if cloudinary_url:
+                if 'image' in common_fields:
+                    # If we already have images, append this one
+                    common_fields['image'] = common_fields['image'] + '; ' + cloudinary_url
+                else:
+                    # Otherwise create a new field
+                    common_fields['image'] = cloudinary_url
+                logger.info(f"Using Cloudinary image URL: {cloudinary_url}")
+        
+        # Handle traditional file uploads (for backwards compatibility)
         image_urls = []
         if 'images' in request.files:
             image_files = request.files.getlist('images')
@@ -831,9 +848,9 @@ def update_product(product_id):
                         
                         logger.info(f"Processing image: {original_filename}")
                         
-                        # Upload to Google Drive
+                        # Upload to Cloudinary
                         image.stream.seek(0)
-                        image_url = upload_image_to_drive(filename, file_object=image)
+                        image_url = upload_image_to_cloudinary(filename, file_object=image)
                         
                         # Add the URL to our list if it was successfully created
                         if image_url:

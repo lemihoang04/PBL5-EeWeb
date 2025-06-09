@@ -10,8 +10,9 @@ import {
     Image
 } from 'react-bootstrap';
 import { fetchProductCategories, fetchProductSchema, addProduct } from '../../services/productService';
-import { FiPackage, FiInfo, FiList, FiImage, FiUpload, FiArrowLeft } from 'react-icons/fi';
+import { FiPackage, FiInfo, FiList, FiImage, FiArrowLeft } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
+import UploadImage from '../../components/UploadImage';
 import './AddProduct.css';
 
 const AddProduct = () => {
@@ -103,32 +104,46 @@ const AddProduct = () => {
         
         // Update form data
         formData.set(`${fieldType}_${fieldName}`, value);
-    };    const handleImageChange = (e) => {
-        const files = Array.from(e.target.files);
-        
-        // Clear previous images from formData
-        if (formData.has('images')) {
-            formData.delete('images');
-        }
-        
-        // Validate image sizes (limit to 10MB per image)
-        const maxSize = 10 * 1024 * 1024; // 10MB
-        const invalidFiles = files.filter(file => file.size > maxSize);
-        
-        if (invalidFiles.length > 0) {
-            setError(`Một số ảnh quá lớn (giới hạn 10MB mỗi ảnh): ${invalidFiles.map(f => f.name).join(', ')}`);
-            return;
-        }
-        
-        // Add each file to formData
-        files.forEach(file => {
-            formData.append('images', file);
+    };    // New function to handle Cloudinary uploads
+    const handleCloudinaryImageUpload = (cloudinaryUrl) => {
+        // Cập nhật formValues để hiển thị trên giao diện
+        setFormValues(prev => {
+            let newImage = cloudinaryUrl;
+            
+            // Nếu đã có hình ảnh, ghép vào chuỗi hiện có
+            if (prev['common_image']) {
+                newImage = prev['common_image'] + '; ' + cloudinaryUrl;
+            }
+            
+            return {
+                ...prev,
+                'common_image': newImage
+            };
         });
         
-        // Create preview URLs
-        const imageURLs = files.map(file => URL.createObjectURL(file));
-        setPreviewImages(imageURLs);
-    };    const handleSubmit = async (e) => {
+        // Add to form data
+        const updatedFormData = formData;
+        if (updatedFormData.has('cloudinary_image_url')) {
+            updatedFormData.delete('cloudinary_image_url');
+        }
+        updatedFormData.append('cloudinary_image_url', cloudinaryUrl);
+        
+        // If we have multiple images, create a semicolon-separated list
+        if (updatedFormData.has('common_image')) {
+            const currentImages = updatedFormData.get('common_image');
+            updatedFormData.delete('common_image');
+            updatedFormData.append('common_image', currentImages + '; ' + cloudinaryUrl);
+        } else {
+            updatedFormData.append('common_image', cloudinaryUrl);
+        }
+        
+        setFormData(updatedFormData);
+        
+        // Add to preview images
+        setPreviewImages(prevImages => [...prevImages, cloudinaryUrl]);
+    };
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         setError('');
@@ -332,25 +347,34 @@ const AddProduct = () => {
                                     ))}                                    {/* Image upload field */}
                                     <Col md={12}>
                                         <Form.Group className="mb-3">
-                                            <Form.Label className="ap-form-label">Hình Ảnh Sản Phẩm</Form.Label>
+                                            <Form.Label>Ảnh sản phẩm</Form.Label>
                                             <div className="ap-file-input-container">
-                                                <label className="ap-file-input-label">
-                                                    <div className="ap-file-input-icon">
-                                                        <FiUpload />
-                                                    </div>
-                                                    <div className="ap-file-input-text">Kéo thả hoặc nhấp để tải ảnh</div>
-                                                    <div className="ap-file-input-hint">Chọn nhiều ảnh để tải lên (tối đa 5 ảnh, tối đa 10MB/ảnh)</div>
-                                                    <Form.Control
-                                                        type="file"
-                                                        multiple
-                                                        accept="image/*"
-                                                        onChange={handleImageChange}
-                                                        className="ap-file-input"
-                                                    />
-                                                </label>
+                                                {/* Replace traditional file input with Cloudinary upload component */}
+                                                <UploadImage onImageUploaded={handleCloudinaryImageUpload} />
+                                                <p>Tải lên nhiều ảnh bằng cách sử dụng nút tải lên nhiều lần</p>
                                             </div>
+                                            
+                                            {/* Hiển thị và chỉnh sửa URL ảnh đã upload */}
+                                            {formValues['common_image'] && (
+                                                <div className="mt-3">
+                                                    <Form.Label>URL ảnh đã tải lên (có thể chỉnh sửa)</Form.Label>
+                                                    <Form.Control
+                                                        as="textarea"
+                                                        rows={3}
+                                                        value={formValues['common_image'] || ''}
+                                                        onChange={(e) => handleInputChange(e, 'common', 'image')}
+                                                        className="ap-form-control"
+                                                        placeholder="URL ảnh sẽ hiển thị ở đây sau khi tải lên"
+                                                    />
+                                                    <Form.Text className="text-muted">
+                                                        Nhiều URL được phân cách bằng dấu chấm phẩy (;)
+                                                    </Form.Text>
+                                                </div>
+                                            )}
                                         </Form.Group>
-                                    </Col>                                    {/* Image previews */}
+                                    </Col>
+                                    
+                                    {/* Image previews */}
                                     {previewImages.length > 0 && (
                                         <Col md={12}>
                                             <div className="ap-image-preview-container">

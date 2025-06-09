@@ -90,17 +90,6 @@ def authenticate():
         return None
 
 def upload_image_to_drive(file_path, file_object=None):
-    """
-    Uploads an image to Google Drive and returns the publicly accessible URL.
-    
-    Args:
-        file_path (str): The path to the image file to upload or the filename if file_object is provided.
-        file_object (FileStorage, optional): Flask FileStorage object from request.files. If provided,
-            file will be uploaded directly without saving to disk first.
-        
-    Returns:
-        str: The publicly accessible URL of the uploaded image, or None if upload fails.
-    """
     try:
         # Get Google Drive service
         service = authenticate()

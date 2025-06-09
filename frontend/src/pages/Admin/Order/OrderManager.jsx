@@ -43,7 +43,7 @@ const OrderManager = () => {
         const normalizedOrders = ordersData.map(order => ({
             ...order,
             // Đảm bảo status luôn có giá trị và được chuẩn hóa
-            status: order.status ? order.status.toLowerCase() : 'unknown'
+            status: order.status ? order.status.toLowerCase().trim() : 'unknown'
         }));
         
         if (status === "all") {
@@ -54,10 +54,11 @@ const OrderManager = () => {
             setFilteredOrders(sortedOrders);
         } else {
             // Lọc theo trạng thái đã được chuẩn hóa
-            const normalizedStatus = status.toLowerCase();
-            const filtered = normalizedOrders.filter(order => 
-                order.status === normalizedStatus
-            );
+            const normalizedStatus = status.toLowerCase().trim();
+            const filtered = normalizedOrders.filter(order => {
+                const orderStatus = order.status ? order.status.toLowerCase().trim() : '';
+                return orderStatus === normalizedStatus;
+            });
             
             // Sắp xếp các đơn hàng đã lọc
             const sortedFiltered = [...filtered].sort((a, b) => {
@@ -66,11 +67,11 @@ const OrderManager = () => {
             
             setFilteredOrders(sortedFiltered);
         }
-    };    // fetchOrders được định nghĩa trong component nên sẽ không thay đổi giữa các lần render
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    };    // Gọi fetchOrders khi component được mount
     useEffect(() => {
         fetchOrders();
-    }, []);    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);// eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
         if (orders && orders.length > 0) {
             filterOrdersByStatus(orders, activeTab);
@@ -81,55 +82,54 @@ const OrderManager = () => {
         if (orders && orders.length > 0) {
             filterOrdersByStatus(orders, status);
         }
-    };    const handleCancelOrder = async (orderId) => {
-        if (!window.confirm("Are you sure you want to cancel this order?")) return;
-        try {
-            const response = await CancelOrder(orderId);
-            if (response && response.errCode === 0) {
-                toast.success("Order cancelled successfully.");
-                
-                // Update only the specific order's status in the local state
-                const updatedOrders = orders.map(order => 
-                    (order.order_id === orderId || order.id === orderId) 
-                        ? { ...order, status: "cancelled" } 
-                        : order
-                );
-                
-                setOrders(updatedOrders);
-                
-                // Re-apply filter to update the filtered orders list
-                filterOrdersByStatus(updatedOrders, activeTab);
-            } else {
-                toast.error("Failed to cancel order.");
-            }
-        } catch (error) {
-            toast.error("Error cancelling order.");
+    };    
+    const handleCancelOrder = async (orderId) => {
+    if (!window.confirm("Are you sure you want to cancel this order?")) return;
+    try {
+        const response = await CancelOrder(orderId);
+        if (response && response.errCode === 0) {
+            toast.success("Order cancelled successfully.");
+
+            const updatedOrders = orders.map(order =>
+                (order.order_id === orderId || order.id === orderId)
+                    ? { ...order, status: "cancelled".toLowerCase().trim() }
+                    : order
+            );
+
+            setOrders(updatedOrders);
+            filterOrdersByStatus(updatedOrders, activeTab);
+        } else {
+            toast.error("Failed to cancel order.");
         }
-    };    const handleApproveOrder = async (orderId) => {
-        if (!window.confirm("Are you sure you want to approve this order?")) return;
-        try {
-            const response = await ApproveOrder(orderId);
-            if (response && response.errCode === 0) {
-                toast.success("Order approved successfully.");
-                
-                // Update only the specific order's status in the local state
-                const updatedOrders = orders.map(order => 
-                    (order.order_id === orderId || order.id === orderId) 
-                        ? { ...order, status: "completed" } 
-                        : order
-                );
-                
-                setOrders(updatedOrders);
-                
-                // Re-apply filter to update the filtered orders list
-                filterOrdersByStatus(updatedOrders, activeTab);
-            } else {
-                toast.error("Failed to approve order.");
-            }
-        } catch (error) {
-            toast.error("Error approving order.");
+    } catch (error) {
+        toast.error("Error cancelling order: " + (error.message || "Unknown error"));
+        console.error("Cancel order error:", error);
+    }
+};
+    const handleApproveOrder = async (orderId) => {
+    if (!window.confirm("Are you sure you want to approve this order?")) return;
+    try {
+        const response = await ApproveOrder(orderId);
+        if (response && response.errCode === 0) {
+            toast.success("Order approved successfully.");
+
+            const updatedOrders = orders.map(order =>
+                (order.order_id === orderId || order.id === orderId)
+                    ? { ...order, status: "completed".toLowerCase().trim() }
+                    : order
+            );
+
+            setOrders(updatedOrders);
+            filterOrdersByStatus(updatedOrders, activeTab);
+        } else {
+            toast.error("Failed to approve order.");
         }
-    };
+    } catch (error) {
+        toast.error("Error approving order: " + (error.message || "Unknown error"));
+        console.error("Approve order error:", error);
+    }
+};
+
 
     const handleViewDetails = (order) => {
         setSelectedOrder(order);
@@ -176,7 +176,7 @@ const OrderManager = () => {
                 >
                     Pending
                 </button>
-                <button 
+                {/* <button 
                     className={`tab-btn ${activeTab === "completed" ? "active" : ""}`} 
                     onClick={() => handleTabChange("completed")}
                 >
@@ -187,7 +187,7 @@ const OrderManager = () => {
                     onClick={() => handleTabChange("cancelled")}
                 >
                     Cancelled
-                </button>
+                </button> */}
             </div>
 
             {loading ? (
