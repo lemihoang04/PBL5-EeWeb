@@ -2,3 +2,4 @@
 
 trước khi làm phải chạy:
 npm i
+test text
